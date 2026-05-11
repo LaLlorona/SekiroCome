@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CombatAttacker.h"
 #include "CombatDamageable.h"
+#include "CombatTypes.h"
 #include "Animation/AnimMontage.h"
 #include "Engine/TimerHandle.h"
 #include "CombatEnemy.generated.h"
@@ -52,6 +53,13 @@ public:
 	/** Current amount of HP the character has */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
 	float CurrentHP = 0.0f;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AttackState")
+	bool bParryWindowOpen = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AttackState")
+	EAttackDirection AttackDirection = EAttackDirection::Up;
 
 protected:
 
