@@ -9,6 +9,7 @@
 #include "Animation/AnimInstance.h"
 #include "CombatCharacter.generated.h"
 
+class UCombatLockOnComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
@@ -42,6 +43,10 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 	/** Life bar widget component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* LifeBar;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UCombatLockOnComponent* LockOnComponent;
+	
 	
 protected:
 
@@ -72,6 +77,9 @@ protected:
 	/** Toggle Camera Side Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* ToggleCameraAction;
+
+	UPROPERTY(EditAnywhere, Category ="Input")
+	UInputAction* TryLockOnAction;
 
 	/** Max amount of HP the character will have on respawn */
 	UPROPERTY(EditAnywhere, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
@@ -210,6 +218,8 @@ protected:
 	/** Called for toggle camera side input */
 	void ToggleCamera();
 
+	void TryLockOnCamera();
+
 	/** BP hook to animate the camera side switch */
 	UFUNCTION(BlueprintImplementableEvent, Category="Combat")
 	void BP_ToggleCamera();
@@ -323,6 +333,8 @@ protected:
 
 	/** Handles possessed initialization */
 	virtual void NotifyControllerChanged() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 public:
 

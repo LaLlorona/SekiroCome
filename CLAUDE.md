@@ -33,32 +33,4 @@ A 3D melee action game (Unreal Engine) focused on a skill-expressive 1v1 combat 
 
 Full design doc: `docs/combat_design.md`
 
-### Three Parry States
-- **Perfect Parry**: correct direction + correct timing → auto-triggered riposte animation + damage
-- **Partial Parry**: wrong direction + correct timing → slight advantage (TBD), enemy continues
-- **Block**: wrong timing → no advantage, enemy continues
 
-### Directions
-4-directional: `Up`, `Down`, `Left`, `Right` — defined as an enum on enemy attacks. No UI indicators; player reads enemy animations.
-
-### Input (PC only)
-- WASD direction held at the moment of pressing the parry button = parry direction
-- No direction held = Block (no directional intent)
-
-### Enemy Attacks
-Each attack has a direction enum + animation that telegraphs the direction. Enemies support combo chains where each hit has its own direction and parry window.
-
-## Key Terminology
-| Term | Meaning |
-|---|---|
-| Perfect Parry | Correct direction + correct timing |
-| Partial Parry | Wrong direction + correct timing |
-| Block | Wrong timing |
-| Riposte | Auto-triggered counter animation after Perfect Parry |
-
-## TBD / Open Design Questions
-- Partial Parry exact advantage over Block
-- Parry timing window size
-- Whether riposte animation varies by parry direction
-- Stamina/resource system
-- Consequence of a mistimed parry attempt (vulnerable window?)

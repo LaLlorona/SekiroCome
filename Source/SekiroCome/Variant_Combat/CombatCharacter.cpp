@@ -15,6 +15,8 @@
 #include "TimerManager.h"
 #include "Engine/LocalPlayer.h"
 #include "CombatPlayerController.h"
+#include "CombatLockOnComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ACombatCharacter::ACombatCharacter()
 {
@@ -46,6 +48,7 @@ ACombatCharacter::ACombatCharacter()
 	// create the life bar widget component
 	LifeBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("LifeBar"));
 	LifeBar->SetupAttachment(RootComponent);
+	LockOnComponent = CreateDefaultSubobject<UCombatLockOnComponent>(TEXT("LockOnComponent"));
 
 	// set the player tag
 	Tags.Add(FName("Player"));
@@ -62,10 +65,13 @@ void ACombatCharacter::Move(const FInputActionValue& Value)
 
 void ACombatCharacter::Look(const FInputActionValue& Value)
 {
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	// route the input
-	DoLook(LookAxisVector.X, LookAxisVector.Y);
+	auto lockOnResult = LockOnComponent->GetLockOnResult();
+	if (lockOnResult.IsType<FLockOnTargetNotExist>())
+	{
+		FVector2D LookAxisVector = Value.Get<FVector2D>();
+		// route the input
+		DoLook(LookAxisVector.X, LookAxisVector.Y);
+	}
 }
 
 void ACombatCharacter::ComboAttackPressed()
@@ -91,6 +97,12 @@ void ACombatCharacter::ToggleCamera()
 	// call the BP hook
 	BP_ToggleCamera();
 }
+
+void ACombatCharacter::TryLockOnCamera()
+{
+	LockOnComponent->TryLockOn(GetFollowCamera()->GetForwardVector(), GetFollowCamera()->GetUpVector());
+}
+
 
 void ACombatCharacter::DoMove(float Right, float Forward)
 {
@@ -531,6 +543,10 @@ void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// Camera Side Toggle
 		EnhancedInputComponent->BindAction(ToggleCameraAction, ETriggerEvent::Triggered, this, &ACombatCharacter::ToggleCamera);
+
+		EnhancedInputComponent->BindAction(TryLockOnAction, ETriggerEvent::Triggered, this, &ACombatCharacter::TryLockOnCamera);
+
+		
 	}
 }
 
@@ -542,6 +558,21 @@ void ACombatCharacter::NotifyControllerChanged()
 	if (ACombatPlayerController* PC = Cast<ACombatPlayerController>(GetController()))
 	{
 		PC->SetRespawnTransform(GetActorTransform());
+	}
+}
+
+void ACombatCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	FLockOnResult Result = LockOnComponent->GetLockOnResult();
+
+	if (Result.IsType<FLockOnTargetExist>())
+	{
+		FVector TargetPos = Result.Get<FLockOnTargetExist>().TargetPosition;
+		FVector CameraPos = GetFollowCamera() -> GetComponentLocation();
+
+		FRotator TargetRotation = (UKismetMathLibrary::FindLookAtRotation(CameraPos, TargetPos));
+		GetController()->SetControlRotation(TargetRotation);		
 	}
 }
 
