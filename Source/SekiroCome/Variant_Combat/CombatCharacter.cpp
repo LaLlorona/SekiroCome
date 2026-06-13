@@ -264,9 +264,8 @@ void ACombatCharacter::AttackMontageEnded(UAnimMontage* Montage, bool bInterrupt
 	}
 }
 
-void ACombatCharacter::DoAttackTrace(FName DamageSourceBone)
+void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection)
 {
-	// sweep for objects in front of the character to be hit by the attack
 	TArray<FHitResult> OutHits;
 
 	// start at the provided socket location, sweep forward

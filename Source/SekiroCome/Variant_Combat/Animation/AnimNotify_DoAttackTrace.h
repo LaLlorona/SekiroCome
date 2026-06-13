@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatTypes.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AnimNotify_DoAttackTrace.generated.h"
 
@@ -19,6 +20,9 @@ protected:
 	/** Source bone for the attack trace */
 	UPROPERTY(EditAnywhere, Category="Attack")
 	FName AttackBoneName;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	EAttackDirection AttackDirection;
 
 public:
 

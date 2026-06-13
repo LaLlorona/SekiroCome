@@ -57,10 +57,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AttackState")
 	bool bParryWindowOpen = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AttackState")
-	EAttackDirection AttackDirection = EAttackDirection::Up;
-
 protected:
 
 	/** Name of the pelvis bone, for damage ragdoll physics */
@@ -183,7 +179,7 @@ public:
 	// ~begin ICombatAttacker interface
 
 	/** Performs an attack's collision check */
-	virtual void DoAttackTrace(FName DamageSourceBone) override;
+	virtual void DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection) override;
 
 	/** Performs a combo attack's check to continue the string */
 	UFUNCTION(BlueprintCallable, Category="Attacker")

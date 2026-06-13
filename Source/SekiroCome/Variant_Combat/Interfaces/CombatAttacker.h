@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatTypes.h"
 #include "UObject/Interface.h"
 #include "CombatAttacker.generated.h"
 
@@ -24,7 +25,7 @@ public:
 
 	/** Performs an attack's collision check. Usually called from a montage's AnimNotify */
 	UFUNCTION(BlueprintCallable, Category="Attacker")
-	virtual void DoAttackTrace(FName DamageSourceBone) = 0;
+	virtual void DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection) = 0;
 
 	/** Performs a combo attack's check to continue the string. Usually called from a montage's AnimNotify */
 	UFUNCTION(BlueprintCallable, Category="Attacker")

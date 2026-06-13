@@ -123,7 +123,7 @@ float ACombatEnemy::GetLastDangerTime() const
 	return LastDangerTime;
 }
 
-void ACombatEnemy::DoAttackTrace(FName DamageSourceBone)
+void ACombatEnemy::DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection)
 {
 	// sweep for objects in front of the character to be hit by the attack
 	TArray<FHitResult> OutHits;
@@ -168,7 +168,6 @@ void ACombatEnemy::DoAttackTrace(FName DamageSourceBone)
 		}
 	}
 }
-
 void ACombatEnemy::CheckCombo()
 {
 	// increase the combo counter

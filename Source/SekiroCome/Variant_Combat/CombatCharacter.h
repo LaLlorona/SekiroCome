@@ -270,7 +270,7 @@ public:
 	// ~begin CombatAttacker interface
 
 	/** Performs the collision check for an attack */
-	virtual void DoAttackTrace(FName DamageSourceBone) override;
+	virtual void DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection) override;
 
 	/** Performs the combo string check */
 	virtual void CheckCombo() override;
