@@ -2,3 +2,12 @@
 
 
 #include "PlayerCombatStateIdle.h"
+
+void UPlayerCombatStateIdle::UpdateState(float deltaTime)
+{
+}
+
+float UPlayerCombatStateIdle::GetElapsedTimeFromStateEnter()
+{
+	return 0;
+}

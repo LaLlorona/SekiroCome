@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "CombatPlayerController.generated.h"
 
+class UPlayerCombatStateMachineComponent;
 class UInputMappingContext;
 class ACombatCharacter;
 

@@ -17,6 +17,7 @@
 #include "CombatPlayerController.h"
 #include "CombatLockOnComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/State/PlayerCombatStateMachineComponent.h"
 
 ACombatCharacter::ACombatCharacter()
 {
@@ -49,9 +50,10 @@ ACombatCharacter::ACombatCharacter()
 	LifeBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("LifeBar"));
 	LifeBar->SetupAttachment(RootComponent);
 	LockOnComponent = CreateDefaultSubobject<UCombatLockOnComponent>(TEXT("LockOnComponent"));
+	CombatStateMachineComponent = CreateDefaultSubobject<UPlayerCombatStateMachineComponent>("CombatStateMachineComponent");
 
 	// set the player tag
-	Tags.Add(FName("Player"));
+	Tags.Add(FName("Player")); 
 }
 
 void ACombatCharacter::Move(const FInputActionValue& Value)
@@ -80,18 +82,6 @@ void ACombatCharacter::ComboAttackPressed()
 	DoComboAttackStart();
 }
 
-void ACombatCharacter::ChargedAttackPressed()
-{
-	// route the input
-	DoChargedAttackStart();
-}
-
-void ACombatCharacter::ChargedAttackReleased()
-{
-	// route the input
-	DoChargedAttackEnd();
-}
-
 void ACombatCharacter::ToggleCamera()
 {
 	// call the BP hook
@@ -101,6 +91,16 @@ void ACombatCharacter::ToggleCamera()
 void ACombatCharacter::TryLockOnCamera()
 {
 	LockOnComponent->TryLockOn(GetFollowCamera()->GetForwardVector(), GetFollowCamera()->GetUpVector());
+}
+
+void ACombatCharacter::TryGuardStart()
+{
+	CombatStateMachineComponent->TryChangeToBlockState();
+}
+
+void ACombatCharacter::TryGuardEnd()
+{
+	CombatStateMachineComponent->TryChangeToIdleState();
 }
 
 
@@ -154,33 +154,8 @@ void ACombatCharacter::DoComboAttackEnd()
 	// stub
 }
 
-void ACombatCharacter::DoChargedAttackStart()
-{
-	// raise the charging attack flag
-	bIsChargingAttack = true;
 
-	if (bIsAttacking)
-	{
-		// cache the input time so we can check it later
-		CachedAttackInputTime = GetWorld()->GetTimeSeconds();
 
-		return;
-	}
-
-	ChargedAttack();
-}
-
-void ACombatCharacter::DoChargedAttackEnd()
-{
-	// lower the charging attack flag
-	bIsChargingAttack = false;
-
-	// if we've done the charge loop at least once, release the charged attack right away
-	if (bHasLoopedChargedAttack)
-	{
-		CheckChargedAttack();
-	}
-}
 
 void ACombatCharacter::ResetHP()
 {
@@ -536,14 +511,14 @@ void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		// Combo Attack
 		EnhancedInputComponent->BindAction(ComboAttackAction, ETriggerEvent::Started, this, &ACombatCharacter::ComboAttackPressed);
 
-		// Charged Attack
-		EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Started, this, &ACombatCharacter::ChargedAttackPressed);
-		EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Completed, this, &ACombatCharacter::ChargedAttackReleased);
-
 		// Camera Side Toggle
 		EnhancedInputComponent->BindAction(ToggleCameraAction, ETriggerEvent::Triggered, this, &ACombatCharacter::ToggleCamera);
 
-		EnhancedInputComponent->BindAction(TryLockOnAction, ETriggerEvent::Triggered, this, &ACombatCharacter::TryLockOnCamera);
+		EnhancedInputComponent->BindAction(TryLockOnAction, ETriggerEvent::Started, this, &ACombatCharacter::TryLockOnCamera);
+
+		//guard
+		EnhancedInputComponent->BindAction(TryGuardAction, ETriggerEvent::Started, this, &ACombatCharacter::TryGuardStart);
+		EnhancedInputComponent->BindAction(TryGuardAction, ETriggerEvent::Completed, this, &ACombatCharacter::TryGuardEnd);
 
 		
 	}

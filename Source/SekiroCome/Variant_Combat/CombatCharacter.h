@@ -9,6 +9,7 @@
 #include "Animation/AnimInstance.h"
 #include "CombatCharacter.generated.h"
 
+class UPlayerCombatStateMachineComponent;
 class UCombatLockOnComponent;
 class USpringArmComponent;
 class UCameraComponent;
@@ -46,6 +47,9 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCombatLockOnComponent* LockOnComponent;
+
+	UPROPERTY()
+	TObjectPtr<UPlayerCombatStateMachineComponent> CombatStateMachineComponent;
 	
 	
 protected:
@@ -70,9 +74,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* ComboAttackAction;
 
-	/** Charged Attack Input Action */
-	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* ChargedAttackAction;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* TryGuardAction;
 
 	/** Toggle Camera Side Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
@@ -209,16 +212,13 @@ protected:
 	/** Called for combo attack input */
 	void ComboAttackPressed();
 
-	/** Called for combo attack input pressed */
-	void ChargedAttackPressed();
-
-	/** Called for combo attack input released */
-	void ChargedAttackReleased();
-
 	/** Called for toggle camera side input */
 	void ToggleCamera();
 
 	void TryLockOnCamera();
+
+	void TryGuardStart();
+	void TryGuardEnd();
 
 	/** BP hook to animate the camera side switch */
 	UFUNCTION(BlueprintImplementableEvent, Category="Combat")
@@ -241,15 +241,6 @@ public:
 	/** Handles combo attack released from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoComboAttackEnd();
-
-	/** Handles charged attack pressed from either controls or UI interfaces */
-	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void DoChargedAttackStart();
-
-	/** Handles charged attack released from either controls or UI interfaces */
-	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void DoChargedAttackEnd();
-
 protected:
 
 	/** Resets the character's current HP to maximum */

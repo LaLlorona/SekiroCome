@@ -18,7 +18,7 @@ The system is inspired by KCD2's directional combat but built around a faster, m
 
 ### Notes
 - On **Perfect Parry**, the player character immediately enters a dedicated riposte animation — this is automatic, not player-initiated.
-- The **Partial Parry advantage** is not yet determined. Candidates: shorter recovery time, small stamina gain, brief stagger on enemy, small chip damage.
+- The **Partial Parry advantage** is not yet determined. Candidates: shorter recovery time, small stamina gain, brief stagger on enemy
 - **Block** and **Partial Parry** both allow the enemy to continue their attack pattern (including combos).
 
 ---

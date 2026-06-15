@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/Interface.h"
 
 #include "PlayerCombatState.generated.h"
 
@@ -22,6 +23,6 @@ class SEKIROCOME_API IPlayerCombatState
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void UpdateState(float deltaTime);
-	virtual float GetElapsedTimeFromStateEnter();
+	virtual void UpdateState(float deltaTime) = 0;
+	virtual float GetElapsedTimeFromStateEnter() = 0;
 };

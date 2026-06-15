@@ -11,11 +11,13 @@
 #include "Engine/World.h"
 #include "Blueprint/UserWidget.h"
 #include "SekiroCome.h"
+#include "Player/State/PlayerCombatStateMachineComponent.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
 void ACombatPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
 
 	// only spawn touch controls on local player controllers
 	if (ShouldUseTouchControls() && IsLocalPlayerController())

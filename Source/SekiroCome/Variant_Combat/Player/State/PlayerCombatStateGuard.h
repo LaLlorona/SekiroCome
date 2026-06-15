@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "PlayerCombatState.h"
 
-#include "PlayerCombatStateIdle.generated.h"
+#include "PlayerCombatStateGuard.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SEKIROCOME_API UPlayerCombatStateIdle : public UObject, public IPlayerCombatState
+class SEKIROCOME_API UPlayerCombatStateGuard : public UObject, public IPlayerCombatState
 {
 	GENERATED_BODY()
 
