@@ -18,4 +18,5 @@ class SEKIROCOME_API UPlayerCombatStateGuard : public UObject, public IPlayerCom
 public:
 	virtual void UpdateState(float deltaTime) override;
 	virtual float GetElapsedTimeFromStateEnter() override;
+	virtual EAnimationStateEnum GetAnimationStateEnum() override;
 };

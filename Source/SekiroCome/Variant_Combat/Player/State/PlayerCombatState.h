@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatTypes.h"
 #include "UObject/Interface.h"
 
 #include "PlayerCombatState.generated.h"
@@ -25,4 +26,5 @@ class SEKIROCOME_API IPlayerCombatState
 public:
 	virtual void UpdateState(float deltaTime) = 0;
 	virtual float GetElapsedTimeFromStateEnter() = 0;
+	virtual EAnimationStateEnum GetAnimationStateEnum() = 0;
 };

@@ -51,6 +51,7 @@ ACombatCharacter::ACombatCharacter()
 	LifeBar->SetupAttachment(RootComponent);
 	LockOnComponent = CreateDefaultSubobject<UCombatLockOnComponent>(TEXT("LockOnComponent"));
 	CombatStateMachineComponent = CreateDefaultSubobject<UPlayerCombatStateMachineComponent>("CombatStateMachineComponent");
+	CombatStateMachineComponent->Initialize();
 
 	// set the player tag
 	Tags.Add(FName("Player")); 
@@ -420,6 +421,11 @@ void ACombatCharacter::RespawnCharacter()
 {
 	// destroy the character and let it be respawned by the Player Controller
 	Destroy();
+}
+
+EAnimationStateEnum ACombatCharacter::GetCurrentAnimationState()
+{
+	return CombatStateMachineComponent->GetAnimationStateEnum();
 }
 
 float ACombatCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

@@ -19,3 +19,10 @@ enum class EParryResult : uint8
 	PartialParry,
 	Block
 };
+
+UENUM(BlueprintType)
+enum class EAnimationStateEnum : uint8
+{
+	Normal,
+	Guard
+};

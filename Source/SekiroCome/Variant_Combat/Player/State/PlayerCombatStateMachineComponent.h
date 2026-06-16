@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatTypes.h"
 
 #include "PlayerCombatStateMachineComponent.generated.h"
 class IPlayerCombatState;
@@ -26,6 +27,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+	void Initialize();
 	void TryChangeToBlockState();
 	void TryChangeToIdleState();
+
+	EAnimationStateEnum GetAnimationStateEnum();
 };

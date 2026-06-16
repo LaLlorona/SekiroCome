@@ -3,6 +3,8 @@
 
 #include "PlayerCombatStateIdle.h"
 
+#include "CombatTypes.h"
+
 void UPlayerCombatStateIdle::UpdateState(float deltaTime)
 {
 }
@@ -10,4 +12,9 @@ void UPlayerCombatStateIdle::UpdateState(float deltaTime)
 float UPlayerCombatStateIdle::GetElapsedTimeFromStateEnter()
 {
 	return 0;
+}
+
+EAnimationStateEnum UPlayerCombatStateIdle::GetAnimationStateEnum()
+{
+	return EAnimationStateEnum::Normal;
 }

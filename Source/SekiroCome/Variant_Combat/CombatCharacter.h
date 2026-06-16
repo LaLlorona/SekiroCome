@@ -293,6 +293,9 @@ public:
 	/** Called from the respawn timer to destroy and re-create the character */
 	void RespawnCharacter();
 
+	UFUNCTION(BlueprintPure, Category="Combat")
+	EAnimationStateEnum GetCurrentAnimationState();
+
 public:
 
 	/** Overrides the default TakeDamage functionality */

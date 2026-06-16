@@ -38,6 +38,11 @@ void UPlayerCombatStateMachineComponent::TickComponent(float DeltaTime, ELevelTi
 	// ...
 }
 
+void UPlayerCombatStateMachineComponent::Initialize()
+{
+	PlayerCombatState = NewObject<UPlayerCombatStateIdle>();
+}
+
 void UPlayerCombatStateMachineComponent::TryChangeToBlockState()
 {
 	PlayerCombatState = NewObject<UPlayerCombatStateGuard>();
@@ -46,6 +51,11 @@ void UPlayerCombatStateMachineComponent::TryChangeToBlockState()
 void UPlayerCombatStateMachineComponent::TryChangeToIdleState()
 {
 	PlayerCombatState = NewObject<UPlayerCombatStateIdle>();
+}
+
+EAnimationStateEnum UPlayerCombatStateMachineComponent::GetAnimationStateEnum()
+{
+	return PlayerCombatState->GetAnimationStateEnum();
 }
 
 
