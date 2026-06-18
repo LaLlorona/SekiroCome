@@ -24,5 +24,6 @@ UENUM(BlueprintType)
 enum class EAnimationStateEnum : uint8
 {
 	Normal,
-	Guard
+	Guard,
+	Riposte,
 };
