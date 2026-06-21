@@ -11,6 +11,8 @@ UINTERFACE()
 class UCombatParryable : public UInterface
 {
 	GENERATED_BODY()
+public:
+
 };
 
 /**
@@ -22,4 +24,6 @@ class SEKIROCOME_API ICombatParryable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual bool CanParryNow() const = 0;
+	virtual void ChangeToRiposteState() = 0;
 };

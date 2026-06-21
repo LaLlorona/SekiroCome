@@ -6,6 +6,7 @@
 #include "PlayerCombatState.h"
 #include "PlayerCombatStateGuard.h"
 #include "PlayerCombatStateIdle.h"
+#include "PlayerCombatStatePerfectParryRiposte.h"
 
 
 // Sets default values for this component's properties
@@ -28,14 +29,9 @@ void UPlayerCombatStateMachineComponent::BeginPlay()
 	
 }
 
-
-// Called every frame
-void UPlayerCombatStateMachineComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                                       FActorComponentTickFunction* ThisTickFunction)
+void UPlayerCombatStateMachineComponent::UpdateCombatState(float deltaTime)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	PlayerCombatState->UpdateState(deltaTime);
 }
 
 void UPlayerCombatStateMachineComponent::Initialize()
@@ -53,8 +49,27 @@ void UPlayerCombatStateMachineComponent::TryChangeToIdleState()
 	PlayerCombatState = NewObject<UPlayerCombatStateIdle>();
 }
 
+void UPlayerCombatStateMachineComponent::TryChangeToRiposteState()
+{
+	PlayerCombatState = NewObject<UPlayerCombatStatePerfectParryRiposte>();
+}
+
+bool UPlayerCombatStateMachineComponent::CanParryNow() const
+{
+	auto state = Cast<UPlayerCombatStateGuard>(PlayerCombatState.GetObject());
+	if (state != nullptr)
+	{
+		return state->CanParryNow();
+	}
+	return false;
+}
+
 EAnimationStateEnum UPlayerCombatStateMachineComponent::GetAnimationStateEnum()
 {
+	if (PlayerCombatState == nullptr)
+	{
+		return EAnimationStateEnum::Normal;
+	}
 	return PlayerCombatState->GetAnimationStateEnum();
 }
 

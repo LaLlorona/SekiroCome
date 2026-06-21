@@ -14,9 +14,11 @@ UCLASS()
 class SEKIROCOME_API UPlayerCombatStateGuard : public UObject, public IPlayerCombatState
 {
 	GENERATED_BODY()
+	float ElapsedTimeFromStateEnter;
 
 public:
 	virtual void UpdateState(float deltaTime) override;
 	virtual float GetElapsedTimeFromStateEnter() override;
 	virtual EAnimationStateEnum GetAnimationStateEnum() override;
+	bool CanParryNow() const;
 };

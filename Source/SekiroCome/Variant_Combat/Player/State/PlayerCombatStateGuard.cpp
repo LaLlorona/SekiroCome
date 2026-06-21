@@ -4,17 +4,25 @@
 #include "PlayerCombatStateGuard.h"
 
 #include "CombatTypes.h"
+#include "CombatLogic/CombatDefine.h"
 
 void UPlayerCombatStateGuard::UpdateState(float deltaTime)
 {
+	ElapsedTimeFromStateEnter += deltaTime;
 }
 
 float UPlayerCombatStateGuard::GetElapsedTimeFromStateEnter()
 {
-	return 0;
+	return ElapsedTimeFromStateEnter;
 }
 
 EAnimationStateEnum UPlayerCombatStateGuard::GetAnimationStateEnum()
 {
 	return EAnimationStateEnum::Guard;
 }
+
+bool UPlayerCombatStateGuard::CanParryNow() const
+{
+	return ElapsedTimeFromStateEnter <= CombatDefine::RiposteMinimumTimeWindow;
+}
+

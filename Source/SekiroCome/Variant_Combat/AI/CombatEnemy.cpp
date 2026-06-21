@@ -8,9 +8,11 @@
 #include "Components/WidgetComponent.h"
 #include "Engine/DamageEvents.h"
 #include "CombatLifeBar.h"
+#include "CombatManager.h"
 #include "TimerManager.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
+#include "CombatLogic/FAttackData.h"
 
 ACombatEnemy::ACombatEnemy()
 {
@@ -159,10 +161,11 @@ void ACombatEnemy::DoAttackTrace(FName DamageSourceBone, EAttackDirection Attack
 				{
 					// knock upwards and away from the impact normal
 					const FVector Impulse = (CurrentHit.ImpactNormal * -MeleeKnockbackImpulse) + (FVector::UpVector * MeleeLaunchImpulse);
-
-					// pass the damage event to the actor
-					Damageable->ApplyDamage(MeleeDamage, this, CurrentHit.ImpactPoint, Impulse);
-
+					if (UCombatManager* CombatManager = GetWorld()->GetSubsystem<UCombatManager>())
+					{
+						FAttackData AttackData(MeleeDamage, CurrentHit.ImpactPoint, Impulse, AttackDirection);
+						CombatManager->ResolveAttack(this, this, CurrentHit.GetActor(), Damageable, AttackData);
+					}
 				}
 			}
 		}

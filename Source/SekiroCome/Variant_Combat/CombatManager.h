@@ -6,6 +6,7 @@
 
 #include "CombatManager.generated.h"
 
+struct FAttackData;
 class ICombatAttacker;
 class ICombatDamageable;
 /**
@@ -17,5 +18,5 @@ class SEKIROCOME_API UCombatManager : public UWorldSubsystem
 	GENERATED_BODY()
 
 public:
-	void ResolveAttack(ICombatAttacker Attacker, ICombatDamageable Damageable);
+	void ResolveAttack(AActor* AttackerActor, ICombatAttacker* Attacker, AActor* DamagedActor, ICombatDamageable* Damageable, const FAttackData& AttackData);
 };

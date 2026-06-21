@@ -11,9 +11,10 @@
  * 
  */
 UCLASS()
-class SEKIROCOME_API UPlayerCombatStatePerfectParryRiposte : public UObject, IPlayerCombatState
+class SEKIROCOME_API UPlayerCombatStatePerfectParryRiposte : public UObject, public IPlayerCombatState
 {
 	GENERATED_BODY()
+	float ElapsedTimeFromStateEnter;
 
 public:
 	virtual void UpdateState(float deltaTime) override;

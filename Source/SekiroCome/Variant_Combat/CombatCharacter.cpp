@@ -16,6 +16,8 @@
 #include "Engine/LocalPlayer.h"
 #include "CombatPlayerController.h"
 #include "CombatLockOnComponent.h"
+#include "CombatManager.h"
+#include "CombatLogic/FAttackData.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/State/PlayerCombatStateMachineComponent.h"
 
@@ -51,7 +53,7 @@ ACombatCharacter::ACombatCharacter()
 	LifeBar->SetupAttachment(RootComponent);
 	LockOnComponent = CreateDefaultSubobject<UCombatLockOnComponent>(TEXT("LockOnComponent"));
 	CombatStateMachineComponent = CreateDefaultSubobject<UPlayerCombatStateMachineComponent>("CombatStateMachineComponent");
-	CombatStateMachineComponent->Initialize();
+
 
 	// set the player tag
 	Tags.Add(FName("Player")); 
@@ -240,6 +242,16 @@ void ACombatCharacter::AttackMontageEnded(UAnimMontage* Montage, bool bInterrupt
 	}
 }
 
+bool ACombatCharacter::CanParryNow() const
+{
+	return CombatStateMachineComponent->CanParryNow();
+}
+
+void ACombatCharacter::ChangeToRiposteState()
+{
+	CombatStateMachineComponent->TryChangeToRiposteState();
+}
+
 void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection)
 {
 	TArray<FHitResult> OutHits;
@@ -275,10 +287,11 @@ void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection At
 				const FVector Impulse = (CurrentHit.ImpactNormal * -MeleeKnockbackImpulse) + (FVector::UpVector * MeleeLaunchImpulse);
 
 				// pass the damage event to the actor
-				Damageable->ApplyDamage(MeleeDamage, this, CurrentHit.ImpactPoint, Impulse);
-
-				// call the BP handler to play effects, etc.
-				DealtDamage(MeleeDamage, CurrentHit.ImpactPoint);
+				if (UCombatManager* CombatManager = GetWorld()->GetSubsystem<UCombatManager>())
+				{
+					FAttackData AttackData(MeleeDamage, CurrentHit.ImpactPoint, Impulse, AttackDirection);
+					CombatManager->ResolveAttack(this, this, CurrentHit.GetActor(), Damageable, AttackData);
+				}
 			}
 		}
 	}
@@ -425,7 +438,12 @@ void ACombatCharacter::RespawnCharacter()
 
 EAnimationStateEnum ACombatCharacter::GetCurrentAnimationState()
 {
-	return CombatStateMachineComponent->GetAnimationStateEnum();
+	if (CombatStateMachineComponent)
+	{
+		return CombatStateMachineComponent->GetAnimationStateEnum();
+	}
+	return EAnimationStateEnum::Normal;
+	
 }
 
 float ACombatCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -490,6 +508,7 @@ void ACombatCharacter::BeginPlay()
 
 	// reset HP to maximum
 	ResetHP();
+	CombatStateMachineComponent->Initialize();
 }
 
 void ACombatCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -552,7 +571,8 @@ void ACombatCharacter::Tick(float DeltaTime)
 		FVector CameraPos = GetFollowCamera() -> GetComponentLocation();
 
 		FRotator TargetRotation = (UKismetMathLibrary::FindLookAtRotation(CameraPos, TargetPos));
-		GetController()->SetControlRotation(TargetRotation);		
+		GetController()->SetControlRotation(TargetRotation);
 	}
+	CombatStateMachineComponent->UpdateCombatState(DeltaTime);
 }
 

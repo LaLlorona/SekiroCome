@@ -3,7 +3,9 @@
     "allow": [
       "Bash(Get-ChildItem -Path \"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\" -Recurse -Attributes Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(Sort-Object)"
+      "Bash(Sort-Object)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Epic Games\\\\UE_5.7\\\\Engine\\\\Build\\\\BatchFiles\\\\Build.bat\" SekiroComeEditor Win64 DebugGame -Project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -WaitMutex -FromMsBuild -architecture=x64)",
+      "PowerShell(git *)"
     ]
   }
 }

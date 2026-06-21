@@ -12,7 +12,9 @@ UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SEKIROCOME_API UPlayerCombatStateMachineComponent : public UActorComponent
 {
 	GENERATED_BODY()
-	IPlayerCombatState* PlayerCombatState;
+
+	UPROPERTY()
+	TScriptInterface<IPlayerCombatState> PlayerCombatState;
 
 public:
 	// Sets default values for this component's properties
@@ -23,13 +25,13 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+	void UpdateCombatState(float deltaTime);
 	void Initialize();
 	void TryChangeToBlockState();
 	void TryChangeToIdleState();
+	void TryChangeToRiposteState();
+	bool CanParryNow() const ;
 
 	EAnimationStateEnum GetAnimationStateEnum();
 };

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CombatAttacker.h"
 #include "CombatDamageable.h"
+#include "CombatParryable.h"
 #include "Animation/AnimInstance.h"
 #include "CombatCharacter.generated.h"
 
@@ -29,7 +30,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCombatCharacter, Log, All);
  *  - Respawning
  */
 UCLASS(abstract)
-class ACombatCharacter : public ACharacter, public ICombatAttacker, public ICombatDamageable
+class ACombatCharacter : public ACharacter, public ICombatAttacker, public ICombatDamageable, public ICombatParryable
 {
 	GENERATED_BODY()
 
@@ -255,8 +256,9 @@ protected:
 	/** Called from a delegate when the attack montage ends */
 	void AttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
-	
 public:
+	virtual bool CanParryNow() const override ;
+	virtual void ChangeToRiposteState() override;
 
 	// ~begin CombatAttacker interface
 
@@ -303,16 +305,16 @@ public:
 
 	/** Overrides landing to reset damage ragdoll physics */
 	virtual void Landed(const FHitResult& Hit) override;
-
+	/** Blueprint handler to play damage dealt effects */
 protected:
 
-	/** Blueprint handler to play damage dealt effects */
-	UFUNCTION(BlueprintImplementableEvent, Category="Combat")
-	void DealtDamage(float Damage, const FVector& ImpactPoint);
+
 
 	/** Blueprint handler to play damage received effects */
 	UFUNCTION(BlueprintImplementableEvent, Category="Combat")
 	void ReceivedDamage(float Damage, const FVector& ImpactPoint, const FVector& DamageDirection);
+
+	
 
 protected:
 

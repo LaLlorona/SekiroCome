@@ -5,11 +5,12 @@
 
 void UPlayerCombatStatePerfectParryRiposte::UpdateState(float deltaTime)
 {
+	ElapsedTimeFromStateEnter += deltaTime;
 }
 
 float UPlayerCombatStatePerfectParryRiposte::GetElapsedTimeFromStateEnter()
 {
-	return 0;
+	return ElapsedTimeFromStateEnter;
 }
 
 EAnimationStateEnum UPlayerCombatStatePerfectParryRiposte::GetAnimationStateEnum()
