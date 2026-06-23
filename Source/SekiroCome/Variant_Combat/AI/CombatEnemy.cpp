@@ -168,6 +168,7 @@ void ACombatEnemy::DoAttackTrace(FName DamageSourceBone, EAttackDirection Attack
 					}
 				}
 			}
+			
 		}
 	}
 }

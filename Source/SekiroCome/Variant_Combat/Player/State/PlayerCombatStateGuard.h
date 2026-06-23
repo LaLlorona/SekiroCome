@@ -17,8 +17,12 @@ class SEKIROCOME_API UPlayerCombatStateGuard : public UObject, public IPlayerCom
 	float ElapsedTimeFromStateEnter;
 
 public:
+	virtual void InitializeState(const FCombatStateInitializeParameter& Parameter) override;
 	virtual void UpdateState(float deltaTime) override;
 	virtual float GetElapsedTimeFromStateEnter() override;
 	virtual EAnimationStateEnum GetAnimationStateEnum() override;
 	bool CanParryNow() const;
+	virtual bool IsStateExpired() override;
+	virtual void OnStateEnter() override;
+	virtual void OnStateFinish() override;
 };

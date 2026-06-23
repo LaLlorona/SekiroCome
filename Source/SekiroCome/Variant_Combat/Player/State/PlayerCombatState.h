@@ -8,6 +8,8 @@
 
 #include "PlayerCombatState.generated.h"
 
+struct FCombatStateInitializeParameter;
+
 // This class does not need to be modified.
 UINTERFACE()
 class UPlayerCombatState : public UInterface
@@ -24,7 +26,12 @@ class SEKIROCOME_API IPlayerCombatState
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual void InitializeState(const FCombatStateInitializeParameter& Parameter) = 0;
 	virtual void UpdateState(float deltaTime) = 0;
 	virtual float GetElapsedTimeFromStateEnter() = 0;
 	virtual EAnimationStateEnum GetAnimationStateEnum() = 0;
+	virtual bool IsStateExpired() = 0;
+	virtual void OnStateEnter() = 0;
+	virtual void OnStateFinish() = 0;
+	
 };

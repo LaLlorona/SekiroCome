@@ -15,6 +15,7 @@ class SEKIROCOME_API UPlayerCombatStateMachineComponent : public UActorComponent
 
 	UPROPERTY()
 	TScriptInterface<IPlayerCombatState> PlayerCombatState;
+	
 
 public:
 	// Sets default values for this component's properties
@@ -31,7 +32,13 @@ public:
 	void TryChangeToBlockState();
 	void TryChangeToIdleState();
 	void TryChangeToRiposteState();
+	void TryChangeState(ECombatStateEnum NewState);
+	
+
 	bool CanParryNow() const ;
 
 	EAnimationStateEnum GetAnimationStateEnum();
+
+private:
+	void ChangeState(ECombatStateEnum NewState);
 };

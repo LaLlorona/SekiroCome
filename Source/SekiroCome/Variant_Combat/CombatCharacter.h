@@ -10,6 +10,7 @@
 #include "Animation/AnimInstance.h"
 #include "CombatCharacter.generated.h"
 
+class UCombatMontageSet;
 class UPlayerCombatStateMachineComponent;
 class UCombatLockOnComponent;
 class USpringArmComponent;
@@ -175,6 +176,10 @@ protected:
 	
 	/** If true, the charged attack hold check has been tested at least once */
 	bool bHasLoopedChargedAttack = false;
+
+
+	UPROPERTY(EditAnywhere, Category="Melee Attack|Riposte")
+	UCombatMontageSet* CombatMontageSet; 
 
 	/** Camera boom length while the character is dead */
 	UPROPERTY(EditAnywhere, Category="Camera", meta = (ClampMin = 0, ClampMax = 1000, Units = "cm"))

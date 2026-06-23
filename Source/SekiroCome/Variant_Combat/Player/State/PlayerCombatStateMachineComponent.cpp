@@ -6,6 +6,7 @@
 #include "PlayerCombatState.h"
 #include "PlayerCombatStateGuard.h"
 #include "PlayerCombatStateIdle.h"
+#include "PlayerCombatStatePartialParry.h"
 #include "PlayerCombatStatePerfectParryRiposte.h"
 
 
@@ -31,6 +32,10 @@ void UPlayerCombatStateMachineComponent::BeginPlay()
 
 void UPlayerCombatStateMachineComponent::UpdateCombatState(float deltaTime)
 {
+	if (PlayerCombatState->IsStateExpired())
+	{
+		TryChangeToIdleState();
+	}
 	PlayerCombatState->UpdateState(deltaTime);
 }
 
@@ -38,6 +43,7 @@ void UPlayerCombatStateMachineComponent::Initialize()
 {
 	PlayerCombatState = NewObject<UPlayerCombatStateIdle>();
 }
+
 
 void UPlayerCombatStateMachineComponent::TryChangeToBlockState()
 {
@@ -53,6 +59,36 @@ void UPlayerCombatStateMachineComponent::TryChangeToRiposteState()
 {
 	PlayerCombatState = NewObject<UPlayerCombatStatePerfectParryRiposte>();
 }
+
+void UPlayerCombatStateMachineComponent::TryChangeState(ECombatStateEnum NewState)
+{
+	//check whether current transition is possible
+	ChangeState(NewState);
+}
+
+#pragma warning(push)
+#pragma warning(error: 4062) 
+void UPlayerCombatStateMachineComponent::ChangeState(ECombatStateEnum NewState)
+{
+	PlayerCombatState->OnStateFinish();
+	switch (NewState)
+	{
+	case ECombatStateEnum::Idle:
+		PlayerCombatState = NewObject<UPlayerCombatStateIdle>();
+		break;
+	case ECombatStateEnum::Guard:
+		PlayerCombatState = NewObject<UPlayerCombatStateGuard>();
+		break;
+	case ECombatStateEnum::PartialParry:
+		PlayerCombatState = NewObject<UPlayerCombatStatePartialParry>();
+		break;
+	case ECombatStateEnum::PerfectParryRiposte:
+		PlayerCombatState = NewObject<UPlayerCombatStatePerfectParryRiposte>();
+		break;
+	}
+	PlayerCombatState->OnStateEnter();
+}
+#pragma warning(pop)
 
 bool UPlayerCombatStateMachineComponent::CanParryNow() const
 {

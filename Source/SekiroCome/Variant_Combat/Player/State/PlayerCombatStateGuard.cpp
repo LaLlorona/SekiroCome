@@ -5,6 +5,11 @@
 
 #include "CombatTypes.h"
 #include "CombatLogic/CombatDefine.h"
+#include "FCombatStateInitializeParameter.h"
+
+void UPlayerCombatStateGuard::InitializeState(const FCombatStateInitializeParameter& Parameter)
+{
+}
 
 void UPlayerCombatStateGuard::UpdateState(float deltaTime)
 {
@@ -24,5 +29,19 @@ EAnimationStateEnum UPlayerCombatStateGuard::GetAnimationStateEnum()
 bool UPlayerCombatStateGuard::CanParryNow() const
 {
 	return ElapsedTimeFromStateEnter <= CombatDefine::RiposteMinimumTimeWindow;
+}
+
+bool UPlayerCombatStateGuard::IsStateExpired()
+{
+	return false;
+}
+
+void UPlayerCombatStateGuard::OnStateEnter()
+{
+	ElapsedTimeFromStateEnter = 0.0f;
+}
+
+void UPlayerCombatStateGuard::OnStateFinish()
+{
 }
 

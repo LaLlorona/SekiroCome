@@ -25,5 +25,15 @@ enum class EAnimationStateEnum : uint8
 {
 	Normal,
 	Guard,
+	PartialParry,
 	Riposte,
+};
+
+UENUM(BlueprintType)
+enum class ECombatStateEnum : uint8
+{
+	Idle,
+	Guard,
+	PartialParry,
+	PerfectParryRiposte,
 };
