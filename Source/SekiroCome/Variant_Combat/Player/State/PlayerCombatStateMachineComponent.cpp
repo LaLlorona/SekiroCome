@@ -34,30 +34,15 @@ void UPlayerCombatStateMachineComponent::UpdateCombatState(float deltaTime)
 {
 	if (PlayerCombatState->IsStateExpired())
 	{
-		TryChangeToIdleState();
+		TryChangeState(ECombatStateEnum::Idle);
 	}
 	PlayerCombatState->UpdateState(deltaTime);
 }
 
-void UPlayerCombatStateMachineComponent::Initialize()
+void UPlayerCombatStateMachineComponent::Initialize(const FCombatStateInitializeParameter& Parameter)
 {
-	PlayerCombatState = NewObject<UPlayerCombatStateIdle>();
-}
-
-
-void UPlayerCombatStateMachineComponent::TryChangeToBlockState()
-{
-	PlayerCombatState = NewObject<UPlayerCombatStateGuard>();
-}
-
-void UPlayerCombatStateMachineComponent::TryChangeToIdleState()
-{
-	PlayerCombatState = NewObject<UPlayerCombatStateIdle>();
-}
-
-void UPlayerCombatStateMachineComponent::TryChangeToRiposteState()
-{
-	PlayerCombatState = NewObject<UPlayerCombatStatePerfectParryRiposte>();
+	CombatStateInitializeParameter = Parameter;
+	ChangeState(ECombatStateEnum::Idle);
 }
 
 void UPlayerCombatStateMachineComponent::TryChangeState(ECombatStateEnum NewState)
@@ -70,22 +55,26 @@ void UPlayerCombatStateMachineComponent::TryChangeState(ECombatStateEnum NewStat
 #pragma warning(error: 4062) 
 void UPlayerCombatStateMachineComponent::ChangeState(ECombatStateEnum NewState)
 {
-	PlayerCombatState->OnStateFinish();
+	if (PlayerCombatState)
+	{
+		PlayerCombatState->OnStateFinish();
+	}
 	switch (NewState)
 	{
-	case ECombatStateEnum::Idle:
-		PlayerCombatState = NewObject<UPlayerCombatStateIdle>();
-		break;
-	case ECombatStateEnum::Guard:
-		PlayerCombatState = NewObject<UPlayerCombatStateGuard>();
-		break;
-	case ECombatStateEnum::PartialParry:
-		PlayerCombatState = NewObject<UPlayerCombatStatePartialParry>();
-		break;
-	case ECombatStateEnum::PerfectParryRiposte:
-		PlayerCombatState = NewObject<UPlayerCombatStatePerfectParryRiposte>();
-		break;
+		case ECombatStateEnum::Idle:
+			PlayerCombatState = NewObject<UPlayerCombatStateIdle>();
+			break;
+		case ECombatStateEnum::Guard:
+			PlayerCombatState = NewObject<UPlayerCombatStateGuard>();
+			break;
+		case ECombatStateEnum::PartialParry:
+			PlayerCombatState = NewObject<UPlayerCombatStatePartialParry>();
+			break;
+		case ECombatStateEnum::PerfectParryRiposte:
+			PlayerCombatState = NewObject<UPlayerCombatStatePerfectParryRiposte>();
+			break;
 	}
+	PlayerCombatState->InitializeState(CombatStateInitializeParameter);
 	PlayerCombatState->OnStateEnter();
 }
 #pragma warning(pop)

@@ -3,7 +3,9 @@
 
 #include "PlayerCombatStatePerfectParryRiposte.h"
 
+#include "CombatCharacter.h"
 #include "FCombatStateInitializeParameter.h"
+#include "Montage/CombatMontageSet.h"
 
 void UPlayerCombatStatePerfectParryRiposte::InitializeState(const FCombatStateInitializeParameter& Parameter)
 {
@@ -33,6 +35,10 @@ bool UPlayerCombatStatePerfectParryRiposte::IsStateExpired()
 void UPlayerCombatStatePerfectParryRiposte::OnStateEnter()
 {
 	ElapsedTimeFromStateEnter = 0.0f;
+	//ToDO: Montage 재생
+	auto stateOwner = InitParam.OwnerCharacter;
+	stateOwner.Get()->PlayMontage(InitParam.CombatMontageSet->GetRiposteMontage());
+	
 }
 
 void UPlayerCombatStatePerfectParryRiposte::OnStateFinish()

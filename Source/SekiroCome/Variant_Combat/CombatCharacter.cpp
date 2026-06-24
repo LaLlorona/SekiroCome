@@ -98,12 +98,12 @@ void ACombatCharacter::TryLockOnCamera()
 
 void ACombatCharacter::TryGuardStart()
 {
-	CombatStateMachineComponent->TryChangeToBlockState();
+	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Guard);
 }
 
 void ACombatCharacter::TryGuardEnd()
 {
-	CombatStateMachineComponent->TryChangeToIdleState();
+	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Idle);
 }
 
 
@@ -249,7 +249,7 @@ bool ACombatCharacter::CanParryNow() const
 
 void ACombatCharacter::ChangeToRiposteState()
 {
-	CombatStateMachineComponent->TryChangeToRiposteState();
+	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::PerfectParryRiposte);
 }
 
 void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection)
@@ -436,6 +436,14 @@ void ACombatCharacter::RespawnCharacter()
 	Destroy();
 }
 
+void ACombatCharacter::PlayMontage(UAnimMontage* Montage)
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->Montage_Play(Montage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+	}
+}
+
 EAnimationStateEnum ACombatCharacter::GetCurrentAnimationState()
 {
 	if (CombatStateMachineComponent)
@@ -508,8 +516,9 @@ void ACombatCharacter::BeginPlay()
 
 	// reset HP to maximum
 	ResetHP();
-	CombatStateMachineComponent->Initialize();
+	CombatStateMachineComponent->Initialize(FCombatStateInitializeParameter(CombatMontageSet, this));
 }
+
 
 void ACombatCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {

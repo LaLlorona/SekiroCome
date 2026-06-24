@@ -300,6 +300,8 @@ public:
 	/** Called from the respawn timer to destroy and re-create the character */
 	void RespawnCharacter();
 
+	void PlayMontage(UAnimMontage* Montage);
+
 	UFUNCTION(BlueprintPure, Category="Combat")
 	EAnimationStateEnum GetCurrentAnimationState();
 

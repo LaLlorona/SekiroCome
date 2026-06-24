@@ -20,6 +20,7 @@ void UCombatManager::ResolveAttack(AActor* AttackerActor, ICombatAttacker* Attac
 				//ToDo: Reposte Animation 재생
 				AttackerDamageable->ApplyDamage(AttackData.Damage, AttackerActor, AttackData.DamageLocation, AttackData.DamageImpulse);
 				/*Parryable->*/
+				Parryable->ChangeToRiposteState();
 				return;
 			}
 		}

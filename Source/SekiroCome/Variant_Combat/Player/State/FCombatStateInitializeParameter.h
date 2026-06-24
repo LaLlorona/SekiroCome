@@ -1,11 +1,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FCombatStateInitializeParameter.generated.h"
+
+class ACombatCharacter;
 class UCombatMontageSet;
 
 
+#include "FCombatStateInitializeParameter.generated.h"
 
+
+ 
 
 USTRUCT()
 struct FCombatStateInitializeParameter
@@ -14,8 +18,13 @@ struct FCombatStateInitializeParameter
 
 	UPROPERTY()
 	TObjectPtr<UCombatMontageSet> CombatMontageSet;
+
+
+	UPROPERTY()
+	TObjectPtr<ACombatCharacter> OwnerCharacter;
+	
 	FCombatStateInitializeParameter() = default;
-	FCombatStateInitializeParameter(UCombatMontageSet* InParameter):  CombatMontageSet (InParameter)
+	FCombatStateInitializeParameter(UCombatMontageSet* InCombatMontageSet, ACombatCharacter* InCombatCharacter):  CombatMontageSet (InCombatMontageSet), OwnerCharacter(InCombatCharacter)
 	{
 	}
 	

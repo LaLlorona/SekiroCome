@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "CombatTypes.h"
+#include "FCombatStateInitializeParameter.h"
 
 #include "PlayerCombatStateMachineComponent.generated.h"
+struct FCombatStateInitializeParameter;
 class IPlayerCombatState;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -28,10 +30,7 @@ protected:
 public:
 
 	void UpdateCombatState(float deltaTime);
-	void Initialize();
-	void TryChangeToBlockState();
-	void TryChangeToIdleState();
-	void TryChangeToRiposteState();
+	void Initialize(const FCombatStateInitializeParameter& Parameter);
 	void TryChangeState(ECombatStateEnum NewState);
 	
 
@@ -41,4 +40,7 @@ public:
 
 private:
 	void ChangeState(ECombatStateEnum NewState);
+
+	UPROPERTY()
+	FCombatStateInitializeParameter CombatStateInitializeParameter;
 };
