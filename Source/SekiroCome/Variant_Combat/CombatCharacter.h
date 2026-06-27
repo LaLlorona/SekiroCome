@@ -147,6 +147,7 @@ protected:
 	/** AnimMontage that will play for combo attacks */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Combo")
 	UAnimMontage* ComboAttackMontage;
+	
 
 	/** Names of the AnimMontage sections that correspond to each stage of the combo attack */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Combo")
@@ -247,6 +248,9 @@ public:
 	/** Handles combo attack released from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoComboAttackEnd();
+
+	UFUNCTION(BlueprintCallable, Category="input")
+	FVector2D GetCurrentMovementInput() const;
 protected:
 
 	/** Resets the character's current HP to maximum */

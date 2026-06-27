@@ -20,6 +20,8 @@
 #include "CombatLogic/FAttackData.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/State/PlayerCombatStateMachineComponent.h"
+#include "EnhancedPlayerInput.h"
+
 
 ACombatCharacter::ACombatCharacter()
 {
@@ -157,7 +159,26 @@ void ACombatCharacter::DoComboAttackEnd()
 	// stub
 }
 
+FVector2D ACombatCharacter::GetCurrentMovementInput() const
+{
+	ACombatPlayerController* PC = Cast<ACombatPlayerController>(GetController());
+	if (PC == nullptr)
+	{
+		return FVector2D::ZeroVector;
+	}
+	const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+	if (Subsystem == nullptr || Subsystem->GetPlayerInput() == nullptr)
+	{
+		return FVector2D::ZeroVector;
+	}
 
+	const FInputActionValue Value = Subsystem->GetPlayerInput()->GetActionValue(MoveAction);
+	return Value.Get<FVector2D>();
+	
+	
+
+	
+}
 
 
 void ACombatCharacter::ResetHP()
@@ -537,7 +558,7 @@ void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	{
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACombatCharacter::Move);
-
+		
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACombatCharacter::Look);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ACombatCharacter::Look);

@@ -17,6 +17,9 @@ class SEKIROCOME_API UCombatMontageSet : public UDataAsset
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* RiposteMontage;
 
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* PartialParryMontage;
 public:
 	UAnimMontage* GetRiposteMontage() const { return RiposteMontage; }
+	UAnimMontage* GetPartialParryMontage() const { return PartialParryMontage; }
 };

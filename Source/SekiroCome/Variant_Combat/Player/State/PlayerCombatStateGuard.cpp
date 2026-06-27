@@ -3,12 +3,14 @@
 
 #include "PlayerCombatStateGuard.h"
 
+#include "CombatCharacter.h"
 #include "CombatTypes.h"
 #include "CombatLogic/CombatDefine.h"
 #include "FCombatStateInitializeParameter.h"
 
 void UPlayerCombatStateGuard::InitializeState(const FCombatStateInitializeParameter& Parameter)
 {
+	InitParam = Parameter;
 }
 
 void UPlayerCombatStateGuard::UpdateState(float deltaTime)
@@ -28,6 +30,9 @@ EAnimationStateEnum UPlayerCombatStateGuard::GetAnimationStateEnum()
 
 bool UPlayerCombatStateGuard::CanParryNow() const
 {
+	auto asdf = InitParam.OwnerCharacter.Get()->GetCurrentMovementInput();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, asdf.ToString());
+	
 	return ElapsedTimeFromStateEnter <= CombatDefine::RiposteMinimumTimeWindow;
 }
 

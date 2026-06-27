@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FCombatStateInitializeParameter.h"
 #include "PlayerCombatState.h"
 
 #include "PlayerCombatStateGuard.generated.h"
@@ -15,6 +16,9 @@ class SEKIROCOME_API UPlayerCombatStateGuard : public UObject, public IPlayerCom
 {
 	GENERATED_BODY()
 	float ElapsedTimeFromStateEnter;
+
+	UPROPERTY()
+	FCombatStateInitializeParameter InitParam;
 
 public:
 	virtual void InitializeState(const FCombatStateInitializeParameter& Parameter) override;
