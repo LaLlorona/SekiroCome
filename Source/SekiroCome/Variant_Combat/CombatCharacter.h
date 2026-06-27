@@ -12,6 +12,7 @@
 
 class UCombatMontageSet;
 class UPlayerCombatStateMachineComponent;
+class UCombatCharacterInputComponent;
 class UCombatLockOnComponent;
 class USpringArmComponent;
 class UCameraComponent;
@@ -52,39 +53,42 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 
 	UPROPERTY()
 	TObjectPtr<UPlayerCombatStateMachineComponent> CombatStateMachineComponent;
+
+	UPROPERTY(VisibleAnywhere, Category="Components", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UCombatCharacterInputComponent> CombatInputComponent;
 	
 	
 protected:
 
-	/** Jump Input Action */
+	/*/** Jump Input Action #1#
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* JumpAction;
 
-	/** Move Input Action */
+	/** Move Input Action #1#
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* MoveAction;
 
-	/** Look Input Action */
+	/** Look Input Action #1#
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* LookAction;
 
-	/** Mouse Look Input Action */
+	/** Mouse Look Input Action #1#
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
-	/** Combo Attack Input Action */
+	/** Combo Attack Input Action #1#
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* ComboAttackAction;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* TryGuardAction;
 
-	/** Toggle Camera Side Input Action */
+	/** Toggle Camera Side Input Action #1#
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* ToggleCameraAction;
 
 	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* TryLockOnAction;
+	UInputAction* TryLockOnAction;*/
 
 	/** Max amount of HP the character will have on respawn */
 	UPROPERTY(EditAnywhere, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
@@ -210,23 +214,6 @@ public:
 
 protected:
 
-	/** Called for movement input */
-	void Move(const FInputActionValue& Value);
-
-	/** Called for looking input */
-	void Look(const FInputActionValue& Value);
-
-	/** Called for combo attack input */
-	void ComboAttackPressed();
-
-	/** Called for toggle camera side input */
-	void ToggleCamera();
-
-	void TryLockOnCamera();
-
-	void TryGuardStart();
-	void TryGuardEnd();
-
 	/** BP hook to animate the camera side switch */
 	UFUNCTION(BlueprintImplementableEvent, Category="Combat")
 	void BP_ToggleCamera();
@@ -251,6 +238,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="input")
 	FVector2D GetCurrentMovementInput() const;
+
+	void ToggleCamera();
+	void TryLockOnCamera();
+	void TryGuardStart();
+	void TryGuardEnd();
 protected:
 
 	/** Resets the character's current HP to maximum */

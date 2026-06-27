@@ -20,6 +20,7 @@
 #include "CombatLogic/FAttackData.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/State/PlayerCombatStateMachineComponent.h"
+#include "Player/PlayerComponent/CombatCharacterInputComponent.h"
 #include "EnhancedPlayerInput.h"
 
 
@@ -55,41 +56,15 @@ ACombatCharacter::ACombatCharacter()
 	LifeBar->SetupAttachment(RootComponent);
 	LockOnComponent = CreateDefaultSubobject<UCombatLockOnComponent>(TEXT("LockOnComponent"));
 	CombatStateMachineComponent = CreateDefaultSubobject<UPlayerCombatStateMachineComponent>("CombatStateMachineComponent");
+	CombatInputComponent = CreateDefaultSubobject<UCombatCharacterInputComponent>("CombatInputComponent");
 
 
 	// set the player tag
 	Tags.Add(FName("Player")); 
 }
 
-void ACombatCharacter::Move(const FInputActionValue& Value)
-{
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	// route the input
-	DoMove(MovementVector.X, MovementVector.Y);
-}
-
-void ACombatCharacter::Look(const FInputActionValue& Value)
-{
-	auto lockOnResult = LockOnComponent->GetLockOnResult();
-	if (lockOnResult.IsType<FLockOnTargetNotExist>())
-	{
-		FVector2D LookAxisVector = Value.Get<FVector2D>();
-		// route the input
-		DoLook(LookAxisVector.X, LookAxisVector.Y);
-	}
-}
-
-void ACombatCharacter::ComboAttackPressed()
-{
-	// route the input
-	DoComboAttackStart();
-}
-
 void ACombatCharacter::ToggleCamera()
 {
-	// call the BP hook
 	BP_ToggleCamera();
 }
 
@@ -131,9 +106,12 @@ void ACombatCharacter::DoMove(float Right, float Forward)
 
 void ACombatCharacter::DoLook(float Yaw, float Pitch)
 {
+	auto lockOnResult = LockOnComponent->GetLockOnResult();
+	if (!lockOnResult.IsType<FLockOnTargetNotExist>())
+		return;
+
 	if (GetController() != nullptr)
 	{
-		// add yaw and pitch input to controller
 		AddControllerYawInput(Yaw);
 		AddControllerPitchInput(Pitch);
 	}
@@ -161,23 +139,7 @@ void ACombatCharacter::DoComboAttackEnd()
 
 FVector2D ACombatCharacter::GetCurrentMovementInput() const
 {
-	ACombatPlayerController* PC = Cast<ACombatPlayerController>(GetController());
-	if (PC == nullptr)
-	{
-		return FVector2D::ZeroVector;
-	}
-	const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
-	if (Subsystem == nullptr || Subsystem->GetPlayerInput() == nullptr)
-	{
-		return FVector2D::ZeroVector;
-	}
-
-	const FInputActionValue Value = Subsystem->GetPlayerInput()->GetActionValue(MoveAction);
-	return Value.Get<FVector2D>();
-	
-	
-
-	
+	return CombatInputComponent->GetCurrentMovementInput();
 }
 
 
@@ -538,6 +500,7 @@ void ACombatCharacter::BeginPlay()
 	// reset HP to maximum
 	ResetHP();
 	CombatStateMachineComponent->Initialize(FCombatStateInitializeParameter(CombatMontageSet, this));
+	CombatInputComponent->Initialize(this);
 }
 
 
@@ -553,29 +516,9 @@ void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACombatCharacter::Move);
-		
-		// Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACombatCharacter::Look);
-		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ACombatCharacter::Look);
-
-		// Combo Attack
-		EnhancedInputComponent->BindAction(ComboAttackAction, ETriggerEvent::Started, this, &ACombatCharacter::ComboAttackPressed);
-
-		// Camera Side Toggle
-		EnhancedInputComponent->BindAction(ToggleCameraAction, ETriggerEvent::Triggered, this, &ACombatCharacter::ToggleCamera);
-
-		EnhancedInputComponent->BindAction(TryLockOnAction, ETriggerEvent::Started, this, &ACombatCharacter::TryLockOnCamera);
-
-		//guard
-		EnhancedInputComponent->BindAction(TryGuardAction, ETriggerEvent::Started, this, &ACombatCharacter::TryGuardStart);
-		EnhancedInputComponent->BindAction(TryGuardAction, ETriggerEvent::Completed, this, &ACombatCharacter::TryGuardEnd);
-
-		
+		CombatInputComponent->SetupBindings(EnhancedInputComponent);
 	}
 }
 
