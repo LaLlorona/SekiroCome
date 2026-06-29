@@ -76,17 +76,29 @@ void UCombatCharacterInputComponent::TryGuardEnd()
 	OwnerCharacter->TryGuardEnd();
 }
 
-FVector2D UCombatCharacterInputComponent::GetCurrentMovementInput() const
+ECombatInputDirectionEnum UCombatCharacterInputComponent::GetCombatInputDirection() const
 {
-	if (!OwnerCharacter) return FVector2D::ZeroVector;
+	if (!OwnerCharacter) return ECombatInputDirectionEnum::NoInput;
 
 	ACombatPlayerController* PC = Cast<ACombatPlayerController>(OwnerCharacter->GetController());
-	if (!PC) return FVector2D::ZeroVector;
+	if (!PC) return ECombatInputDirectionEnum::NoInput;
 
 	const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
-	if (!Subsystem || !Subsystem->GetPlayerInput()) return FVector2D::ZeroVector;
+	if (!Subsystem || !Subsystem->GetPlayerInput()) return ECombatInputDirectionEnum::NoInput;
 
-	return Subsystem->GetPlayerInput()->GetActionValue(MoveAction).Get<FVector2D>();
+	auto InputValue = Subsystem->GetPlayerInput()->GetActionValue(MoveAction).Get<FVector2D>();
+	if (InputValue.IsNearlyZero())
+	{
+		return ECombatInputDirectionEnum::NoInput;
+	}
+	if (FMath::Abs(InputValue.X) > FMath::Abs(InputValue.Y))
+	{
+		return InputValue.X > 0 ? ECombatInputDirectionEnum::Right : ECombatInputDirectionEnum::Left;
+	}
+	else
+	{
+		return InputValue.Y > 0 ? ECombatInputDirectionEnum::Top : ECombatInputDirectionEnum::Down;
+	}
 }
 
 

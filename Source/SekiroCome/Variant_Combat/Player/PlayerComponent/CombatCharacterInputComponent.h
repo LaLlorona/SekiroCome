@@ -7,6 +7,7 @@
 #include "CombatCharacterInputComponent.generated.h"
 
 
+enum class ECombatInputDirectionEnum : uint8;
 class UInputAction;
 class UEnhancedInputComponent;
 class ACombatCharacter;
@@ -74,5 +75,5 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SetupBindings(UEnhancedInputComponent* EnhancedInputComponent);
-	FVector2D GetCurrentMovementInput() const;
+	ECombatInputDirectionEnum GetCombatInputDirection() const;
 };

@@ -37,3 +37,13 @@ enum class ECombatStateEnum : uint8
 	PartialParry,
 	PerfectParryRiposte,
 };
+
+UENUM(BlueprintType)
+enum class ECombatInputDirectionEnum : uint8
+{
+	NoInput,
+	Left,
+	Top,
+	Right,
+	Down
+};

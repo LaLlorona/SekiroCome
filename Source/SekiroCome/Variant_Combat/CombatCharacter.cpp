@@ -16,7 +16,7 @@
 #include "Engine/LocalPlayer.h"
 #include "CombatPlayerController.h"
 #include "CombatLockOnComponent.h"
-#include "CombatManager.h"
+#include "CombatLogic.h"
 #include "CombatLogic/FAttackData.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/State/PlayerCombatStateMachineComponent.h"
@@ -137,9 +137,9 @@ void ACombatCharacter::DoComboAttackEnd()
 	// stub
 }
 
-FVector2D ACombatCharacter::GetCurrentMovementInput() const
+ECombatInputDirectionEnum ACombatCharacter::GetCombatInputDirection() const
 {
-	return CombatInputComponent->GetCurrentMovementInput();
+	return CombatInputComponent->GetCombatInputDirection();
 }
 
 
@@ -270,10 +270,9 @@ void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection At
 				const FVector Impulse = (CurrentHit.ImpactNormal * -MeleeKnockbackImpulse) + (FVector::UpVector * MeleeLaunchImpulse);
 
 				// pass the damage event to the actor
-				if (UCombatManager* CombatManager = GetWorld()->GetSubsystem<UCombatManager>())
 				{
 					FAttackData AttackData(MeleeDamage, CurrentHit.ImpactPoint, Impulse, AttackDirection);
-					CombatManager->ResolveAttack(this, this, CurrentHit.GetActor(), Damageable, AttackData);
+					CombatLogic::ResolveAttack(this, this, CurrentHit.GetActor(), Damageable, AttackData);
 				}
 			}
 		}

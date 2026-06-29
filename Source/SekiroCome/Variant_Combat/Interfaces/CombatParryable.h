@@ -2,6 +2,7 @@
 
 #pragma once
 
+enum class ECombatInputDirectionEnum : uint8;
 #include "CoreMinimal.h"
 
 #include "CombatParryable.generated.h"
@@ -26,4 +27,5 @@ class SEKIROCOME_API ICombatParryable
 public:
 	virtual bool CanParryNow() const = 0;
 	virtual void ChangeToRiposteState() = 0;
+	virtual ECombatInputDirectionEnum GetCombatInputDirection() const = 0;
 };

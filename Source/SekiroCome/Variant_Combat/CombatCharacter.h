@@ -10,6 +10,7 @@
 #include "Animation/AnimInstance.h"
 #include "CombatCharacter.generated.h"
 
+enum class ECombatInputDirectionEnum : uint8;
 class UCombatMontageSet;
 class UPlayerCombatStateMachineComponent;
 class UCombatCharacterInputComponent;
@@ -59,37 +60,6 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 	
 	
 protected:
-
-	/*/** Jump Input Action #1#
-	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* JumpAction;
-
-	/** Move Input Action #1#
-	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* MoveAction;
-
-	/** Look Input Action #1#
-	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* LookAction;
-
-	/** Mouse Look Input Action #1#
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* MouseLookAction;
-
-	/** Combo Attack Input Action #1#
-	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* ComboAttackAction;
-
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* TryGuardAction;
-
-	/** Toggle Camera Side Input Action #1#
-	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* ToggleCameraAction;
-
-	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* TryLockOnAction;*/
-
 	/** Max amount of HP the character will have on respawn */
 	UPROPERTY(EditAnywhere, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
 	float MaxHP = 5.0f;
@@ -237,7 +207,7 @@ public:
 	virtual void DoComboAttackEnd();
 
 	UFUNCTION(BlueprintCallable, Category="input")
-	FVector2D GetCurrentMovementInput() const;
+	ECombatInputDirectionEnum GetCombatInputDirection() const;
 
 	void ToggleCamera();
 	void TryLockOnCamera();

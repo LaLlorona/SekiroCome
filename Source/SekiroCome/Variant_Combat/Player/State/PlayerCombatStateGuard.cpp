@@ -30,8 +30,8 @@ EAnimationStateEnum UPlayerCombatStateGuard::GetAnimationStateEnum()
 
 bool UPlayerCombatStateGuard::CanParryNow() const
 {
-	auto asdf = InitParam.OwnerCharacter.Get()->GetCurrentMovementInput();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, asdf.ToString());
+	auto asdf = InitParam.OwnerCharacter.Get()->GetCombatInputDirection();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, asdf == ECombatInputDirectionEnum::NoInput ? TEXT("NoInput") : TEXT("HasInput"));
 	
 	return ElapsedTimeFromStateEnter <= CombatDefine::RiposteMinimumTimeWindow;
 }

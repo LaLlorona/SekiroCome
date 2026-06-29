@@ -2,13 +2,15 @@
 
 
 #include "CombatEnemy.h"
+
+#include <CombatLogic.h>
+
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CombatAIController.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/DamageEvents.h"
 #include "CombatLifeBar.h"
-#include "CombatManager.h"
 #include "TimerManager.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
@@ -161,11 +163,8 @@ void ACombatEnemy::DoAttackTrace(FName DamageSourceBone, EAttackDirection Attack
 				{
 					// knock upwards and away from the impact normal
 					const FVector Impulse = (CurrentHit.ImpactNormal * -MeleeKnockbackImpulse) + (FVector::UpVector * MeleeLaunchImpulse);
-					if (UCombatManager* CombatManager = GetWorld()->GetSubsystem<UCombatManager>())
-					{
-						FAttackData AttackData(MeleeDamage, CurrentHit.ImpactPoint, Impulse, AttackDirection);
-						CombatManager->ResolveAttack(this, this, CurrentHit.GetActor(), Damageable, AttackData);
-					}
+					FAttackData AttackData(MeleeDamage, CurrentHit.ImpactPoint, Impulse, AttackDirection);
+					CombatLogic::ResolveAttack(this, this, CurrentHit.GetActor(), Damageable, AttackData);
 				}
 			}
 			
