@@ -1,8 +1,10 @@
+#include "CombatLogic.h"
 #include "CombatLogic/FAttackData.h"
 #include "Interfaces/CombatAttacker.h"
 #include "Interfaces/CombatDamageable.h"
 #include "Interfaces/CombatParryable.h"
 
+  
 namespace CombatLogic
 {
 	void ResolveAttack(AActor* AttackerActor, ICombatAttacker* Attacker, AActor* DamagedActor, ICombatDamageable* Damageable, const FAttackData& AttackData)

@@ -1,0 +1,124 @@
+# 구현 체크리스트 (combatsystem_base.md 기준)
+
+> **완료 기준**: 각 항목 완료 후 실제 코드를 확인하여 `[ ]` → `[x]` 로 변경한다.
+> **참고 설계 문서**: `docs/combatsystem_base.md`
+
+---
+
+## 현재 구현 완료 상태 (기존 코드 확인 기준)
+
+- [x] HP 기본 구조 (`ACombatCharacter::CurrentHP / MaxHP`)
+- [x] 공격 콤보 / 차지 공격 몽타주 재생
+- [x] 공격 충돌 판정 (`DoAttackTrace` — sphere sweep)
+- [x] 락온 컴포넌트 (`UCombatLockOnComponent`)
+- [x] 가드 / 패링 상태머신 (Idle / Guard / PartialParry / PerfectParryRiposte)
+- [x] PerfectParry 타이밍 창 (Guard 진입 후 `RiposteMinimumTimeWindow` 이내)
+- [x] 리포스트 몽타주 재생 (`UCombatMontageSet`)
+- [x] 공격 방향 열거형 (`EAttackDirection`: Up / Down / Left / Right)
+- [x] 이동 입력 → 방향 변환 (`ECombatInputDirectionEnum`, `GetCombatInputDirection`)
+- [x] 피격 해결 로직 (`CombatLogic::ResolveAttack` — 패링 여부 판별 후 데미지 적용)
+- [x] AnimNotify 연결 (DoAttackTrace / CheckCombo / CheckChargedAttack)
+
+---
+
+## Phase 1 — 스태미나 시스템 (설계 §1)
+
+> **우선 구현 이유**: 데미지 계산, MasterStrike 반격 조건 등 이후 모든 시스템이 스태미나에 의존한다.
+
+- [ ] `ACombatCharacter`에 `CurrentSP / MaxSP` 추가 (`MaxSP = 30 + 70 * HP/100`)
+- [ ] `ACombatEnemy`에 동일한 SP 필드 추가
+- [ ] 데미지 처리: SP > 0 이면 SP 우선 차감, 초과분 즉시 HP 전이 (`ApplyDamage` 수정)
+- [ ] 스태미나 회복 틱 구현 (`SP_RegenPerSecond`, Tick마다 회복)
+- [ ] 회복 정지 조건 — 공격 / 가드 / 회피 / 점프 / 스프린트 시작 시 타이머 리셋 (`SP_RegenDelay`)
+- [ ] 이동(걷기)은 회복 정지 조건에서 제외 (현재 `DoMove`는 스태미나 영향 없음 — 유지)
+- [ ] HP 변경 시 SP 최댓값 즉시 클램프 (`min(CurrentSP, 새캡)`)
+- [ ] DataTable(`UCombatStaminaDataTable` 또는 `UDataTable`) 생성: `SP_RegenPerSecond`, `SP_RegenDelay`
+
+---
+
+## Phase 2 — 무기 데미지 타입 / 계산식 (설계 §1-1, §1-2)
+
+> **우선 구현 이유**: Phase 1 스태미나 시스템과 함께 데미지 파이프라인 완성.
+
+- [ ] 무기 데미지 타입 enum 추가 (`EWeaponDamageType`: Slash / Pierce / Blunt)
+- [ ] `FAttackData`에 `EWeaponDamageType` 필드 추가
+- [ ] 적 저항률 구조체 추가 (`FEnemyResistance`: Slash/Pierce/Blunt 각각 0~1)
+- [ ] 공격 배율 DataTable 추가 (일반공격 1.0 / 강공격 1.5 / 콤보 피니셔 1.3)
+- [ ] `CombatLogic::ResolveAttack`에 최종 데미지 계산식 적용
+
+---
+
+## Phase 3 — 공격 방향 자동 전환 (설계 §3-1, §3-2)
+
+> **우선 구현 이유**: 콤보 히스토리 버퍼와 MasterStrike 난이도 분기의 전제 조건.
+
+- [ ] 플레이어 "다음 공격 방향" 상태 변수 추가 (`EAttackDirection NextAttackDirection`)
+- [ ] 공격 성공 후 방향 자동 전환 테이블 구현 (§3-1: 우→좌, 좌→우, 아래→우, 위→좌)
+- [ ] 가드 성공(Block) 후 방향 자동 전환 테이블 구현 (§3-2: 우→좌, 좌→위, 아래→우, 위→우)
+- [ ] `CombatAttackDirectionUI`에 `NextAttackDirection` 연동 (기존 UI 위젯 활용)
+
+---
+
+## Phase 4 — MasterStrike / PerfectBlock 고도화 (설계 §5)
+
+> **우선 구현 이유**: 방향 자동 전환(Phase 3) 완료 후 방향-난이도 분기 구현 가능.
+
+- [ ] MasterStrike 판정 창을 InGameTime 기준으로 변경 (Time Dilation 보정)
+- [ ] 무기별 판정 창 DataTable 추가 (`MasterStrike_WindowStart`, `MasterStrike_WindowEnd`, `MasterStrike_ColliderActivation`)
+- [ ] 방향 난이도 분기 구현 (§3-3: Down/Right = 자동흐름으로 MasterStrike 가능 / Up/Left = 수동 재조정 필요)
+- [ ] MasterStrike 이원 데미지 구조 (`MasterStrike_BaseDamage` + `MasterStrike_PriorityHealthDamage`)
+- [ ] 실패 분기 구현: 판정 창 이후 플레이어 공격 시 적 공격 캔슬 (§5-3)
+- [ ] 실패 분기 구현: 일반 Block → 피해 감소, 적 콤보 유지 (§5-3)
+- [ ] PerfectBlock 반격 창 (`PerfectBlock_CounterWindow`) DataTable 추가
+- [ ] `PerfectBlock_GuaranteedHit` bool DataTable 추가
+
+---
+
+## Phase 5 — 콤보 커맨드 매칭 시스템 (설계 §4)
+
+> **우선 구현 이유**: 방향 자동 전환(Phase 3) 완료 후 히스토리 버퍼 의미 있음.
+
+- [ ] 공격 히스토리 버퍼 구조 추가 (`TArray<EAttackDirection> AttackHistoryBuffer`, 최대 길이 3)
+- [ ] 공격 성공 시 버퍼에 방향 추가 + 패턴 매칭 검사
+- [ ] 버퍼 초기화 조건 구현 (PerfectBlock 당함 / `Combo_BufferTimeout` 초과)
+- [ ] DataTable 기반 콤보 패턴 정의 (`FCombatComboRow`: 패턴 배열 + 피니셔 몽타주 + 데미지값)
+- [ ] 기본 패턴 3종 등록 (좌→우→좌 / 우→좌→우 / 아래→아래→우)
+- [ ] 패턴 매칭 성공 시 피니셔 몽타주 재생
+- [ ] 콤보 피니셔 이원 데미지 구조 (`Combo_BaseDamage` + `Combo_PriorityHealthDamage`) — §4-5
+- [ ] PerfectBlock 당하면 콤보 버퍼 초기화 (§3-5 확정 사항)
+- [ ] 적 PerfectBlock 성공 시 반격 조건 (`Enemy_CounterStaminaThreshold` DataTable 상수)
+
+---
+
+## Phase 6 — 이동 시스템 (설계 §2)
+
+> **우선 구현 이유**: 전투 느낌 완성을 위한 락온 연동 이동.
+
+- [ ] 락온 시 좌우 입력 → 원형 스트레이프 이동 구현 (`LockOn_StrafeRadius`, `LockOn_AngularSpeed`)
+- [ ] 스트레이프 반경 / 각속도 DataTable 추가
+- [ ] AI 다수 포위 슬롯 시스템 (`Surround_MaxCloseSlots`, `Surround_CloseSlotRadius`, `Surround_SideAngle`)
+
+---
+
+## DataTable 전체 상수 목록 (설계 §7)
+
+> 위 Phase 구현 완료 여부와 별개로, 하드코딩된 수치가 있으면 DataTable로 이동한다.
+
+- [ ] `SP_RegenPerSecond`
+- [ ] `SP_RegenDelay`
+- [ ] `LockOn_StrafeRadius`
+- [ ] `LockOn_AngularSpeed`
+- [ ] `Surround_MaxCloseSlots`
+- [ ] `Surround_CloseSlotRadius`
+- [ ] `Surround_SideAngle`
+- [ ] `Enemy_CounterStaminaThreshold`
+- [ ] `Combo_BufferTimeout`
+- [ ] `Combo_InputWindow`
+- [ ] `Combo_BaseDamage` / `Combo_PriorityHealthDamage` (콤보별)
+- [ ] `MasterStrike_WindowStart` / `MasterStrike_WindowEnd` / `MasterStrike_ColliderActivation` (무기별)
+- [ ] `MasterStrike_BaseDamage` / `MasterStrike_PriorityHealthDamage` (무기별)
+- [ ] `PerfectBlock_CounterWindow`
+- [ ] `PerfectBlock_GuaranteedHit`
+- [ ] 무기별 베기/찌르기/둔기 데미지
+- [ ] 적별 베기/찌르기/둔기 저항률
+- [ ] 공격 종류별 배율 (일반/강공격/콤보 피니셔)
