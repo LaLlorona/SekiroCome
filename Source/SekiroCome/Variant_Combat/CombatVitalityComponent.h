@@ -19,21 +19,25 @@ class SEKIROCOME_API UCombatVitalityComponent : public UActorComponent
 
 	FName CombatTuningRowName;
 
+	/** Recomputes MaxSP from the current HP ratio and clamps CurrentSP to it */
+	void RecomputeMaxSP();
+
 
 public:
 	// Sets default values for this component's properties
 	UCombatVitalityComponent();
 
 	/** Max amount of HP the owner will have on reset */
-	UPROPERTY(EditAnywhere, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
-	float MaxHP = 5.0f;
+	UPROPERTY(VisibleAnywhere, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
+	float MaxHP = 100.0f;
 
 	/** Current amount of HP the owner has */
 	UPROPERTY(VisibleAnywhere, Category="Damage")
 	float CurrentHP = 0.0f;
 
-	UPROPERTY(EditAnywhere, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
-	float MaxSP = 5.0f;
+	/** MaxSP = 30 + 70 * (CurrentHP / MaxHP), recomputed whenever HP changes */
+	UPROPERTY(VisibleAnywhere, Category="Damage")
+	float MaxSP = 100.0f;
 
 	/** Current amount of HP the owner has */
 	UPROPERTY(VisibleAnywhere, Category="Damage")

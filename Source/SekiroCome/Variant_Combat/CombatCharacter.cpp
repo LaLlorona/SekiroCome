@@ -78,6 +78,7 @@ void ACombatCharacter::TryLockOnCamera()
 void ACombatCharacter::TryGuardStart()
 {
 	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Guard);
+	VitalityComponent->OnRegenStopTimerBegin();
 }
 
 void ACombatCharacter::TryGuardEnd()
@@ -159,6 +160,8 @@ void ACombatCharacter::ComboAttack()
 	// raise the attacking flag
 	bIsAttacking = true;
 
+	VitalityComponent->OnRegenStopTimerBegin();
+
 	// reset the combo count
 	ComboCount = 0;
 
@@ -184,6 +187,8 @@ void ACombatCharacter::ChargedAttack()
 {
 	// raise the attacking flag
 	bIsAttacking = true;
+
+	VitalityComponent->OnRegenStopTimerBegin();
 
 	// reset the charge loop flag
 	bHasLoopedChargedAttack = false;

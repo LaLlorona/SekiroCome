@@ -25,14 +25,14 @@
 
 > **우선 구현 이유**: 데미지 계산, MasterStrike 반격 조건 등 이후 모든 시스템이 스태미나에 의존한다.
 
-- [ ] `ACombatCharacter`에 `CurrentSP / MaxSP` 추가 (`MaxSP = 30 + 70 * HP/100`)
-- [ ] `ACombatEnemy`에 동일한 SP 필드 추가
-- [ ] 데미지 처리: SP > 0 이면 SP 우선 차감, 초과분 즉시 HP 전이 (`ApplyDamage` 수정)
-- [ ] 스태미나 회복 틱 구현 (`SP_RegenPerSecond`, Tick마다 회복)
-- [ ] 회복 정지 조건 — 공격 / 가드 / 회피 / 점프 / 스프린트 시작 시 타이머 리셋 (`SP_RegenDelay`)
-- [ ] 이동(걷기)은 회복 정지 조건에서 제외 (현재 `DoMove`는 스태미나 영향 없음 — 유지)
-- [ ] HP 변경 시 SP 최댓값 즉시 클램프 (`min(CurrentSP, 새캡)`)
-- [ ] DataTable(`UCombatStaminaDataTable` 또는 `UDataTable`) 생성: `SP_RegenPerSecond`, `SP_RegenDelay`
+- [x] `ACombatCharacter`에 `CurrentSP / MaxSP` 추가 (`MaxSP = 30 + 70 * HP/100`) — `UCombatVitalityComponent`(`CurrentHP/MaxHP/CurrentSP/MaxSP`)를 만들어 `ACombatCharacter`가 소유하는 방식으로 구현 (`VitalityComponent` 필드)
+- [ ] `ACombatEnemy`에 동일한 SP 필드 추가 — 아직 미적용, `UCombatVitalityComponent`를 그대로 재사용하면 됨
+- [x] 데미지 처리: SP > 0 이면 SP 우선 차감, 초과분 즉시 HP 전이 (`UCombatVitalityComponent::ApplyDamage`)
+- [x] 스태미나 회복 틱 구현 (`SP_RegenPerSecond`, `UCombatVitalityComponent::CustomUpdate`에서 매 틱 처리 — 엔진 `TickComponent`가 아니라 `ACombatCharacter::Tick`에서 명시적으로 호출)
+- [~] 회복 정지 조건 — 공격 / 가드 / 회피 / 점프 / 스프린트 시작 시 타이머 리셋 (`SP_RegenDelay`) — 공격(`ComboAttack`/`ChargedAttack`)과 가드(`TryGuardStart`)는 `VitalityComponent->OnRegenStopTimerBegin()` 연결 완료. 회피/점프/스프린트는 `ACombatCharacter`에 해당 액션 자체가 아직 없어서 미적용 (해당 시스템 구현 시 같이 연결 필요)
+- [x] 이동(걷기)은 회복 정지 조건에서 제외 (현재 `DoMove`는 스태미나 영향 없음 — 유지)
+- [x] HP 변경 시 SP 최댓값 즉시 클램프 (`UCombatVitalityComponent::RecomputeMaxSP`, `ApplyDamage`/`ResetVitality`/`CustomUpdate`에서 호출)
+- [x] DataTable 생성: `UCombatTuningDataTable`(`FCombatTuningRow`: `SP_RegenPerSecond`, `SP_RegenDelayInSecond`) + 전용 `UFactory`
 
 ---
 
