@@ -15,6 +15,8 @@ class UCombatMontageSet;
 class UPlayerCombatStateMachineComponent;
 class UCombatCharacterInputComponent;
 class UCombatLockOnComponent;
+class UCombatVitalityComponent;
+class UCombatTuningDataTable;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
@@ -52,22 +54,22 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCombatLockOnComponent* LockOnComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCombatVitalityComponent> VitalityComponent;
+
 	UPROPERTY()
 	TObjectPtr<UPlayerCombatStateMachineComponent> CombatStateMachineComponent;
 
 	UPROPERTY(VisibleAnywhere, Category="Components", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UCombatCharacterInputComponent> CombatInputComponent;
-	
+
+	UPROPERTY(EditAnywhere, Category="Damage")
+	UCombatTuningDataTable* CombatTuningDataTable;
+
+	UPROPERTY(EditAnywhere, Category="Damage")
+	FName CombatTuningRowName;
 	
 protected:
-	/** Max amount of HP the character will have on respawn */
-	UPROPERTY(EditAnywhere, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
-	float MaxHP = 5.0f;
-
-	/** Current amount of HP the character has */
-	UPROPERTY(VisibleAnywhere, Category="Damage")
-	float CurrentHP = 0.0f;
-
 	/** Life bar widget fill color */
 	UPROPERTY(EditAnywhere, Category="Damage")
 	FLinearColor LifeBarColor;

@@ -16,6 +16,7 @@
 #include "Engine/LocalPlayer.h"
 #include "CombatPlayerController.h"
 #include "CombatLockOnComponent.h"
+#include "CombatVitalityComponent.h"
 #include "CombatLogic.h"
 #include "CombatLogic/FAttackData.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -55,6 +56,7 @@ ACombatCharacter::ACombatCharacter()
 	LifeBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("LifeBar"));
 	LifeBar->SetupAttachment(RootComponent);
 	LockOnComponent = CreateDefaultSubobject<UCombatLockOnComponent>(TEXT("LockOnComponent"));
+	VitalityComponent = CreateDefaultSubobject<UCombatVitalityComponent>(TEXT("VitalityComponent"));
 	CombatStateMachineComponent = CreateDefaultSubobject<UPlayerCombatStateMachineComponent>("CombatStateMachineComponent");
 	CombatInputComponent = CreateDefaultSubobject<UCombatCharacterInputComponent>("CombatInputComponent");
 
@@ -146,7 +148,7 @@ ECombatInputDirectionEnum ACombatCharacter::GetCombatInputDirection() const
 void ACombatCharacter::ResetHP()
 {
 	// reset the current HP total
-	CurrentHP = MaxHP;
+	VitalityComponent->ResetVitality();
 
 	// update the life bar
 	LifeBarWidget->SetLifePercentage(1.0f);
@@ -439,16 +441,16 @@ EAnimationStateEnum ACombatCharacter::GetCurrentAnimationState()
 float ACombatCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	// only process damage if the character is still alive
-	if (CurrentHP <= 0.0f)
+	if (!VitalityComponent->IsAlive())
 	{
 		return 0.0f;
 	}
 
 	// reduce the current HP
-	CurrentHP -= Damage;
+	VitalityComponent->ApplyDamage(Damage);
 
 	// have we run out of HP?
-	if (CurrentHP <= 0.0f)
+	if (!VitalityComponent->IsAlive())
 	{
 		// die
 		HandleDeath();
@@ -456,7 +458,7 @@ float ACombatCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 	else
 	{
 		// update the life bar
-		LifeBarWidget->SetLifePercentage(CurrentHP / MaxHP);
+		LifeBarWidget->SetLifePercentage(VitalityComponent->GetHPPercentage());
 
 		// enable partial ragdoll physics, but keep the pelvis vertical
 		GetMesh()->SetPhysicsBlendWeight(0.5f);
@@ -472,7 +474,7 @@ void ACombatCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	// is the character still alive?
-	if (CurrentHP >= 0.0f)
+	if (VitalityComponent->IsAlive())
 	{
 		// disable ragdoll physics
 		GetMesh()->SetPhysicsBlendWeight(0.0f);
@@ -500,6 +502,7 @@ void ACombatCharacter::BeginPlay()
 	ResetHP();
 	CombatStateMachineComponent->Initialize(FCombatStateInitializeParameter(CombatMontageSet, this));
 	CombatInputComponent->Initialize(this);
+	VitalityComponent->Initialize(CombatTuningDataTable, CombatTuningRowName);
 }
 
 
@@ -546,5 +549,6 @@ void ACombatCharacter::Tick(float DeltaTime)
 		GetController()->SetControlRotation(TargetRotation);
 	}
 	CombatStateMachineComponent->UpdateCombatState(DeltaTime);
+	VitalityComponent->CustomUpdate(DeltaTime);
 }
 

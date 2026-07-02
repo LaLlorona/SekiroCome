@@ -5,7 +5,11 @@
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Sort-Object)",
       "PowerShell(& \"C:\\\\Program Files\\\\Epic Games\\\\UE_5.7\\\\Engine\\\\Build\\\\BatchFiles\\\\Build.bat\" SekiroComeEditor Win64 DebugGame -Project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -WaitMutex -FromMsBuild -architecture=x64)",
-      "PowerShell(git *)"
+      "PowerShell(git *)",
+      "Read(//c/Program Files/Epic Games/**)",
+      "Bash(find \"/d\" -maxdepth 2 -iname \"UE_*\")",
+      "Bash(find \"/c\" -maxdepth 3 -iname \"UE_*\")",
+      "Bash(git mv *)"
     ]
   }
 }

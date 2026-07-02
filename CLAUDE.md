@@ -35,6 +35,28 @@ Implementation progress is tracked in `docs/implementation_checklist.md`.
 
 ---
 
+## Coding Conventions
+
+**Component update pattern**: Actor components owned by a specific actor (e.g. `CombatVitalityComponent` owned by `CombatCharacter`) should NOT rely on Unreal's automatic `TickComponent`. Instead:
+- Set `PrimaryComponentTick.bCanEverTick = false` in the component's constructor.
+- Do not override `TickComponent` or `BeginPlay` for per-frame/init logic.
+- Expose a `void CustomUpdate(float DeltaTime)` method that the owning actor calls explicitly from its own `Tick()`.
+
+This gives the owner explicit control over update order between its components (mirrors how `CombatStateMachineComponent::UpdateCombatState` is already called explicitly from `ACombatCharacter::Tick`), instead of depending on the engine's implicit tick scheduling.
+
+**DataTable row typing**: Don't expose a generic `UDataTable*` for a fixed data schema. Instead, define a dedicated `UDataTable` subclass per row struct that locks `RowStruct` to that struct in its constructor (e.g. `UCombatTuningDataTable` locked to `FCombatTuningRow` — see `Variant_Combat/CombatLogic/CombatTuningDataTable.h`), and expose a typed lookup method (e.g. `FindByRowName`) instead of making callers use the generic templated `FindRow<T>()` directly.
+
+This makes the asset picker in the editor only show tables of the correct schema, and keeps row-struct lookups type-safe without needing `FDataTableRowHandle` + `RowType` meta everywhere.
+
+Content Browser's built-in "New Data Table" menu item always creates a plain `UDataTable`, never a subclass, and always prompts for a row structure. To make the subclass creatable directly (and skip the row-structure prompt, since it's fixed), pair it with a `UFactory` subclass (e.g. `UCombatTuningDataTableFactory` — see `Variant_Combat/CombatLogic/CombatTuningDataTableFactory.h`):
+- Set `SupportedClass` to the DataTable subclass in the factory's constructor.
+- Override `ConfigureProperties()` to set `Struct` to the fixed row struct and return `true` (skips the picker dialog).
+- **Also override `MakeNewDataTable()`** to `NewObject<YourSubclass>(...)`. `UDataTableFactory::FactoryCreateNew` delegates object construction to this separate `protected virtual` function, whose base implementation hardcodes `NewObject<UDataTable>(...)` — it ignores `SupportedClass`/`Class` entirely. Without this override, `FactoryCreateNew` silently creates a plain `UDataTable` (with the right `RowStruct`, but the wrong C++ class), which then fails to satisfy any `UYourSubclass*` UPROPERTY.
+- Override `GetDisplayName()` too, or the new-asset menu entry shows the same generic label as the base "Data Table" entry (the default impl resolves the name via the nearest registered `IAssetTypeActions` up the class hierarchy, which for any `UDataTable` subclass resolves to `UDataTable`'s own "Data Table" label).
+- Factory code is editor-only: wrap the whole file in `#if WITH_EDITOR` / `#endif`, and only add `UnrealEd` to `PrivateDependencyModuleNames` when `Target.Type == TargetType.Editor` in `SekiroCome.Build.cs` (this project has no separate Editor module, so the dependency must be conditional or it breaks packaged builds).
+
+---
+
 ## Project Goal
 A 3D melee action game (Unreal Engine) focused on a skill-expressive 1v1 combat system built around directional parrying. The name references Sekiro's parry-centric feel.
 

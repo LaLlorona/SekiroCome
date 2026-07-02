@@ -23,6 +23,11 @@ public class SekiroCome : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
+		if (Target.Type == TargetType.Editor)
+		{
+			PrivateDependencyModuleNames.Add("UnrealEd");
+		}
+
 		PublicIncludePaths.AddRange(new string[] {
 			"SekiroCome",
 			"SekiroCome/Variant_Platforming",
