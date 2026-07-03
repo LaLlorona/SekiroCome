@@ -10,6 +10,10 @@ UCombatVitalityComponent::UCombatVitalityComponent()
 {
 	// This component is updated explicitly by its owner via CustomUpdate(), not by the engine's tick system.
 	PrimaryComponentTick.bCanEverTick = false;
+
+	// start fully alive by default, so anything reading HP/SP before Initialize() runs (e.g. StateTree on possess) sees a valid state
+	CurrentHP = MaxHP;
+	CurrentSP = MaxSP;
 }
 
 void UCombatVitalityComponent::CustomUpdate(float DeltaTime)
@@ -39,6 +43,7 @@ void UCombatVitalityComponent::OnRegenStopTimerBegin()
 	if (const FCombatTuningRow* Row = CombatTuningDataTable->FindByRowName(CombatTuningRowName))
 	{
 		HpRegenLeftTime = Row->SP_RegenDelayInSecond;
+		
 	}
 }
 

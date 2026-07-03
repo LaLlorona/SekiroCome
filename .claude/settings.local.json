@@ -9,7 +9,9 @@
       "Read(//c/Program Files/Epic Games/**)",
       "Bash(find \"/d\" -maxdepth 2 -iname \"UE_*\")",
       "Bash(find \"/c\" -maxdepth 3 -iname \"UE_*\")",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python -c ' *)"
     ]
   }
 }

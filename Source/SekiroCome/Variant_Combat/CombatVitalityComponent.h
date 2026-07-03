@@ -28,19 +28,19 @@ public:
 	UCombatVitalityComponent();
 
 	/** Max amount of HP the owner will have on reset */
-	UPROPERTY(VisibleAnywhere, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
 	float MaxHP = 100.0f;
 
 	/** Current amount of HP the owner has */
-	UPROPERTY(VisibleAnywhere, Category="Damage")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage")
 	float CurrentHP = 0.0f;
 
 	/** MaxSP = 30 + 70 * (CurrentHP / MaxHP), recomputed whenever HP changes */
-	UPROPERTY(VisibleAnywhere, Category="Damage")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage")
 	float MaxSP = 100.0f;
 
 	/** Current amount of HP the owner has */
-	UPROPERTY(VisibleAnywhere, Category="Damage")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage")
 	float CurrentSP = 0.0f;
 
 

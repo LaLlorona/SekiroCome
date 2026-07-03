@@ -15,9 +15,14 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 #include "CombatLogic/FAttackData.h"
+#include "CombatVitalityComponent.h"
 
 ACombatEnemy::ACombatEnemy()
 {
+	// create the vitality component (handles HP/SP)
+
+
+
 	PrimaryActorTick.bCanEverTick = true;
 
 	// bind the attack montage ended delegate
@@ -25,9 +30,12 @@ ACombatEnemy::ACombatEnemy()
 
 	// set the AI Controller class by default
 	AIControllerClass = ACombatAIController::StaticClass();
+	
 
 	// use an AI Controller regardless of whether we're placed or spawned
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	VitalityComponent = CreateDefaultSubobject<UCombatVitalityComponent>(TEXT("VitalityComponent"));
 
 	// ignore the controller's yaw rotation
 	bUseControllerRotationYaw = false;
@@ -35,15 +43,20 @@ ACombatEnemy::ACombatEnemy()
 	// create the life bar
 	LifeBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("LifeBar"));
 	LifeBar->SetupAttachment(RootComponent);
+	
 
 	// set the collision capsule size
 	GetCapsuleComponent()->SetCapsuleSize(35.0f, 90.0f);
 
 	// set the character movement properties
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+}
 
-	// reset HP to maximum
-	CurrentHP = MaxHP;
+void ACombatEnemy::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	VitalityComponent->CustomUpdate(DeltaTime);
 }
 
 void ACombatEnemy::DoAIComboAttack()
@@ -277,16 +290,16 @@ void ACombatEnemy::RemoveFromLevel()
 float ACombatEnemy::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	// only process damage if the character is still alive
-	if (CurrentHP <= 0.0f)
+	if (!VitalityComponent->IsAlive())
 	{
 		return 0.0f;
 	}
 
-	// reduce the current HP
-	CurrentHP -= Damage;
+	// reduce the current HP (stamina-first, with overflow to HP)
+	VitalityComponent->ApplyDamage(Damage);
 
 	// have we run out of HP?
-	if (CurrentHP <= 0.0f)
+	if (!VitalityComponent->IsAlive())
 	{
 		// die
 		HandleDeath();
@@ -294,7 +307,7 @@ float ACombatEnemy::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 	else
 	{
 		// update the life bar
-		LifeBarWidget->SetLifePercentage(CurrentHP / MaxHP);
+		LifeBarWidget->SetLifePercentage(VitalityComponent->GetHPPercentage());
 
 		// enable partial ragdoll physics, but keep the pelvis vertical
 		GetMesh()->SetPhysicsBlendWeight(0.5f);
@@ -310,7 +323,7 @@ void ACombatEnemy::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	// is the character still alive?
-	if (CurrentHP >= 0.0f)
+	if (VitalityComponent->IsAlive())
 	{
 		// disable ragdoll physics
 		GetMesh()->SetPhysicsBlendWeight(0.0f);
@@ -322,11 +335,10 @@ void ACombatEnemy::Landed(const FHitResult& Hit)
 
 void ACombatEnemy::BeginPlay()
 {
-	// reset HP to maximum
-	CurrentHP = MaxHP;
-
-	// we top the HP before BeginPlay so StateTree picks it up at the right value
 	Super::BeginPlay();
+
+	// wire up the tuning DataTable reference now that Blueprint-configured properties are valid
+	VitalityComponent->Initialize(CombatTuningDataTable, CombatTuningRowName);
 
 	// get the life bar widget from the widget comp
 	LifeBarWidget = Cast<UCombatLifeBar>(LifeBar->GetUserWidgetObject());

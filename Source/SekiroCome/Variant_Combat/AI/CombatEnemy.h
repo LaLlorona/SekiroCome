@@ -14,6 +14,8 @@
 class UWidgetComponent;
 class UCombatLifeBar;
 class UAnimMontage;
+class UCombatVitalityComponent;
+class UCombatTuningDataTable;
 
 /** Completed attack animation delegate for StateTree */
 DECLARE_DELEGATE(FOnEnemyAttackCompleted);
@@ -42,18 +44,18 @@ public:
 	/** Constructor */
 	ACombatEnemy();
 
-protected:
+	/** Per-frame update */
+	virtual void Tick(float DeltaTime) override;
 
-	/** Max amount of HP the character will have on respawn */
+	/** Handles HP/SP for this enemy (shared with ACombatCharacter) */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCombatVitalityComponent> VitalityComponent;
+
 	UPROPERTY(EditAnywhere, Category="Damage")
-	float MaxHP = 3.0f;
+	UCombatTuningDataTable* CombatTuningDataTable;
 
-public:
-
-	/** Current amount of HP the character has */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
-	float CurrentHP = 0.0f;
-
+	UPROPERTY(EditAnywhere, Category="Damage")
+	FName CombatTuningRowName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AttackState")
 	bool bParryWindowOpen = false;
@@ -146,6 +148,7 @@ protected:
 	/** Last recorded game time we were attacked */
 	float LastDangerTime = -1000.0f;
 
+
 public:
 	/** Attack completed internal delegate to notify StateTree tasks */
 	FOnEnemyAttackCompleted OnAttackCompleted;
@@ -156,6 +159,9 @@ public:
 	/** Enemy died delegate. Allows external subscribers to respond to enemy death */
 	UPROPERTY(BlueprintAssignable, Category="Events")
 	FOnEnemyDied OnEnemyDied;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage", meta = (ClampMin = 0, ClampMax = 100))
+	float CurrentHP = 10.0f;
 
 public:
 

@@ -33,7 +33,7 @@ Implementation progress is tracked in `docs/implementation_checklist.md`.
 2. Only then change `[ ]` → `[x]` in the checklist.
 3. Never mark an item complete based on conversation alone — always confirm from the code.
 
----
+---[combatsystem_base.md](docs/combatsystem_base.md)
 
 ## Coding Conventions
 

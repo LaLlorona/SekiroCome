@@ -26,25 +26,25 @@
 > **우선 구현 이유**: 데미지 계산, MasterStrike 반격 조건 등 이후 모든 시스템이 스태미나에 의존한다.
 
 - [x] `ACombatCharacter`에 `CurrentSP / MaxSP` 추가 (`MaxSP = 30 + 70 * HP/100`) — `UCombatVitalityComponent`(`CurrentHP/MaxHP/CurrentSP/MaxSP`)를 만들어 `ACombatCharacter`가 소유하는 방식으로 구현 (`VitalityComponent` 필드)
-- [ ] `ACombatEnemy`에 동일한 SP 필드 추가 — 아직 미적용, `UCombatVitalityComponent`를 그대로 재사용하면 됨
+- [x] `ACombatEnemy`에 동일한 SP 필드 추가 — `VitalityComponent`(`UCombatVitalityComponent`) 소유, `BeginPlay`에서 `Initialize(CombatTuningDataTable, CombatTuningRowName)` 호출, `Tick`에서 `CustomUpdate` 명시 호출, `TakeDamage`도 `VitalityComponent::ApplyDamage` 경유로 전환 완료
 - [x] 데미지 처리: SP > 0 이면 SP 우선 차감, 초과분 즉시 HP 전이 (`UCombatVitalityComponent::ApplyDamage`)
 - [x] 스태미나 회복 틱 구현 (`SP_RegenPerSecond`, `UCombatVitalityComponent::CustomUpdate`에서 매 틱 처리 — 엔진 `TickComponent`가 아니라 `ACombatCharacter::Tick`에서 명시적으로 호출)
-- [~] 회복 정지 조건 — 공격 / 가드 / 회피 / 점프 / 스프린트 시작 시 타이머 리셋 (`SP_RegenDelay`) — 공격(`ComboAttack`/`ChargedAttack`)과 가드(`TryGuardStart`)는 `VitalityComponent->OnRegenStopTimerBegin()` 연결 완료. 회피/점프/스프린트는 `ACombatCharacter`에 해당 액션 자체가 아직 없어서 미적용 (해당 시스템 구현 시 같이 연결 필요)
+- [~] 회복 정지 조건 — 공격 / 가드 / 회피 / 점프 / 스프린트 시작 시 타이머 리셋 (`SP_RegenDelay`) — 플레이어 쪽 공격(`ComboAttack`/`ChargedAttack`)과 가드(`TryGuardStart`)는 `VitalityComponent->OnRegenStopTimerBegin()` 연결 완료. 회피/점프/스프린트는 `ACombatCharacter`에 해당 액션 자체가 아직 없어서 미적용. **`ACombatEnemy`는 SP 필드는 생겼지만 `DoAIComboAttack`/`DoAIChargedAttack`에 `OnRegenStopTimerBegin()` 호출이 아직 연결되지 않음** (해당 시스템 구현 시 같이 연결 필요)
 - [x] 이동(걷기)은 회복 정지 조건에서 제외 (현재 `DoMove`는 스태미나 영향 없음 — 유지)
 - [x] HP 변경 시 SP 최댓값 즉시 클램프 (`UCombatVitalityComponent::RecomputeMaxSP`, `ApplyDamage`/`ResetVitality`/`CustomUpdate`에서 호출)
 - [x] DataTable 생성: `UCombatTuningDataTable`(`FCombatTuningRow`: `SP_RegenPerSecond`, `SP_RegenDelayInSecond`) + 전용 `UFactory`
 
 ---
 
-## Phase 2 — 무기 데미지 타입 / 계산식 (설계 §1-1, §1-2)
+## Phase 2 — 무기 데미지 타입 / 계산식 (설계 §1-2, 3-테이블 방식)
 
 > **우선 구현 이유**: Phase 1 스태미나 시스템과 함께 데미지 파이프라인 완성.
 
-- [ ] 무기 데미지 타입 enum 추가 (`EWeaponDamageType`: Slash / Pierce / Blunt)
-- [ ] `FAttackData`에 `EWeaponDamageType` 필드 추가
-- [ ] 적 저항률 구조체 추가 (`FEnemyResistance`: Slash/Pierce/Blunt 각각 0~1)
-- [ ] 공격 배율 DataTable 추가 (일반공격 1.0 / 강공격 1.5 / 콤보 피니셔 1.3)
-- [ ] `CombatLogic::ResolveAttack`에 최종 데미지 계산식 적용
+- [x] 무기 데미지 테이블 (`FCombatWeaponDamageRow`: ThrustDamage/SlashDamage/BluntDamage) + `UCombatWeaponDamageDataTable` + 전용 `UFactory` (§1-2-1)
+- [x] 공격 종류 배율 테이블 (`FCombatAttackTypeRow`: ThrustMultiplier/SlashMultiplier/BluntMultiplier/PriorityHealthDamageRatio) + `UCombatAttackTypeDataTable` + 전용 `UFactory` (§1-2-2, 좌/우/상/하 공격·Riposte·콤보피니셔·MasterStrike 10행 예정)
+- [x] 적 방어력 테이블 (`FCombatEnemyDefenseRow`: ThrustDefense/SlashDefense/BluntDefense) + `UCombatEnemyDefenseDataTable` + 전용 `UFactory` (§1-2-3)
+- [ ] `FAttackData`에 무기 ID / 공격 종류 RowName / 적 타입 ID 등 테이블 조회 키 필드 추가
+- [ ] `CombatLogic::ResolveAttack`에 최종 데미지 계산식(§1-2-4) + 체력 우선 데미지 분리 적용(§1-2-5) 구현
 
 ---
 
@@ -66,7 +66,7 @@
 - [ ] MasterStrike 판정 창을 InGameTime 기준으로 변경 (Time Dilation 보정)
 - [ ] 무기별 판정 창 DataTable 추가 (`MasterStrike_WindowStart`, `MasterStrike_WindowEnd`, `MasterStrike_ColliderActivation`)
 - [ ] 방향 난이도 분기 구현 (§3-3: Down/Right = 자동흐름으로 MasterStrike 가능 / Up/Left = 수동 재조정 필요)
-- [ ] MasterStrike 이원 데미지 구조 (`MasterStrike_BaseDamage` + `MasterStrike_PriorityHealthDamage`)
+- [ ] MasterStrike 데미지: `UCombatAttackTypeDataTable`의 "MasterStrike" 행을 이용한 §1-2 통합 계산식 적용 (§5-4)
 - [ ] 실패 분기 구현: 판정 창 이후 플레이어 공격 시 적 공격 캔슬 (§5-3)
 - [ ] 실패 분기 구현: 일반 Block → 피해 감소, 적 콤보 유지 (§5-3)
 - [ ] PerfectBlock 반격 창 (`PerfectBlock_CounterWindow`) DataTable 추가
@@ -84,7 +84,7 @@
 - [ ] DataTable 기반 콤보 패턴 정의 (`FCombatComboRow`: 패턴 배열 + 피니셔 몽타주 + 데미지값)
 - [ ] 기본 패턴 3종 등록 (좌→우→좌 / 우→좌→우 / 아래→아래→우)
 - [ ] 패턴 매칭 성공 시 피니셔 몽타주 재생
-- [ ] 콤보 피니셔 이원 데미지 구조 (`Combo_BaseDamage` + `Combo_PriorityHealthDamage`) — §4-5
+- [ ] 콤보 피니셔 데미지: `UCombatAttackTypeDataTable`의 "ComboFinisher" 행을 이용한 §1-2 통합 계산식 적용 — §4-5
 - [ ] PerfectBlock 당하면 콤보 버퍼 초기화 (§3-5 확정 사항)
 - [ ] 적 PerfectBlock 성공 시 반격 조건 (`Enemy_CounterStaminaThreshold` DataTable 상수)
 
@@ -114,11 +114,9 @@
 - [ ] `Enemy_CounterStaminaThreshold`
 - [ ] `Combo_BufferTimeout`
 - [ ] `Combo_InputWindow`
-- [ ] `Combo_BaseDamage` / `Combo_PriorityHealthDamage` (콤보별)
 - [ ] `MasterStrike_WindowStart` / `MasterStrike_WindowEnd` / `MasterStrike_ColliderActivation` (무기별)
-- [ ] `MasterStrike_BaseDamage` / `MasterStrike_PriorityHealthDamage` (무기별)
 - [ ] `PerfectBlock_CounterWindow`
 - [ ] `PerfectBlock_GuaranteedHit`
-- [ ] 무기별 베기/찌르기/둔기 데미지
-- [ ] 적별 베기/찌르기/둔기 저항률
-- [ ] 공격 종류별 배율 (일반/강공격/콤보 피니셔)
+- [x] 무기별 찌르기/베기/둔기 데미지 (`UCombatWeaponDamageDataTable`, §1-2-1)
+- [x] 공격 종류별(좌/우/상/하 공격·Riposte·콤보피니셔·MasterStrike) 찌르기/베기/둔기 배율 + 체력 우선 비율 (`UCombatAttackTypeDataTable`, §1-2-2)
+- [x] 적 타입별 찌르기/베기/둔기 방어력 (`UCombatEnemyDefenseDataTable`, §1-2-3)
