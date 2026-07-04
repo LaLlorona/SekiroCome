@@ -2,11 +2,13 @@
 
 UCombatWeaponDamageDataTable::UCombatWeaponDamageDataTable()
 {
-	RowStruct = FCombatWeaponDamageRow::StaticStruct();
+	RowStruct = FCombatWeaponDamageDataRow::StaticStruct();
 }
 
-const FCombatWeaponDamageRow* UCombatWeaponDamageDataTable::FindByRowName(FName RowName) const
+const FCombatWeaponDamageDataRow& UCombatWeaponDamageDataTable::FindByRowNameOrThrow(FName RowName) const
 {
 	const FString ContextString = FString::Printf(TEXT("Could Not Find Row Name %s"), *RowName.ToString());
-	return FindRow<FCombatWeaponDamageRow>(RowName, ContextString);
+	const FCombatWeaponDamageDataRow* Row = FindRow<FCombatWeaponDamageDataRow>(RowName, ContextString);
+	checkf(Row, TEXT("UCombatWeaponDamageDataTable '%s': row '%s' not found"), *GetName(), *RowName.ToString());
+	return *Row;
 }

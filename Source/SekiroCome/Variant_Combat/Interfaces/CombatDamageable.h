@@ -38,4 +38,8 @@ public:
 	/** Notifies the actor of impending danger such as an incoming hit, allowing it to react. */
 	UFUNCTION(BlueprintCallable, Category="Damageable")
 	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource) = 0;
+
+	/** Returns the row key (into UCombatDefenseDataTable) identifying this actor's armor type */
+	UFUNCTION(BlueprintCallable, Category="Damageable")
+	virtual FName GetArmorTypeID() const = 0;
 };

@@ -24,6 +24,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	EAttackDirection AttackDirection;
 
+	/** Attack kind used to look up its damage multipliers in UCombatAttackTypeDataTable */
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	EAttackType AttackType = EAttackType::Left;
+
 public:
 
 	/** Perform the Anim Notify */

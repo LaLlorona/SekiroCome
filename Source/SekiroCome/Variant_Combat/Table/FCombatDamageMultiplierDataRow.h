@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Engine/DataTable.h"
-#include "FCombatAttackTypeRow.generated.h"
+#include "FCombatDamageMultiplierDataRow.generated.h"
 
 /**
  * Row key (RowName) identifies the attack type, e.g.:
@@ -9,7 +9,7 @@
  * "ComboFinisher", "MasterStrike"
  */
 USTRUCT(BlueprintType)
-struct FCombatAttackTypeRow : public FTableRowBase
+struct FCombatDamageMultiplierDataRow : public FTableRowBase
 {
 	GENERATED_BODY()
 

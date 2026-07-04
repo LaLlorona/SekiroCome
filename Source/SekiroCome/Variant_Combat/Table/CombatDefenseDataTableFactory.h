@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Factories/DataTableFactory.h"
-#include "CombatEnemyDefenseDataTableFactory.generated.h"
+#include "CombatDefenseDataTableFactory.generated.h"
 
-/** Lets Content Browser create UCombatEnemyDefenseDataTable assets directly, pre-locked to FCombatEnemyDefenseRow */
+/** Lets Content Browser create UCombatDefenseDataTable assets directly, pre-locked to FCombatDefenseRow */
 UCLASS()
-class UCombatEnemyDefenseDataTableFactory : public UDataTableFactory
+class UCombatDefenseDataTableFactory : public UDataTableFactory
 {
 	GENERATED_BODY()
 
 public:
-	UCombatEnemyDefenseDataTableFactory();
+	UCombatDefenseDataTableFactory();
 
 	virtual bool ConfigureProperties() override;
 	virtual FText GetDisplayName() const override;

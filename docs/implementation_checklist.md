@@ -29,7 +29,7 @@
 - [x] `ACombatEnemy`에 동일한 SP 필드 추가 — `VitalityComponent`(`UCombatVitalityComponent`) 소유, `BeginPlay`에서 `Initialize(CombatTuningDataTable, CombatTuningRowName)` 호출, `Tick`에서 `CustomUpdate` 명시 호출, `TakeDamage`도 `VitalityComponent::ApplyDamage` 경유로 전환 완료
 - [x] 데미지 처리: SP > 0 이면 SP 우선 차감, 초과분 즉시 HP 전이 (`UCombatVitalityComponent::ApplyDamage`)
 - [x] 스태미나 회복 틱 구현 (`SP_RegenPerSecond`, `UCombatVitalityComponent::CustomUpdate`에서 매 틱 처리 — 엔진 `TickComponent`가 아니라 `ACombatCharacter::Tick`에서 명시적으로 호출)
-- [~] 회복 정지 조건 — 공격 / 가드 / 회피 / 점프 / 스프린트 시작 시 타이머 리셋 (`SP_RegenDelay`) — 플레이어 쪽 공격(`ComboAttack`/`ChargedAttack`)과 가드(`TryGuardStart`)는 `VitalityComponent->OnRegenStopTimerBegin()` 연결 완료. 회피/점프/스프린트는 `ACombatCharacter`에 해당 액션 자체가 아직 없어서 미적용. **`ACombatEnemy`는 SP 필드는 생겼지만 `DoAIComboAttack`/`DoAIChargedAttack`에 `OnRegenStopTimerBegin()` 호출이 아직 연결되지 않음** (해당 시스템 구현 시 같이 연결 필요)
+- [~] 회복 정지 조건 — 공격 / 가드 / 회피 / 점프 / 스프린트 시작 시 타이머 리셋 (`SP_RegenDelay`) — 플레이어 쪽 공격(`ComboAttack`/`ChargedAttack`)과 가드(`TryGuardStart`), AI 쪽 공격(`DoAIComboAttack`/`DoAIChargedAttack`) 모두 `VitalityComponent->OnRegenStopTimerBegin()` 연결 완료. 회피/점프/스프린트는 `ACombatCharacter`/`ACombatEnemy`에 해당 액션 자체가 아직 없어서 미적용 (해당 시스템 구현 시 같이 연결 필요)
 - [x] 이동(걷기)은 회복 정지 조건에서 제외 (현재 `DoMove`는 스태미나 영향 없음 — 유지)
 - [x] HP 변경 시 SP 최댓값 즉시 클램프 (`UCombatVitalityComponent::RecomputeMaxSP`, `ApplyDamage`/`ResetVitality`/`CustomUpdate`에서 호출)
 - [x] DataTable 생성: `UCombatTuningDataTable`(`FCombatTuningRow`: `SP_RegenPerSecond`, `SP_RegenDelayInSecond`) + 전용 `UFactory`
@@ -42,9 +42,9 @@
 
 - [x] 무기 데미지 테이블 (`FCombatWeaponDamageRow`: ThrustDamage/SlashDamage/BluntDamage) + `UCombatWeaponDamageDataTable` + 전용 `UFactory` (§1-2-1)
 - [x] 공격 종류 배율 테이블 (`FCombatAttackTypeRow`: ThrustMultiplier/SlashMultiplier/BluntMultiplier/PriorityHealthDamageRatio) + `UCombatAttackTypeDataTable` + 전용 `UFactory` (§1-2-2, 좌/우/상/하 공격·Riposte·콤보피니셔·MasterStrike 10행 예정)
-- [x] 적 방어력 테이블 (`FCombatEnemyDefenseRow`: ThrustDefense/SlashDefense/BluntDefense) + `UCombatEnemyDefenseDataTable` + 전용 `UFactory` (§1-2-3)
-- [ ] `FAttackData`에 무기 ID / 공격 종류 RowName / 적 타입 ID 등 테이블 조회 키 필드 추가
-- [ ] `CombatLogic::ResolveAttack`에 최종 데미지 계산식(§1-2-4) + 체력 우선 데미지 분리 적용(§1-2-5) 구현
+- [x] 방어구 방어력 테이블 (`FCombatDefenseRow`: ThrustDefense/SlashDefense/BluntDefense, RowName = 방어구 타입 ID) + `UCombatDefenseDataTable` + 전용 `UFactory` (§1-2-3) — 플레이어/적 공용으로 사용하도록 `FCombatEnemyDefenseRow`/`UCombatEnemyDefenseDataTable`에서 이름 변경 (기존 `DT_EnemyDefenseData.uasset` 호환을 위해 `DefaultEngine.ini`에 `CoreRedirects` 추가)
+- [x] `FAttackData`에 공격 종류 RowName(`AttackTypeRowName`) 필드 추가 (무기 ID는 `ACombatCharacter`/`ACombatEnemy`가, 방어구 타입 ID는 `ACombatCharacter`/`ACombatEnemy`가 각각 직접 보유 — 장착 시스템은 추후 구현). `ICombatAttacker::GetWeaponID()` / `ICombatDamageable::GetArmorTypeID()` 인터페이스 게터 추가, `CombatLogic::ResolveAttack`에서 호출하여 값 확보 (실제 데미지 계산식에는 아직 미사용)
+- [ ] `CombatLogic::ResolveAttack`에 최종 데미지 계산식(§1-2-4) + 체력 우선 데미지 분리 적용(§1-2-5) 구현 — 위에서 확보한 `WeaponID`/`ArmorTypeID`/`AttackTypeRowName`으로 `WeaponDamageTable`/`AttackTypeTable`/`DefenseTable` 조회 후 계산
 
 ---
 
@@ -119,4 +119,4 @@
 - [ ] `PerfectBlock_GuaranteedHit`
 - [x] 무기별 찌르기/베기/둔기 데미지 (`UCombatWeaponDamageDataTable`, §1-2-1)
 - [x] 공격 종류별(좌/우/상/하 공격·Riposte·콤보피니셔·MasterStrike) 찌르기/베기/둔기 배율 + 체력 우선 비율 (`UCombatAttackTypeDataTable`, §1-2-2)
-- [x] 적 타입별 찌르기/베기/둔기 방어력 (`UCombatEnemyDefenseDataTable`, §1-2-3)
+- [x] 방어구 타입별 찌르기/베기/둔기 방어력 (`UCombatDefenseDataTable`, §1-2-3, 플레이어/적 공용)

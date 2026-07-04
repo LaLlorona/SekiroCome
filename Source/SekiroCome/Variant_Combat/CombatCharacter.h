@@ -68,7 +68,15 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 
 	UPROPERTY(EditAnywhere, Category="Damage")
 	FName CombatTuningRowName;
-	
+
+	/** Row key into UCombatWeaponDamageDataTable identifying the weapon this character is using. Equipping a weapon actor may replace this later. */
+	UPROPERTY(EditAnywhere, Category="Damage")
+	FName WeaponID;
+
+	/** Row key into UCombatDefenseDataTable identifying this character's armor type */
+	UPROPERTY(EditAnywhere, Category="Damage")
+	FName ArmorTypeID;
+
 protected:
 	/** Life bar widget fill color */
 	UPROPERTY(EditAnywhere, Category="Damage")
@@ -107,10 +115,6 @@ protected:
 	/** Radius of the sphere trace to notify enemies of incoming attacks */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Trace", meta = (ClampMin = 0, ClampMax = 200, Units = "cm"))
 	float DangerTraceRadius = 100.0f;
-
-	/** Amount of damage a melee attack will deal */
-	UPROPERTY(EditAnywhere, Category="Melee Attack|Damage", meta = (ClampMin = 0, ClampMax = 100))
-	float MeleeDamage = 1.0f;
 
 	/** Amount of knockback impulse a melee attack will apply */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Damage", meta = (ClampMin = 0, ClampMax = 1000, Units = "cm/s"))
@@ -236,13 +240,16 @@ public:
 	// ~begin CombatAttacker interface
 
 	/** Performs the collision check for an attack */
-	virtual void DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection) override;
+	virtual void DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection, EAttackType AttackType) override;
 
 	/** Performs the combo string check */
 	virtual void CheckCombo() override;
 
 	/** Performs the charged attack hold check */
 	virtual void CheckChargedAttack() override;
+
+	/** Returns the row key identifying the weapon this character is using */
+	virtual FName GetWeaponID() const override;
 
 	// ~end CombatAttacker interface
 
@@ -262,6 +269,9 @@ public:
 
 	/** Allows reaction to incoming attacks */
 	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource) override;
+
+	/** Returns the row key identifying this character's armor type */
+	virtual FName GetArmorTypeID() const override;
 
 	// ~end CombatDamageable interface
 

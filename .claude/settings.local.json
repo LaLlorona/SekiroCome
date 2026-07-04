@@ -11,7 +11,10 @@
       "Bash(find \"/c\" -maxdepth 3 -iname \"UE_*\")",
       "Bash(git mv *)",
       "Bash(python3 -c ' *)",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(cd /d/myfiles/programming_code/unreal/SekiroCome)",
+      "Bash(find Content -iname \"*Defense*\" -o -iname \"*Weapon*Damage*\" -o -iname \"*AttackType*\")",
+      "Bash(\"/c/Program Files/Epic Games/UE_5.7/Engine/Build/BatchFiles/Build.bat\" SekiroComeEditor Win64 Development -Project=\"D:/myfiles/programming_code/unreal/SekiroCome/SekiroCome.uproject\" -WaitMutex -FromMsBuild)"
     ]
   }
 }

@@ -19,17 +19,14 @@ UCombatVitalityComponent::UCombatVitalityComponent()
 void UCombatVitalityComponent::CustomUpdate(float DeltaTime)
 {
 	RecomputeMaxSP();
-
 	if (HpRegenLeftTime > 0.0f)
 	{
-		HpRegenLeftTime = FMath::Max(0.0f, HpRegenLeftTime - DeltaTime);
+		HpRegenLeftTime -= DeltaTime ;
 		return;
 	}
 
-	if (const FCombatTuningRow* Row = CombatTuningDataTable->FindByRowName(CombatTuningRowName))
-	{
-		CurrentSP = FMath::Min(CurrentSP + Row->SP_RegenPerSecond * DeltaTime, MaxSP);
-	}
+	const FCombatTuningRow& Row = CombatTuningDataTable->FindByRowNameOrThrow(CombatTuningRowName);
+	CurrentSP = FMath::Min(CurrentSP + Row.SP_RegenPerSecond * DeltaTime, MaxSP);
 }
 
 void UCombatVitalityComponent::RecomputeMaxSP()
@@ -40,11 +37,8 @@ void UCombatVitalityComponent::RecomputeMaxSP()
 
 void UCombatVitalityComponent::OnRegenStopTimerBegin()
 {
-	if (const FCombatTuningRow* Row = CombatTuningDataTable->FindByRowName(CombatTuningRowName))
-	{
-		HpRegenLeftTime = Row->SP_RegenDelayInSecond;
-		
-	}
+	const FCombatTuningRow& Row = CombatTuningDataTable->FindByRowNameOrThrow(CombatTuningRowName);
+	HpRegenLeftTime = Row.SP_RegenDelayInSecond;
 }
 
 void UCombatVitalityComponent::Initialize(UCombatTuningDataTable* InTuningDataTable, FName InTuningRowName)
@@ -79,6 +73,7 @@ float UCombatVitalityComponent::ApplyDamage(float Damage)
 	}
 
 	RecomputeMaxSP();
+	OnRegenStopTimerBegin();
 
 	return Damage;
 }

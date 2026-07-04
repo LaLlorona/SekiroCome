@@ -57,6 +57,14 @@ public:
 	UPROPERTY(EditAnywhere, Category="Damage")
 	FName CombatTuningRowName;
 
+	/** Row key into UCombatWeaponDamageDataTable identifying the weapon this enemy is using. Equipping a weapon actor may replace this later. */
+	UPROPERTY(EditAnywhere, Category="Damage")
+	FName WeaponID;
+
+	/** Row key into UCombatDefenseDataTable identifying this enemy's armor type */
+	UPROPERTY(EditAnywhere, Category="Damage")
+	FName ArmorTypeID;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AttackState")
 	bool bParryWindowOpen = false;
 protected:
@@ -79,10 +87,6 @@ protected:
 	/** Radius of the sphere trace for melee attacks */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Trace", meta = (ClampMin = 0, ClampMax = 500, Units = "cm"))
 	float MeleeTraceRadius = 50.0f;
-
-	/** Amount of damage a melee attack will deal */
-	UPROPERTY(EditAnywhere, Category="Melee Attack|Damage", meta = (ClampMin = 0, ClampMax = 100))
-	float MeleeDamage = 1.0f;
 
 	/** Amount of knockback impulse a melee attack will apply */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Damage", meta = (ClampMin = 0, ClampMax = 1000, Units = "cm/s"))
@@ -185,7 +189,7 @@ public:
 	// ~begin ICombatAttacker interface
 
 	/** Performs an attack's collision check */
-	virtual void DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection) override;
+	virtual void DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection, EAttackType AttackType) override;
 
 	/** Performs a combo attack's check to continue the string */
 	UFUNCTION(BlueprintCallable, Category="Attacker")
@@ -194,6 +198,9 @@ public:
 	/** Performs a charged attack's check to loop the charge animation */
 	UFUNCTION(BlueprintCallable, Category="Attacker")
 	virtual void CheckChargedAttack() override;
+
+	/** Returns the row key identifying the weapon this enemy is using */
+	virtual FName GetWeaponID() const override;
 
 	// ~end ICombatAttacker interface
 
@@ -210,6 +217,9 @@ public:
 
 	/** Allows the enemy to react to incoming attacks */
 	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource) override;
+
+	/** Returns the row key identifying this enemy's armor type */
+	virtual FName GetArmorTypeID() const override;
 
 	// ~end ICombatDamageable interface
 

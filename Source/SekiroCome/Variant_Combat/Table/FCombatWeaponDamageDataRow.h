@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Engine/DataTable.h"
-#include "FCombatWeaponDamageRow.generated.h"
+#include "FCombatWeaponDamageDataRow.generated.h"
 
 /** Row key (RowName) identifies the weapon (e.g. weapon ID) */
 USTRUCT(BlueprintType)
-struct FCombatWeaponDamageRow : public FTableRowBase
+struct FCombatWeaponDamageDataRow : public FTableRowBase
 {
 	GENERATED_BODY()
 

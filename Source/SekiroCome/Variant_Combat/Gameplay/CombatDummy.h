@@ -53,7 +53,9 @@ public:
 	/** Allows reaction to incoming attacks */
 	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource) override;
 
+	virtual FName GetArmorTypeID() const override;
 	// ~End CombatDamageable interface
+	
 
 protected:
 

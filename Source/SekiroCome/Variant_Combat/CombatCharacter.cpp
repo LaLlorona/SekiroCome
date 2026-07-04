@@ -242,7 +242,7 @@ void ACombatCharacter::ChangeToRiposteState()
 	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::PerfectParryRiposte);
 }
 
-void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection)
+void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection, EAttackType AttackType)
 {
 	TArray<FHitResult> OutHits;
 
@@ -278,7 +278,7 @@ void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection At
 
 				// pass the damage event to the actor
 				{
-					FAttackData AttackData(MeleeDamage, CurrentHit.ImpactPoint, Impulse, AttackDirection);
+					FAttackData AttackData(CurrentHit.ImpactPoint, Impulse, AttackDirection, AttackType);
 					CombatLogic::ResolveAttack(this, this, CurrentHit.GetActor(), Damageable, AttackData);
 				}
 			}
@@ -326,6 +326,11 @@ void ACombatCharacter::CheckChargedAttack()
 	{
 		AnimInstance->Montage_JumpToSection(bIsChargingAttack ? ChargeLoopSection : ChargeAttackSection, ChargedAttackMontage);
 	}
+}
+
+FName ACombatCharacter::GetWeaponID() const
+{
+	return WeaponID;
 }
 
 void ACombatCharacter::NotifyEnemiesOfIncomingAttack()
@@ -417,6 +422,11 @@ void ACombatCharacter::ApplyHealing(float Healing, AActor* Healer)
 void ACombatCharacter::NotifyDanger(const FVector& DangerLocation, AActor* DangerSource)
 {
 	// stub
+}
+
+FName ACombatCharacter::GetArmorTypeID() const
+{
+	return ArmorTypeID;
 }
 
 void ACombatCharacter::RespawnCharacter()

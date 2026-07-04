@@ -25,7 +25,7 @@ public:
 
 	/** Performs an attack's collision check. Usually called from a montage's AnimNotify */
 	UFUNCTION(BlueprintCallable, Category="Attacker")
-	virtual void DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection) = 0;
+	virtual void DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection, EAttackType AttackType) = 0;
 
 	/** Performs a combo attack's check to continue the string. Usually called from a montage's AnimNotify */
 	UFUNCTION(BlueprintCallable, Category="Attacker")
@@ -34,4 +34,8 @@ public:
 	/** Performs a charged attack's check to loop the charge animation. Usually called from a montage's AnimNotify */
 	UFUNCTION(BlueprintCallable, Category="Attacker")
 	virtual void CheckChargedAttack() = 0;
+
+	/** Returns the row key (into UCombatWeaponDamageDataTable) identifying the weapon this attacker is currently using */
+	UFUNCTION(BlueprintCallable, Category="Attacker")
+	virtual FName GetWeaponID() const = 0;
 };

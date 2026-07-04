@@ -3,13 +3,15 @@
 
 struct FAttackData
 {
-	float Damage = 0.f;
 	FVector DamageLocation = FVector::ZeroVector;
 	FVector DamageImpulse = FVector::ZeroVector;
 	EAttackDirection AttackDirection = EAttackDirection::Down;
 
+	/** This attack's kind (e.g. Left/Right/Up/Down, Riposte, ComboFinisher, MasterStrike). Used as the row key into UCombatAttackTypeDataTable. */
+	EAttackType AttackType = EAttackType::Left;
+
 	FAttackData() = default;
-	FAttackData(float InDamage, const FVector& InLocation, const FVector& InImpulse, EAttackDirection InDirection): Damage(InDamage), DamageLocation(InLocation), DamageImpulse(InImpulse), AttackDirection(InDirection)
+	FAttackData(const FVector& InLocation, const FVector& InImpulse, const EAttackDirection InDirection, const EAttackType InAttackType): DamageLocation(InLocation), DamageImpulse(InImpulse), AttackDirection(InDirection), AttackType(InAttackType)
 	{
 	}
 };

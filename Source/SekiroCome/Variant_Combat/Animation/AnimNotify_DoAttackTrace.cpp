@@ -10,7 +10,7 @@ void UAnimNotify_DoAttackTrace::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 	// cast the owner to the attacker interface
 	if (ICombatAttacker* AttackerInterface = Cast<ICombatAttacker>(MeshComp->GetOwner()))
 	{
-		AttackerInterface->DoAttackTrace(AttackBoneName, AttackDirection);
+		AttackerInterface->DoAttackTrace(AttackBoneName, AttackDirection, AttackType);
 	}
 }
 

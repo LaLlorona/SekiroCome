@@ -18,6 +18,9 @@ class ACombatDamageableBox : public AActor, public ICombatDamageable
 	/** Damageable box mesh */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Mesh;
+	
+	UPROPERTY(EditAnywhere, Category="Damage")
+	FName ArmorTypeID;
 
 public:	
 
@@ -47,6 +50,8 @@ protected:
 
 	/** Timer callback to remove the box from the level after it dies */
 	void RemoveFromLevel();
+	
+	
 
 public:
 
@@ -66,6 +71,7 @@ public:
 
 	/** Allows reaction to incoming attacks */
 	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource) override;
+	virtual FName GetArmorTypeID() const override;
 
 	// ~End CombatDamageable interface
 };

@@ -3,7 +3,7 @@
 #if WITH_EDITOR
 
 #include "CombatWeaponDamageDataTable.h"
-#include "FCombatWeaponDamageRow.h"
+#include "FCombatWeaponDamageDataRow.h"
 
 UCombatWeaponDamageDataTableFactory::UCombatWeaponDamageDataTableFactory()
 {
@@ -15,7 +15,7 @@ UCombatWeaponDamageDataTableFactory::UCombatWeaponDamageDataTableFactory()
 bool UCombatWeaponDamageDataTableFactory::ConfigureProperties()
 {
 	// always use FCombatWeaponDamageRow, skip the row-structure picker dialog
-	Struct = FCombatWeaponDamageRow::StaticStruct();
+	Struct = FCombatWeaponDamageDataRow::StaticStruct();
 	return true;
 }
 

@@ -70,6 +70,8 @@ void ACombatEnemy::DoAIComboAttack()
 	// raise the attacking flag
 	bIsAttacking = true;
 
+	VitalityComponent->OnRegenStopTimerBegin();
+
 	// choose how many times we're going to attack
 	TargetComboCount = FMath::RandRange(1, ComboSectionNames.Num() - 1);
 
@@ -100,6 +102,8 @@ void ACombatEnemy::DoAIChargedAttack()
 
 	// raise the attacking flag
 	bIsAttacking = true;
+
+	VitalityComponent->OnRegenStopTimerBegin();
 
 	// choose how many loops are we going to charge for
 	TargetChargeLoops = FMath::RandRange(MinChargeLoops, MaxChargeLoops);
@@ -140,7 +144,7 @@ float ACombatEnemy::GetLastDangerTime() const
 	return LastDangerTime;
 }
 
-void ACombatEnemy::DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection)
+void ACombatEnemy::DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection, EAttackType AttackType)
 {
 	// sweep for objects in front of the character to be hit by the attack
 	TArray<FHitResult> OutHits;
@@ -176,7 +180,7 @@ void ACombatEnemy::DoAttackTrace(FName DamageSourceBone, EAttackDirection Attack
 				{
 					// knock upwards and away from the impact normal
 					const FVector Impulse = (CurrentHit.ImpactNormal * -MeleeKnockbackImpulse) + (FVector::UpVector * MeleeLaunchImpulse);
-					FAttackData AttackData(MeleeDamage, CurrentHit.ImpactPoint, Impulse, AttackDirection);
+					FAttackData AttackData(CurrentHit.ImpactPoint, Impulse, AttackDirection, AttackType);
 					CombatLogic::ResolveAttack(this, this, CurrentHit.GetActor(), Damageable, AttackData);
 				}
 			}
@@ -210,6 +214,11 @@ void ACombatEnemy::CheckChargedAttack()
 	{
 		AnimInstance->Montage_JumpToSection(CurrentChargeLoop >= TargetChargeLoops ? ChargeAttackSection : ChargeLoopSection, ChargedAttackMontage);
 	}
+}
+
+FName ACombatEnemy::GetWeaponID() const
+{
+	return WeaponID;
 }
 
 void ACombatEnemy::ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
@@ -279,6 +288,11 @@ void ACombatEnemy::NotifyDanger(const FVector& DangerLocation, AActor* DangerSou
 		LastDangerLocation = DangerLocation;
 		LastDangerTime = GetWorld()->GetTimeSeconds();
 	}
+}
+
+FName ACombatEnemy::GetArmorTypeID() const
+{
+	return ArmorTypeID;
 }
 
 void ACombatEnemy::RemoveFromLevel()

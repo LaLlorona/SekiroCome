@@ -2,12 +2,12 @@
 
 #if WITH_EDITOR
 
-#include "CombatAttackTypeDataTable.h"
-#include "FCombatAttackTypeRow.h"
+#include "CombatDamageMultiplierTable.h"
+#include "FCombatDamageMultiplierDataRow.h"
 
 UCombatAttackTypeDataTableFactory::UCombatAttackTypeDataTableFactory()
 {
-	SupportedClass = UCombatAttackTypeDataTable::StaticClass();
+	SupportedClass = UCombatDamageMultiplierTable::StaticClass();
 	bCreateNew = true;
 	bEditAfterNew = true;
 }
@@ -15,7 +15,7 @@ UCombatAttackTypeDataTableFactory::UCombatAttackTypeDataTableFactory()
 bool UCombatAttackTypeDataTableFactory::ConfigureProperties()
 {
 	// always use FCombatAttackTypeRow, skip the row-structure picker dialog
-	Struct = FCombatAttackTypeRow::StaticStruct();
+	Struct = FCombatDamageMultiplierDataRow::StaticStruct();
 	return true;
 }
 
@@ -28,7 +28,7 @@ UDataTable* UCombatAttackTypeDataTableFactory::MakeNewDataTable(UObject* InParen
 {
 	// UDataTableFactory::MakeNewDataTable hardcodes NewObject<UDataTable>(...), ignoring SupportedClass,
 	// so this must be overridden to actually construct our subclass.
-	return NewObject<UCombatAttackTypeDataTable>(InParent, Name, Flags);
+	return NewObject<UCombatDamageMultiplierTable>(InParent, Name, Flags);
 }
 
 #endif // WITH_EDITOR

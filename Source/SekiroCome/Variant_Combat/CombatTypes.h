@@ -12,6 +12,22 @@ enum class EAttackDirection : uint8
 	Left
 };
 
+/** Row key into UCombatAttackTypeDataTable identifying this attack's kind. Values must match FCombatAttackTypeRow RowNames exactly (see FCombatAttackTypeRow.h). */
+UENUM(BlueprintType)
+enum class EAttackType : uint8
+{
+	Left,
+	Right,
+	Up,
+	Down,
+	LeftRiposte,
+	RightRiposte,
+	UpRiposte,
+	DownRiposte,
+	ComboFinisher,
+	MasterStrike
+};
+
 UENUM(BlueprintType)
 enum class EParryResult : uint8
 {

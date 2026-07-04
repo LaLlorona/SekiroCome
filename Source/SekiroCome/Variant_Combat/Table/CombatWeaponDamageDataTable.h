@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "FCombatWeaponDamageRow.h"
+#include "FCombatWeaponDamageDataRow.h"
 #include "CombatWeaponDamageDataTable.generated.h"
 
 /** DataTable locked to FCombatWeaponDamageRow, so any table of this class always uses that row schema */
@@ -14,6 +14,6 @@ class SEKIROCOME_API UCombatWeaponDamageDataTable : public UDataTable
 public:
 	UCombatWeaponDamageDataTable();
 
-	/** Finds a row by name, returns nullptr if not found */
-	const FCombatWeaponDamageRow* FindByRowName(FName RowName) const;
+	/** Finds a row by name. Crashes (checkf) if the row does not exist - a missing row is a data-authoring bug, not a normal runtime case */
+	const FCombatWeaponDamageDataRow& FindByRowNameOrThrow(FName RowName) const;
 };
