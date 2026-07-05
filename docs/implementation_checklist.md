@@ -44,7 +44,7 @@
 - [x] 공격 종류 배율 테이블 (`FCombatAttackTypeRow`: ThrustMultiplier/SlashMultiplier/BluntMultiplier/PriorityHealthDamageRatio) + `UCombatAttackTypeDataTable` + 전용 `UFactory` (§1-2-2, 좌/우/상/하 공격·Riposte·콤보피니셔·MasterStrike 10행 예정)
 - [x] 방어구 방어력 테이블 (`FCombatDefenseRow`: ThrustDefense/SlashDefense/BluntDefense, RowName = 방어구 타입 ID) + `UCombatDefenseDataTable` + 전용 `UFactory` (§1-2-3) — 플레이어/적 공용으로 사용하도록 `FCombatEnemyDefenseRow`/`UCombatEnemyDefenseDataTable`에서 이름 변경 (기존 `DT_EnemyDefenseData.uasset` 호환을 위해 `DefaultEngine.ini`에 `CoreRedirects` 추가)
 - [x] `FAttackData`에 공격 종류 RowName(`AttackTypeRowName`) 필드 추가 (무기 ID는 `ACombatCharacter`/`ACombatEnemy`가, 방어구 타입 ID는 `ACombatCharacter`/`ACombatEnemy`가 각각 직접 보유 — 장착 시스템은 추후 구현). `ICombatAttacker::GetWeaponID()` / `ICombatDamageable::GetArmorTypeID()` 인터페이스 게터 추가, `CombatLogic::ResolveAttack`에서 호출하여 값 확보 (실제 데미지 계산식에는 아직 미사용)
-- [ ] `CombatLogic::ResolveAttack`에 최종 데미지 계산식(§1-2-4) + 체력 우선 데미지 분리 적용(§1-2-5) 구현 — 위에서 확보한 `WeaponID`/`ArmorTypeID`/`AttackTypeRowName`으로 `WeaponDamageTable`/`AttackTypeTable`/`DefenseTable` 조회 후 계산
+- [x] `CombatLogic::ResolveAttack`에 최종 데미지 계산식(§1-2-4) + 체력 우선 데미지 분리 적용(§1-2-5) 구현 — `CombatLogic::CalculateFinalDamage`가 `FDamageData(PriorityHealthDamage, RemainingDamage)`를 반환하도록 구현, `ICombatDamageable::ApplyDamage`/`UCombatVitalityComponent::ApplyDamage` 모두 `FDamageData`를 받도록 변경. `ACombatCharacter`/`ACombatEnemy`는 실제 반영 로직을 `ApplyDamageToVitality(const FDamageData&)` private 헬퍼로 분리하고, 엔진 표준 `TakeDamage(float,...)` 오버라이드는 이 프로젝트에서 아무도 호출하지 않아 완전히 제거함
 
 ---
 

@@ -10,7 +10,6 @@
 #include "Animation/AnimInstance.h"
 #include "CombatCharacter.generated.h"
 
-enum class ECombatInputDirectionEnum : uint8;
 class UCombatMontageSet;
 class UPlayerCombatStateMachineComponent;
 class UCombatCharacterInputComponent;
@@ -62,10 +61,7 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 
 	UPROPERTY(VisibleAnywhere, Category="Components", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UCombatCharacterInputComponent> CombatInputComponent;
-
-	UPROPERTY(EditAnywhere, Category="Damage")
-	UCombatTuningDataTable* CombatTuningDataTable;
-
+	
 	UPROPERTY(EditAnywhere, Category="Damage")
 	FName CombatTuningRowName;
 
@@ -132,6 +128,10 @@ protected:
 	/** Names of the AnimMontage sections that correspond to each stage of the combo attack */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Combo")
 	TArray<FName> ComboSectionNames;
+
+	/** Which section of ComboAttackMontage to enter when starting an attack in each direction */
+	UPROPERTY(EditAnywhere, Category="Melee Attack|Combo")
+	TMap<EAttackDirection, FName> DirectionalAttackSections;
 
 	/** Max amount of time that may elapse for a combo attack input to not be considered stale */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Combo", meta = (ClampMin = 0, ClampMax = 5, Units = "s"))
@@ -212,8 +212,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoComboAttackEnd();
 
-	UFUNCTION(BlueprintCallable, Category="input")
-	ECombatInputDirectionEnum GetCombatInputDirection() const;
+	/** Reads the current WASD move input as a directional value, for aiming while Idle. Returns false if there is no input. */
+	bool GetMoveAttackDirection(EAttackDirection& OutDirection) const;
+
+	/** The direction the player is currently aiming/attacking in, for the animation blueprint's upper body pose */
+	UFUNCTION(BlueprintPure, Category="Combat")
+	EAttackDirection GetPreparedAttackDirection() const;
+
+	/** True while an attack montage is currently playing */
+	bool IsAttacking() const { return bIsAttacking; }
+
+	/** Row key into UCombatTuningDataTable for this character's tunable values (stamina regen, hit stun, etc.) */
+	FName GetCombatTuningRowName() const { return CombatTuningRowName; }
+
+	/** True while the character is in the Hit (stagger) state and cannot start a new attack */
+	bool IsBeingHit() const;
 
 	void ToggleCamera();
 	void TryLockOnCamera();
@@ -259,7 +272,7 @@ public:
 	void NotifyEnemiesOfIncomingAttack();
 
 	/** Handles damage and knockback events */
-	virtual void ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse) override;
+	virtual void ApplyDamage(const FDamageData& DamageData, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse) override;
 
 	/** Handles death events */
 	virtual void HandleDeath() override;
@@ -285,11 +298,14 @@ public:
 
 public:
 
-	/** Overrides the default TakeDamage functionality */
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
 	/** Overrides landing to reset damage ragdoll physics */
 	virtual void Landed(const FHitResult& Hit) override;
+
+private:
+
+	/** Shared by TakeDamage() (generic engine damage, treated as fully stamina-first) and ApplyDamage() (combat damage with the real priority/remaining split). Reduces VitalityComponent, checks death, updates the life bar / ragdoll blend */
+	float ApplyDamageToVitality(const FDamageData& DamageData);
+
 	/** Blueprint handler to play damage dealt effects */
 protected:
 

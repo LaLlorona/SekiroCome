@@ -122,6 +122,12 @@ void ACombatCharacter::DoLook(float Yaw, float Pitch)
 
 void ACombatCharacter::DoComboAttackStart()
 {
+	// can't start a new attack while reeling from a hit
+	if (IsBeingHit())
+	{
+		return;
+	}
+
 	// are we already playing an attack animation?
 	if (bIsAttacking)
 	{
@@ -131,7 +137,14 @@ void ACombatCharacter::DoComboAttackStart()
 		return;
 	}
 
-	// perform a combo attack
+	// only start a fresh attack from the Idle state (e.g. not while guarding)
+	if (CombatStateMachineComponent->GetCurrentStateEnum() != ECombatStateEnum::Idle)
+	{
+		return;
+	}
+
+	// enter the Attack state and perform a combo attack
+	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Attack);
 	ComboAttack();
 }
 
@@ -140,9 +153,14 @@ void ACombatCharacter::DoComboAttackEnd()
 	// stub
 }
 
-ECombatInputDirectionEnum ACombatCharacter::GetCombatInputDirection() const
+bool ACombatCharacter::GetMoveAttackDirection(EAttackDirection& OutDirection) const
 {
-	return CombatInputComponent->GetCombatInputDirection();
+	return CombatInputComponent->GetMoveAttackDirection(OutDirection);
+}
+
+EAttackDirection ACombatCharacter::GetPreparedAttackDirection() const
+{
+	return CombatStateMachineComponent->GetPreparedAttackDirection();
 }
 
 
@@ -153,6 +171,7 @@ void ACombatCharacter::ResetHP()
 
 	// update the life bar
 	LifeBarWidget->SetLifePercentage(1.0f);
+	LifeBarWidget->SetStaminaPercentage(1.0f);
 }
 
 void ACombatCharacter::ComboAttack()
@@ -178,6 +197,12 @@ void ACombatCharacter::ComboAttack()
 		{
 			// set the end delegate for the montage
 			AnimInstance->Montage_SetEndDelegate(OnAttackMontageEnded, ComboAttackMontage);
+		}
+
+		// jump into the section matching the direction we're currently aiming
+		if (const FName* SectionName = DirectionalAttackSections.Find(GetPreparedAttackDirection()))
+		{
+			AnimInstance->Montage_JumpToSection(*SectionName, ComboAttackMontage);
 		}
 	}
 
@@ -235,6 +260,11 @@ void ACombatCharacter::AttackMontageEnded(UAnimMontage* Montage, bool bInterrupt
 bool ACombatCharacter::CanParryNow() const
 {
 	return CombatStateMachineComponent->CanParryNow();
+}
+
+bool ACombatCharacter::IsBeingHit() const
+{
+	return CombatStateMachineComponent->IsBeingHit();
 }
 
 void ACombatCharacter::ChangeToRiposteState()
@@ -371,11 +401,9 @@ void ACombatCharacter::NotifyEnemiesOfIncomingAttack()
 	}
 }
 
-void ACombatCharacter::ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
+void ACombatCharacter::ApplyDamage(const FDamageData& DamageData, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
 {
-	// pass the damage event to the actor
-	FDamageEvent DamageEvent;
-	const float ActualDamage = TakeDamage(Damage, DamageEvent, nullptr, DamageCauser);
+	const float ActualDamage = ApplyDamageToVitality(DamageData);
 
 	// only process knockback and effects if we received nonzero damage
 	if (ActualDamage > 0.0f)
@@ -453,7 +481,7 @@ EAnimationStateEnum ACombatCharacter::GetCurrentAnimationState()
 	
 }
 
-float ACombatCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float ACombatCharacter::ApplyDamageToVitality(const FDamageData& DamageData)
 {
 	// only process damage if the character is still alive
 	if (!VitalityComponent->IsAlive())
@@ -461,8 +489,8 @@ float ACombatCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 		return 0.0f;
 	}
 
-	// reduce the current HP
-	VitalityComponent->ApplyDamage(Damage);
+	// reduce the current HP (priority health bypasses stamina, remaining follows stamina-first/overflow)
+	const float Damage = VitalityComponent->ApplyDamage(DamageData);
 
 	// have we run out of HP?
 	if (!VitalityComponent->IsAlive())
@@ -474,10 +502,14 @@ float ACombatCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 	{
 		// update the life bar
 		LifeBarWidget->SetLifePercentage(VitalityComponent->GetHPPercentage());
+		LifeBarWidget->SetStaminaPercentage(VitalityComponent->GetStaminaPercentage());
 
 		// enable partial ragdoll physics, but keep the pelvis vertical
 		GetMesh()->SetPhysicsBlendWeight(0.5f);
 		GetMesh()->SetBodySimulatePhysics(PelvisBoneName, false);
+
+		// enter the Hit (stagger) state so a new attack can't be started mid-reaction
+		CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Hit);
 	}
 
 	// return the received damage amount
@@ -515,9 +547,9 @@ void ACombatCharacter::BeginPlay()
 
 	// reset HP to maximum
 	ResetHP();
-	CombatStateMachineComponent->Initialize(FCombatStateInitializeParameter(CombatMontageSet, this));
+	CombatStateMachineComponent->Initialize(FCombatStateInitializeParameter(CombatMontageSet, this, EAttackDirection::Down));
 	CombatInputComponent->Initialize(this);
-	VitalityComponent->Initialize(CombatTuningDataTable, CombatTuningRowName);
+	VitalityComponent->Initialize(CombatTuningRowName);
 }
 
 
@@ -565,5 +597,6 @@ void ACombatCharacter::Tick(float DeltaTime)
 	}
 	CombatStateMachineComponent->UpdateCombatState(DeltaTime);
 	VitalityComponent->CustomUpdate(DeltaTime);
+	LifeBarWidget->SetStaminaPercentage(VitalityComponent->GetStaminaPercentage());
 }
 

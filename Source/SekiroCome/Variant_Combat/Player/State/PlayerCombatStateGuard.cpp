@@ -28,11 +28,13 @@ EAnimationStateEnum UPlayerCombatStateGuard::GetAnimationStateEnum()
 	return EAnimationStateEnum::Guard;
 }
 
+EAttackDirection UPlayerCombatStateGuard::GetPreparedAttackDirection() const
+{
+	return InitParam.StateEnterAttackDirection;
+}
+
 bool UPlayerCombatStateGuard::CanParryNow() const
 {
-	auto asdf = InitParam.OwnerCharacter.Get()->GetCombatInputDirection();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, asdf == ECombatInputDirectionEnum::NoInput ? TEXT("NoInput") : TEXT("HasInput"));
-	
 	return ElapsedTimeFromStateEnter <= CombatDefine::RiposteMinimumTimeWindow;
 }
 

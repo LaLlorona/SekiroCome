@@ -1,5 +1,6 @@
 #include "CombatLogic.h"
 #include "CombatLogic/FAttackData.h"
+#include "CombatLogic/FDamageData.h"
 #include "Interfaces/CombatAttacker.h"
 #include "Interfaces/CombatDamageable.h"
 #include "Interfaces/CombatParryable.h"
@@ -17,14 +18,16 @@
 
 namespace CombatLogic
 {
-	float CalculateFinalDamage(const FCombatDamageMultiplierDataRow& DamageMultiplierData, const FCombatWeaponDamageDataRow& WeaponDamageRowData, const FCombatArmorDataRow& ArmorDataRow)
+	FDamageData CalculateFinalDamage(const FCombatDamageMultiplierDataRow& DamageMultiplierData, const FCombatWeaponDamageDataRow& WeaponDamageRowData, const FCombatArmorDataRow& ArmorDataRow)
 	{
 		// §1-2-4: 속성별 (무기 데미지 × 공격 종류 배율 - 방어력)에 최소 1 보장(chip damage floor)을 적용한 뒤 합산 (최소 3, 상한 없음)
 		const float ThrustContribution = FMath::Max(1.0f, (WeaponDamageRowData.ThrustDamage * DamageMultiplierData.ThrustMultiplier) - ArmorDataRow.ThrustDefense);
 		const float SlashContribution = FMath::Max(1.0f, (WeaponDamageRowData.SlashDamage * DamageMultiplierData.SlashMultiplier) - ArmorDataRow.SlashDefense);
 		const float BluntContribution = FMath::Max(1.0f, (WeaponDamageRowData.BluntDamage * DamageMultiplierData.BluntMultiplier) - ArmorDataRow.BluntDefense);
+		auto totalDamage = ThrustContribution + SlashContribution + BluntContribution;
+		auto finalDamageData = FDamageData(totalDamage * DamageMultiplierData.PriorityHealthDamageRatio, totalDamage * (1 - DamageMultiplierData.PriorityHealthDamageRatio));
 
-		return ThrustContribution + SlashContribution + BluntContribution;
+		return finalDamageData;
 	}
 
 	void ResolveAttack(AActor* AttackerActor, ICombatAttacker* Attacker, AActor* DamagedActor, ICombatDamageable* Damageable, const FAttackData& AttackData)
@@ -37,7 +40,7 @@ namespace CombatLogic
 		const FCombatWeaponDamageDataRow& WeaponDamageRowData = TableManager->WeaponDamageTable->FindByRowNameOrThrow(WeaponID);
 		const FCombatArmorDataRow& ArmorDataRow = TableManager->DefenseTable->FindByRowNameOrThrow(ArmorTypeID);
 
-		const float finalDamage = CalculateFinalDamage(DamageMultiplierData, WeaponDamageRowData, ArmorDataRow);
+		const FDamageData DamageData = CalculateFinalDamage(DamageMultiplierData, WeaponDamageRowData, ArmorDataRow);
 
 
 
@@ -48,13 +51,13 @@ namespace CombatLogic
 				if (ICombatDamageable* AttackerDamageable = Cast<ICombatDamageable>(AttackerActor))
 				{
 					//ToDo: Reposte Animation 재생
-					AttackerDamageable->ApplyDamage(finalDamage, AttackerActor, AttackData.DamageLocation, AttackData.DamageImpulse);
+					AttackerDamageable->ApplyDamage(DamageData, AttackerActor, AttackData.DamageLocation, AttackData.DamageImpulse);
 					/*Parryable->*/
 					Parryable->ChangeToRiposteState();
 					return;
 				}
 			}
 		}
-		Damageable->ApplyDamage(finalDamage, AttackerActor, AttackData.DamageLocation, AttackData.DamageImpulse);
+		Damageable->ApplyDamage(DamageData, AttackerActor, AttackData.DamageLocation, AttackData.DamageImpulse);
 	}
 }

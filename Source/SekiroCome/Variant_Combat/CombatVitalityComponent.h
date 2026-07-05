@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "CombatLogic/FDamageData.h"
 #include "CombatVitalityComponent.generated.h"
 
 class UCombatTuningDataTable;
@@ -14,14 +15,7 @@ class SEKIROCOME_API UCombatVitalityComponent : public UActorComponent
 	GENERATED_BODY()
 	float HpRegenLeftTime = 0.0f;
 
-	UPROPERTY()
-	TObjectPtr<UCombatTuningDataTable> CombatTuningDataTable;
-
 	FName CombatTuningRowName;
-
-	/** Recomputes MaxSP from the current HP ratio and clamps CurrentSP to it */
-	void RecomputeMaxSP();
-
 
 public:
 	// Sets default values for this component's properties
@@ -35,7 +29,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage")
 	float CurrentHP = 0.0f;
 
-	/** MaxSP = 30 + 70 * (CurrentHP / MaxHP), recomputed whenever HP changes */
+	/** Absolute SP scale (fixed at 100, same as MaxHP) — used as the denominator for the stamina bar percentage. The actual usable cap at any moment is GetCurrentPossibleMaxSP() */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage")
 	float MaxSP = 100.0f;
 
@@ -53,8 +47,8 @@ public:
 	/** Resets CurrentHP to MaxHP */
 	void ResetVitality();
 
-	/** Reduces CurrentHP by Damage (not clamped, mirrors previous TakeDamage behavior). Returns the amount applied, or 0 if already dead */
-	float ApplyDamage(float Damage);
+	/** Applies PriorityHealthDamage directly to CurrentHP, then RemainingDamage via the stamina-first/overflow rule. Returns the total amount applied, or 0 if already dead */
+	float ApplyDamage(const FDamageData& DamageData);
 
 	/** True while CurrentHP is above zero */
 	bool IsAlive() const { return CurrentHP > 0.0f; }
@@ -62,10 +56,15 @@ public:
 	/** CurrentHP / MaxHP, safe against MaxHP == 0 */
 	float GetHPPercentage() const;
 
+	float GetStaminaPercentage() const;
+
+	/** The usable SP cap right now: 30 + 70 * (CurrentHP / MaxHP). Computed on demand, never cached */
+	float GetCurrentPossibleMaxSP() const;
+
 	/** Called explicitly by the owner (e.g. from its Tick), instead of relying on this component's own TickComponent */
 	void CustomUpdate(float DeltaTime);
 
 	void OnRegenStopTimerBegin();
 
-	void Initialize(UCombatTuningDataTable* InTuningDataTable, FName InTuningRowName);
+	void Initialize(FName InTuningRowName);
 };

@@ -23,4 +23,9 @@ public:
 	// Sets the life bar fill color
 	UFUNCTION(BlueprintImplementableEvent, Category="Life Bar")
 	void SetBarColor(FLinearColor Color);
+
+
+	/** Sets the life bar to the provided 0-1 percentage value*/
+	UFUNCTION(BlueprintImplementableEvent, Category="Stamina Bar")
+	void SetStaminaPercentage(float Percent);
 };

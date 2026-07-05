@@ -3,16 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PlayerCombatState.h"
-#include "FCombatStateInitializeParameter.h"
 
-#include "PlayerCombatStatePerfectParryRiposte.generated.h"
+#include "FCombatStateInitializeParameter.h"
+#include "PlayerCombatState.h"
+
+#include "PlayerCombatStateHit.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
-class SEKIROCOME_API UPlayerCombatStatePerfectParryRiposte : public UObject, public IPlayerCombatState
+class SEKIROCOME_API UPlayerCombatStateHit : public UObject, public IPlayerCombatState
 {
 	GENERATED_BODY()
 	float ElapsedTimeFromStateEnter;

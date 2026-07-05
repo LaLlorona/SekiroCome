@@ -2,6 +2,8 @@
 
 
 #include "CombatVitalityComponent.h"
+#include "Table/CombatDataTableManager.h"
+#include "Table/CombatDataSubsystem.h"
 #include "Table/CombatTuningDataTable.h"
 
 
@@ -18,32 +20,26 @@ UCombatVitalityComponent::UCombatVitalityComponent()
 
 void UCombatVitalityComponent::CustomUpdate(float DeltaTime)
 {
-	RecomputeMaxSP();
+	CurrentSP = FMath::Min(CurrentSP, GetCurrentPossibleMaxSP());
 	if (HpRegenLeftTime > 0.0f)
 	{
 		HpRegenLeftTime -= DeltaTime ;
 		return;
 	}
 
-	const FCombatTuningRow& Row = CombatTuningDataTable->FindByRowNameOrThrow(CombatTuningRowName);
-	CurrentSP = FMath::Min(CurrentSP + Row.SP_RegenPerSecond * DeltaTime, MaxSP);
-}
-
-void UCombatVitalityComponent::RecomputeMaxSP()
-{
-	MaxSP = 30.0f + 70.0f * (MaxHP > 0.0f ? CurrentHP / MaxHP : 0.0f);
-	CurrentSP = FMath::Min(CurrentSP, MaxSP);
+	const FCombatTuningRow& Row = UCombatDataSubsystem::GetCombatDataSubsystem(this)->GetInGameTableManager()->CombatTuningDataTable->FindByRowNameOrThrow(CombatTuningRowName);
+	CurrentSP = FMath::Min(CurrentSP + Row.SP_RegenPerSecond * DeltaTime, GetCurrentPossibleMaxSP());
 }
 
 void UCombatVitalityComponent::OnRegenStopTimerBegin()
 {
-	const FCombatTuningRow& Row = CombatTuningDataTable->FindByRowNameOrThrow(CombatTuningRowName);
+	const FCombatTuningRow& Row =
+		UCombatDataSubsystem::GetCombatDataSubsystem(this)->GetInGameTableManager()->CombatTuningDataTable->FindByRowNameOrThrow(CombatTuningRowName);
 	HpRegenLeftTime = Row.SP_RegenDelayInSecond;
 }
 
-void UCombatVitalityComponent::Initialize(UCombatTuningDataTable* InTuningDataTable, FName InTuningRowName)
+void UCombatVitalityComponent::Initialize(FName InTuningRowName)
 {
-	CombatTuningDataTable = InTuningDataTable;
 	CombatTuningRowName = InTuningRowName;
 	OnRegenStopTimerBegin();
 }
@@ -51,16 +47,21 @@ void UCombatVitalityComponent::Initialize(UCombatTuningDataTable* InTuningDataTa
 void UCombatVitalityComponent::ResetVitality()
 {
 	CurrentHP = MaxHP;
-	RecomputeMaxSP();
-	CurrentSP = MaxSP;
+	CurrentSP = GetCurrentPossibleMaxSP();
 }
 
-float UCombatVitalityComponent::ApplyDamage(float Damage)
+float UCombatVitalityComponent::ApplyDamage(const FDamageData& DamageData)
 {
 	if (!IsAlive())
 	{
 		return 0.0f;
 	}
+
+	// §1-2-5: bypasses stamina entirely, applied straight to HP
+	CurrentHP -= DamageData.PriorityHealthDamage;
+
+	// §1-3: stamina-first, overflow to HP
+	const float Damage = DamageData.RemainingDamage;
 	if (CurrentSP >= Damage)
 	{
 		CurrentSP -= Damage;
@@ -72,14 +73,24 @@ float UCombatVitalityComponent::ApplyDamage(float Damage)
 		CurrentHP -= hpDamage;
 	}
 
-	RecomputeMaxSP();
+	CurrentSP = FMath::Min(CurrentSP, GetCurrentPossibleMaxSP());
 	OnRegenStopTimerBegin();
 
-	return Damage;
+	return DamageData.PriorityHealthDamage + DamageData.RemainingDamage;
 }
 
 float UCombatVitalityComponent::GetHPPercentage() const
 {
 	return MaxHP > 0.0f ? CurrentHP / MaxHP : 0.0f;
+}
+
+float UCombatVitalityComponent::GetStaminaPercentage() const
+{
+	return MaxSP >= 0.0f ? CurrentSP / MaxSP : 0.0f;
+}
+
+float UCombatVitalityComponent::GetCurrentPossibleMaxSP() const
+{
+	return 30.0f + 70.0f * (MaxHP > 0.0f ? CurrentHP / MaxHP : 0.0f);
 }
 

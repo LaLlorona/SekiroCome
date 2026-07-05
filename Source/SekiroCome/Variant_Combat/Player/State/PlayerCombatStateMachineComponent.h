@@ -35,12 +35,17 @@ public:
 	
 
 	bool CanParryNow() const ;
+	bool IsBeingHit() const;
 
 	EAnimationStateEnum GetAnimationStateEnum();
+	EAttackDirection GetPreparedAttackDirection() const;
+	ECombatStateEnum GetCurrentStateEnum() const { return CurrentStateEnum; }
 
 private:
 	void ChangeState(ECombatStateEnum NewState);
 
 	UPROPERTY()
 	FCombatStateInitializeParameter CombatStateInitializeParameter;
+
+	ECombatStateEnum CurrentStateEnum = ECombatStateEnum::Idle;
 };

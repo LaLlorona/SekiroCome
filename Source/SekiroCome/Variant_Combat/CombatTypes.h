@@ -43,23 +43,16 @@ enum class EAnimationStateEnum : uint8
 	Guard,
 	PartialParry,
 	Riposte,
+	Hit,
 };
 
 UENUM(BlueprintType)
 enum class ECombatStateEnum : uint8
 {
 	Idle,
+	Attack,
 	Guard,
 	PartialParry,
 	PerfectParryRiposte,
-};
-
-UENUM(BlueprintType)
-enum class ECombatInputDirectionEnum : uint8
-{
-	NoInput,
-	Left,
-	Top,
-	Right,
-	Down
+	Hit,
 };

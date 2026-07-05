@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "CombatLogic/FDamageData.h"
 #include "CombatDamageable.generated.h"
 
 /**
@@ -25,7 +26,7 @@ public:
 
 	/** Handles damage and knockback events */
 	UFUNCTION(BlueprintCallable, Category="Damageable")
-	virtual void ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse) = 0;
+	virtual void ApplyDamage(const FDamageData& DamageData, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse) = 0;
 
 	/** Handles death events */
 	UFUNCTION(BlueprintCallable, Category="Damageable")

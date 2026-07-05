@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatTypes.h"
 
 #include "CombatCharacterInputComponent.generated.h"
 
 
-enum class ECombatInputDirectionEnum : uint8;
 class UInputAction;
 class UEnhancedInputComponent;
 class ACombatCharacter;
@@ -75,5 +75,5 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SetupBindings(UEnhancedInputComponent* EnhancedInputComponent);
-	ECombatInputDirectionEnum GetCombatInputDirection() const;
+	bool GetMoveAttackDirection(EAttackDirection& OutDirection) const;
 };

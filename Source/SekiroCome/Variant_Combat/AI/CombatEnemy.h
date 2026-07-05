@@ -207,7 +207,7 @@ public:
 	// ~begin ICombatDamageable interface
 
 	/** Handles damage and knockback events */
-	virtual void ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse) override;
+	virtual void ApplyDamage(const FDamageData& DamageData, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse) override;
 
 	/** Handles death events */
 	virtual void HandleDeath() override;
@@ -229,12 +229,15 @@ protected:
 	void RemoveFromLevel();
 
 public:
-
-	/** Overrides the default TakeDamage functionality */
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	
 
 	/** Overrides landing to reset damage ragdoll physics */
 	virtual void Landed(const FHitResult& Hit) override;
+
+private:
+
+	/** Shared by TakeDamage() (generic engine damage, treated as fully stamina-first) and ApplyDamage() (combat damage with the real priority/remaining split). Reduces VitalityComponent, checks death, updates the life bar / ragdoll blend */
+	float ApplyDamageToVitality(const FDamageData& DamageData);
 
 protected:
 

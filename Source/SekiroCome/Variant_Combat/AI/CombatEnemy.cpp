@@ -57,6 +57,7 @@ void ACombatEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	VitalityComponent->CustomUpdate(DeltaTime);
+	LifeBarWidget->SetStaminaPercentage(VitalityComponent->GetStaminaPercentage());
 }
 
 void ACombatEnemy::DoAIComboAttack()
@@ -221,12 +222,9 @@ FName ACombatEnemy::GetWeaponID() const
 	return WeaponID;
 }
 
-void ACombatEnemy::ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
+void ACombatEnemy::ApplyDamage(const FDamageData& DamageData, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
 {
-	
-	// pass the damage event to the actor
-	FDamageEvent DamageEvent;
-	const float ActualDamage = TakeDamage(Damage, DamageEvent, nullptr, DamageCauser);
+	const float ActualDamage = ApplyDamageToVitality(DamageData);
 
 	// only process knockback and effects if we received nonzero damage
 	if (ActualDamage > 0.0f)
@@ -301,7 +299,8 @@ void ACombatEnemy::RemoveFromLevel()
 	Destroy();
 }
 
-float ACombatEnemy::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+
+float ACombatEnemy::ApplyDamageToVitality(const FDamageData& DamageData)
 {
 	// only process damage if the character is still alive
 	if (!VitalityComponent->IsAlive())
@@ -309,8 +308,8 @@ float ACombatEnemy::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 		return 0.0f;
 	}
 
-	// reduce the current HP (stamina-first, with overflow to HP)
-	VitalityComponent->ApplyDamage(Damage);
+	// reduce the current HP (priority health bypasses stamina, remaining follows stamina-first/overflow)
+	const float Damage = VitalityComponent->ApplyDamage(DamageData);
 
 	// have we run out of HP?
 	if (!VitalityComponent->IsAlive())
@@ -322,6 +321,7 @@ float ACombatEnemy::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 	{
 		// update the life bar
 		LifeBarWidget->SetLifePercentage(VitalityComponent->GetHPPercentage());
+		LifeBarWidget->SetStaminaPercentage(VitalityComponent->GetStaminaPercentage());
 
 		// enable partial ragdoll physics, but keep the pelvis vertical
 		GetMesh()->SetPhysicsBlendWeight(0.5f);
@@ -352,7 +352,7 @@ void ACombatEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	// wire up the tuning DataTable reference now that Blueprint-configured properties are valid
-	VitalityComponent->Initialize(CombatTuningDataTable, CombatTuningRowName);
+	VitalityComponent->Initialize(CombatTuningRowName);
 
 	// get the life bar widget from the widget comp
 	LifeBarWidget = Cast<UCombatLifeBar>(LifeBar->GetUserWidgetObject());
@@ -360,6 +360,7 @@ void ACombatEnemy::BeginPlay()
 
 	// fill the life bar
 	LifeBarWidget->SetLifePercentage(1.0f);
+	LifeBarWidget->SetStaminaPercentage(1.0f);
 }
 
 void ACombatEnemy::EndPlay(EEndPlayReason::Type EndPlayReason)

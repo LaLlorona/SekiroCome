@@ -12,5 +12,9 @@ struct FCombatTuningRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Stamina")
 	float SP_RegenDelayInSecond = 1.5f;
-	
+
+	/** How long the character stays in the Hit (stagger) state after taking damage, unable to start a new attack */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Hit")
+	float HitStunDurationInSecond = 0.5f;
+
 };

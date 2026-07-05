@@ -3,23 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FCombatStateInitializeParameter.h"
 #include "PlayerCombatState.h"
 
 #include "PlayerCombatStateIdle.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class SEKIROCOME_API UPlayerCombatStateIdle : public UObject, public IPlayerCombatState
 {
 	GENERATED_BODY()
 
+	UPROPERTY()
+	FCombatStateInitializeParameter InitParam;
+
 public:
 	virtual void InitializeState(const FCombatStateInitializeParameter& Parameter) override;
 	virtual void UpdateState(float deltaTime) override;
 	virtual float GetElapsedTimeFromStateEnter() override;
 	virtual EAnimationStateEnum GetAnimationStateEnum() override;
+	virtual EAttackDirection GetPreparedAttackDirection() const override;
 	virtual bool IsStateExpired() override;
 	virtual void OnStateEnter() override;
 	virtual void OnStateFinish() override;

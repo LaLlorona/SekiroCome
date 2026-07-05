@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatTypes.h"
 
 class ACombatCharacter;
 class UCombatMontageSet;
@@ -22,9 +23,11 @@ struct FCombatStateInitializeParameter
 
 	UPROPERTY()
 	TObjectPtr<ACombatCharacter> OwnerCharacter;
+
+	EAttackDirection StateEnterAttackDirection = EAttackDirection::Down;
 	
 	FCombatStateInitializeParameter() = default;
-	FCombatStateInitializeParameter(UCombatMontageSet* InCombatMontageSet, ACombatCharacter* InCombatCharacter):  CombatMontageSet (InCombatMontageSet), OwnerCharacter(InCombatCharacter)
+	FCombatStateInitializeParameter(UCombatMontageSet* InCombatMontageSet, ACombatCharacter* InCombatCharacter, EAttackDirection InAttackDirection):  CombatMontageSet (InCombatMontageSet), OwnerCharacter(InCombatCharacter), StateEnterAttackDirection(InAttackDirection)
 	{
 	}
 	

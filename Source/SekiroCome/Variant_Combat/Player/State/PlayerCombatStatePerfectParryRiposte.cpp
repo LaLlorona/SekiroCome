@@ -27,6 +27,11 @@ EAnimationStateEnum UPlayerCombatStatePerfectParryRiposte::GetAnimationStateEnum
 	return EAnimationStateEnum::Riposte;
 }
 
+EAttackDirection UPlayerCombatStatePerfectParryRiposte::GetPreparedAttackDirection() const
+{
+	return InitParam.StateEnterAttackDirection;
+}
+
 bool UPlayerCombatStatePerfectParryRiposte::IsStateExpired()
 {
 	return ElapsedTimeFromStateEnter >= 1.0f;

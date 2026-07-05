@@ -3,6 +3,7 @@
 
 #include "CombatLavaFloor.h"
 #include "CombatDamageable.h"
+#include "CombatLogic/FDamageData.h"
 #include "Components/StaticMeshComponent.h"
 
 ACombatLavaFloor::ACombatLavaFloor()
@@ -22,6 +23,6 @@ void ACombatLavaFloor::OnFloorHit(UPrimitiveComponent* HitComponent, AActor* Oth
 	if (ICombatDamageable* Damageable = Cast<ICombatDamageable>(OtherActor))
 	{
 		// damage the actor
-		Damageable->ApplyDamage(Damage, this, Hit.ImpactPoint, FVector::ZeroVector);
+		Damageable->ApplyDamage(FDamageData(0.0f, Damage), this, Hit.ImpactPoint, FVector::ZeroVector);
 	}
 }

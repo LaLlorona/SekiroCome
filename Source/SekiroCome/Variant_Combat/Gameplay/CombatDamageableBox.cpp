@@ -37,13 +37,13 @@ void ACombatDamageableBox::EndPlay(EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(DeathTimer);
 }
 
-void ACombatDamageableBox::ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
+void ACombatDamageableBox::ApplyDamage(const FDamageData& DamageData, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
 {
 	// only process damage if we still have HP
 	if (CurrentHP > 0.0f)
 	{
-		// apply the damage
-		CurrentHP -= Damage;
+		// apply the damage (this actor has no stamina concept, so both parts just subtract from HP)
+		CurrentHP -= (DamageData.PriorityHealthDamage + DamageData.RemainingDamage);
 
 		// are we dead?
 		if (CurrentHP <= 0.0f)

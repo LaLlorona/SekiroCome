@@ -6,9 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "CombatAttackDirectionUI.generated.h"
 
-enum class ECombatInputDirectionEnum : uint8;
+enum class EAttackDirection : uint8;
 /**
- * 
+ *
  */
 UCLASS()
 class SEKIROCOME_API UCombatAttackDirectionUI : public UUserWidget
@@ -17,5 +17,5 @@ class SEKIROCOME_API UCombatAttackDirectionUI : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category="Set Direction UI")
-	void SetDirectionalUI(ECombatInputDirectionEnum DirectionEnum);
+	void SetDirectionalUI(EAttackDirection DirectionEnum);
 };

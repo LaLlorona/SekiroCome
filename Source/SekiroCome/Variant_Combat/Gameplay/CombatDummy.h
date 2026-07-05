@@ -42,7 +42,7 @@ public:
 	// ~Begin CombatDamageable interface
 
 		/** Handles damage and knockback events */
-	virtual void ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse) override;
+	virtual void ApplyDamage(const FDamageData& DamageData, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse) override;
 
 	/** Handles death events */
 	virtual void HandleDeath() override;

@@ -4,7 +4,9 @@
 #include "PlayerCombatStateMachineComponent.h"
 
 #include "PlayerCombatState.h"
+#include "PlayerCombatStateAttack.h"
 #include "PlayerCombatStateGuard.h"
+#include "PlayerCombatStateHit.h"
 #include "PlayerCombatStateIdle.h"
 #include "PlayerCombatStatePartialParry.h"
 #include "PlayerCombatStatePerfectParryRiposte.h"
@@ -57,6 +59,8 @@ void UPlayerCombatStateMachineComponent::ChangeState(ECombatStateEnum NewState)
 {
 	if (PlayerCombatState)
 	{
+		// hand off the direction the outgoing state ended with to the incoming state's init parameter
+		CombatStateInitializeParameter.StateEnterAttackDirection = PlayerCombatState->GetPreparedAttackDirection();
 		PlayerCombatState->OnStateFinish();
 	}
 	switch (NewState)
@@ -73,7 +77,14 @@ void UPlayerCombatStateMachineComponent::ChangeState(ECombatStateEnum NewState)
 		case ECombatStateEnum::PerfectParryRiposte:
 			PlayerCombatState = NewObject<UPlayerCombatStatePerfectParryRiposte>();
 			break;
+		case ECombatStateEnum::Hit:
+			PlayerCombatState = NewObject<UPlayerCombatStateHit>();
+			break;
+		case ECombatStateEnum::Attack:
+			PlayerCombatState = NewObject<UPlayerCombatStateAttack>();
+			break;
 	}
+	CurrentStateEnum = NewState;
 	PlayerCombatState->InitializeState(CombatStateInitializeParameter);
 	PlayerCombatState->OnStateEnter();
 }
@@ -89,6 +100,11 @@ bool UPlayerCombatStateMachineComponent::CanParryNow() const
 	return false;
 }
 
+bool UPlayerCombatStateMachineComponent::IsBeingHit() const
+{
+	return Cast<UPlayerCombatStateHit>(PlayerCombatState.GetObject()) != nullptr;
+}
+
 EAnimationStateEnum UPlayerCombatStateMachineComponent::GetAnimationStateEnum()
 {
 	if (PlayerCombatState == nullptr)
@@ -96,6 +112,15 @@ EAnimationStateEnum UPlayerCombatStateMachineComponent::GetAnimationStateEnum()
 		return EAnimationStateEnum::Normal;
 	}
 	return PlayerCombatState->GetAnimationStateEnum();
+}
+
+EAttackDirection UPlayerCombatStateMachineComponent::GetPreparedAttackDirection() const
+{
+	if (PlayerCombatState == nullptr)
+	{
+		return EAttackDirection::Down;
+	}
+	return PlayerCombatState->GetPreparedAttackDirection();
 }
 
 

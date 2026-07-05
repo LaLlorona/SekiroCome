@@ -30,6 +30,7 @@ public:
 	virtual void UpdateState(float deltaTime) = 0;
 	virtual float GetElapsedTimeFromStateEnter() = 0;
 	virtual EAnimationStateEnum GetAnimationStateEnum() = 0;
+	virtual EAttackDirection GetPreparedAttackDirection() const = 0;
 	virtual bool IsStateExpired() = 0;
 	virtual void OnStateEnter() = 0;
 	virtual void OnStateFinish() = 0;
