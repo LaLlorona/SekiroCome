@@ -2,6 +2,8 @@
 
 
 #include "CombatCharacter.h"
+
+#include "CombatAttackDirectionUI.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -134,12 +136,6 @@ void ACombatCharacter::DoComboAttackStart()
 		// cache the input time so we can check it later
 		CachedAttackInputTime = GetWorld()->GetTimeSeconds();
 
-		return;
-	}
-
-	// only start a fresh attack from the Idle state (e.g. not while guarding)
-	if (CombatStateMachineComponent->GetCurrentStateEnum() != ECombatStateEnum::Idle)
-	{
 		return;
 	}
 
@@ -545,9 +541,10 @@ void ACombatCharacter::BeginPlay()
 	// set the life bar color
 	LifeBarWidget->SetBarColor(LifeBarColor);
 
+
 	// reset HP to maximum
 	ResetHP();
-	CombatStateMachineComponent->Initialize(FCombatStateInitializeParameter(CombatMontageSet, this, EAttackDirection::Down));
+	CombatStateMachineComponent->Initialize(FCombatStateInitializeParameter(CombatMontageSet, this));
 	CombatInputComponent->Initialize(this);
 	VitalityComponent->Initialize(CombatTuningRowName);
 }
@@ -594,6 +591,11 @@ void ACombatCharacter::Tick(float DeltaTime)
 
 		FRotator TargetRotation = (UKismetMathLibrary::FindLookAtRotation(CameraPos, TargetPos));
 		GetController()->SetControlRotation(TargetRotation);
+	}
+	EAttackDirection MoveDirection;
+	if (CombatInputComponent->GetMoveAttackDirection(MoveDirection))
+	{
+		CombatStateMachineComponent->SetAttackDirection(MoveDirection);
 	}
 	CombatStateMachineComponent->UpdateCombatState(DeltaTime);
 	VitalityComponent->CustomUpdate(DeltaTime);

@@ -6,6 +6,7 @@
 #include "InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
+#include "UI/CombatAttackDirectionUI.h"
 #include "CombatCharacter.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
@@ -37,6 +38,8 @@ void ACombatPlayerController::BeginPlay()
 		}
 
 	}
+	FourDirectionWidget = CreateWidget<UCombatAttackDirectionUI>(this, FourDirectionWidgetClass);
+	FourDirectionWidget->AddToPlayerScreen(0);
 }
 
 void ACombatPlayerController::SetupInputComponent()

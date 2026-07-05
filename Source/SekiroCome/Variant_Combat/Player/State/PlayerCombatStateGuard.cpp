@@ -28,11 +28,6 @@ EAnimationStateEnum UPlayerCombatStateGuard::GetAnimationStateEnum()
 	return EAnimationStateEnum::Guard;
 }
 
-EAttackDirection UPlayerCombatStateGuard::GetPreparedAttackDirection() const
-{
-	return InitParam.StateEnterAttackDirection;
-}
-
 bool UPlayerCombatStateGuard::CanParryNow() const
 {
 	return ElapsedTimeFromStateEnter <= CombatDefine::RiposteMinimumTimeWindow;

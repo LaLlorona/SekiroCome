@@ -59,8 +59,6 @@ void UPlayerCombatStateMachineComponent::ChangeState(ECombatStateEnum NewState)
 {
 	if (PlayerCombatState)
 	{
-		// hand off the direction the outgoing state ended with to the incoming state's init parameter
-		CombatStateInitializeParameter.StateEnterAttackDirection = PlayerCombatState->GetPreparedAttackDirection();
 		PlayerCombatState->OnStateFinish();
 	}
 	switch (NewState)
@@ -84,7 +82,6 @@ void UPlayerCombatStateMachineComponent::ChangeState(ECombatStateEnum NewState)
 			PlayerCombatState = NewObject<UPlayerCombatStateAttack>();
 			break;
 	}
-	CurrentStateEnum = NewState;
 	PlayerCombatState->InitializeState(CombatStateInitializeParameter);
 	PlayerCombatState->OnStateEnter();
 }
@@ -116,11 +113,12 @@ EAnimationStateEnum UPlayerCombatStateMachineComponent::GetAnimationStateEnum()
 
 EAttackDirection UPlayerCombatStateMachineComponent::GetPreparedAttackDirection() const
 {
-	if (PlayerCombatState == nullptr)
-	{
-		return EAttackDirection::Down;
-	}
-	return PlayerCombatState->GetPreparedAttackDirection();
+	return CurrentAttackDirection;
+}
+
+void UPlayerCombatStateMachineComponent::SetAttackDirection(EAttackDirection NewDirection)
+{
+	CurrentAttackDirection = NewDirection;
 }
 
 

@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "CombatPlayerController.generated.h"
 
+class UCombatAttackDirectionUI;
 class UPlayerCombatStateMachineComponent;
 class UInputMappingContext;
 class ACombatCharacter;
@@ -34,9 +35,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input|Touch Controls")
 	TSubclassOf<UUserWidget> MobileControlsWidgetClass;
 
+	UPROPERTY(EditAnywhere, Category="HUD")
+	TSubclassOf<UCombatAttackDirectionUI> FourDirectionWidgetClass;
+
 	/** Pointer to the mobile controls widget */
 	UPROPERTY()
 	TObjectPtr<UUserWidget> MobileControlsWidget;
+
+	UPROPERTY()
+	TObjectPtr<UCombatAttackDirectionUI> FourDirectionWidget;
 
 	/** If true, the player will use UMG touch controls even if not playing on mobile platforms */
 	UPROPERTY(EditAnywhere, Config, Category = "Input|Touch Controls")

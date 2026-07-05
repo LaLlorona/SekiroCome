@@ -27,11 +27,6 @@ EAnimationStateEnum UPlayerCombatStatePartialParry::GetAnimationStateEnum()
 	return EAnimationStateEnum::PartialParry;
 }
 
-EAttackDirection UPlayerCombatStatePartialParry::GetPreparedAttackDirection() const
-{
-	return InitParam.StateEnterAttackDirection;
-}
-
 bool UPlayerCombatStatePartialParry::IsStateExpired()
 {
 	return ElapsedTimeFromStateEnter >= 1.0f;

@@ -14,11 +14,6 @@ void UPlayerCombatStateIdle::InitializeState(const FCombatStateInitializeParamet
 
 void UPlayerCombatStateIdle::UpdateState(float deltaTime)
 {
-	EAttackDirection MoveDirection;
-	if (InitParam.OwnerCharacter->GetMoveAttackDirection(MoveDirection))
-	{
-		InitParam.StateEnterAttackDirection = MoveDirection;
-	}
 }
 
 float UPlayerCombatStateIdle::GetElapsedTimeFromStateEnter()
@@ -29,11 +24,6 @@ float UPlayerCombatStateIdle::GetElapsedTimeFromStateEnter()
 EAnimationStateEnum UPlayerCombatStateIdle::GetAnimationStateEnum()
 {
 	return EAnimationStateEnum::Normal;
-}
-
-EAttackDirection UPlayerCombatStateIdle::GetPreparedAttackDirection() const
-{
-	return InitParam.StateEnterAttackDirection;
 }
 
 bool UPlayerCombatStateIdle::IsStateExpired()

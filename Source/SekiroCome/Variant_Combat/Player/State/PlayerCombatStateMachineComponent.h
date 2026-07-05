@@ -39,13 +39,13 @@ public:
 
 	EAnimationStateEnum GetAnimationStateEnum();
 	EAttackDirection GetPreparedAttackDirection() const;
-	ECombatStateEnum GetCurrentStateEnum() const { return CurrentStateEnum; }
+	void SetAttackDirection(EAttackDirection NewDirection);
 
 private:
 	void ChangeState(ECombatStateEnum NewState);
 
 	UPROPERTY()
 	FCombatStateInitializeParameter CombatStateInitializeParameter;
-
-	ECombatStateEnum CurrentStateEnum = ECombatStateEnum::Idle;
+	
+	EAttackDirection CurrentAttackDirection = EAttackDirection::Down;
 };

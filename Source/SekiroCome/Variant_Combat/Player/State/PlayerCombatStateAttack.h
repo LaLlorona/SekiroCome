@@ -26,7 +26,6 @@ public:
 	virtual void UpdateState(float deltaTime) override;
 	virtual float GetElapsedTimeFromStateEnter() override;
 	virtual EAnimationStateEnum GetAnimationStateEnum() override;
-	virtual EAttackDirection GetPreparedAttackDirection() const override;
 	virtual bool IsStateExpired() override;
 	virtual void OnStateEnter() override;
 	virtual void OnStateFinish() override;

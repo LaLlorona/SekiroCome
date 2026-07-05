@@ -10,6 +10,7 @@
 #include "Animation/AnimInstance.h"
 #include "CombatCharacter.generated.h"
 
+class UCombatAttackDirectionUI;
 class UCombatMontageSet;
 class UPlayerCombatStateMachineComponent;
 class UCombatCharacterInputComponent;
@@ -49,6 +50,7 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 	/** Life bar widget component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* LifeBar;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCombatLockOnComponent* LockOnComponent;
@@ -85,7 +87,7 @@ protected:
 	/** Pointer to the life bar widget */
 	UPROPERTY(EditAnywhere, Category="Damage")
 	TObjectPtr<UCombatLifeBar> LifeBarWidget;
-
+	
 	/** Max amount of time that may elapse for a non-combo attack input to not be considered stale */
 	UPROPERTY(EditAnywhere, Category="Melee Attack", meta = (ClampMin = 0, ClampMax = 5, Units = "s"))
 	float AttackInputCacheTimeTolerance = 1.0f;

@@ -24,10 +24,8 @@ struct FCombatStateInitializeParameter
 	UPROPERTY()
 	TObjectPtr<ACombatCharacter> OwnerCharacter;
 
-	EAttackDirection StateEnterAttackDirection = EAttackDirection::Down;
-	
 	FCombatStateInitializeParameter() = default;
-	FCombatStateInitializeParameter(UCombatMontageSet* InCombatMontageSet, ACombatCharacter* InCombatCharacter, EAttackDirection InAttackDirection):  CombatMontageSet (InCombatMontageSet), OwnerCharacter(InCombatCharacter), StateEnterAttackDirection(InAttackDirection)
+	FCombatStateInitializeParameter(UCombatMontageSet* InCombatMontageSet, ACombatCharacter* InCombatCharacter):  CombatMontageSet (InCombatMontageSet), OwnerCharacter(InCombatCharacter)
 	{
 	}
 	

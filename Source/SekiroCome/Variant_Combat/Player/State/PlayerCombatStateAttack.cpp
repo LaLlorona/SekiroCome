@@ -26,11 +26,6 @@ EAnimationStateEnum UPlayerCombatStateAttack::GetAnimationStateEnum()
 	return EAnimationStateEnum::Normal;
 }
 
-EAttackDirection UPlayerCombatStateAttack::GetPreparedAttackDirection() const
-{
-	return InitParam.StateEnterAttackDirection;
-}
-
 bool UPlayerCombatStateAttack::IsStateExpired()
 {
 	return !InitParam.OwnerCharacter->IsAttacking();
