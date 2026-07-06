@@ -18,4 +18,6 @@ class SEKIROCOME_API UCombatAttackDirectionUI : public UUserWidget
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category="Set Direction UI")
 	void SetDirectionalUI(EAttackDirection DirectionEnum);
+
+	
 };

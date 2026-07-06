@@ -22,7 +22,8 @@
       "Read(//d/Program Files/**)",
       "Bash(ls -d /c/Epic*)",
       "Bash(ls -d /d/Epic*)",
-      "Bash(\"/c/Program Files/Epic Games/UE_5.7/Engine/Build/BatchFiles/Build.bat\" SekiroComeEditor Win64 Development -Project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -WaitMutex -FromMsBuild)"
+      "Bash(\"/c/Program Files/Epic Games/UE_5.7/Engine/Build/BatchFiles/Build.bat\" SekiroComeEditor Win64 Development -Project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -WaitMutex -FromMsBuild)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Epic Games\\\\UE_5.7\\\\Engine\\\\Build\\\\BatchFiles\\\\Build.bat\" SekiroComeEditor Win64 Development -project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -waitmutex)"
     ]
   }
 }

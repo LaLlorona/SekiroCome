@@ -5,6 +5,7 @@
 
 #include "CombatCharacter.h"
 #include "FCombatStateInitializeParameter.h"
+#include "PlayerCombatStateIdle.h"
 #include "Table/CombatDataSubsystem.h"
 #include "Table/CombatDataTableManager.h"
 #include "Table/CombatTuningDataTable.h"
@@ -29,12 +30,17 @@ EAnimationStateEnum UPlayerCombatStateHit::GetAnimationStateEnum()
 	return EAnimationStateEnum::Hit;
 }
 
-bool UPlayerCombatStateHit::IsStateExpired()
+TOptional<TScriptInterface<IPlayerCombatState>> UPlayerCombatStateHit::GetStateToTransition()
 {
 	ACombatCharacter* OwnerCharacter = InitParam.OwnerCharacter.Get();
 	const FCombatTuningRow& Row = UCombatDataSubsystem::GetCombatDataSubsystem(OwnerCharacter)->GetInGameTableManager()->CombatTuningDataTable->FindByRowNameOrThrow(OwnerCharacter->GetCombatTuningRowName());
 
-	return ElapsedTimeFromStateEnter >= Row.HitStunDurationInSecond;
+	if (ElapsedTimeFromStateEnter >= Row.HitStunDurationInSecond)
+	{
+		TScriptInterface<IPlayerCombatState> NextState = NewObject<UPlayerCombatStateIdle>();
+		return NextState;
+	}
+	return {};
 }
 
 void UPlayerCombatStateHit::OnStateEnter()
@@ -43,5 +49,9 @@ void UPlayerCombatStateHit::OnStateEnter()
 }
 
 void UPlayerCombatStateHit::OnStateFinish()
+{
+}
+
+void UPlayerCombatStateHit::OnAttackInputPressed()
 {
 }

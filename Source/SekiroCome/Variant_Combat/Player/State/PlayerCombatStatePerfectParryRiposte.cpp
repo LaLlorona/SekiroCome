@@ -6,6 +6,7 @@
 #include "CombatCharacter.h"
 #include "FCombatStateInitializeParameter.h"
 #include "Montage/CombatMontageSet.h"
+#include "PlayerCombatStateIdle.h"
 
 void UPlayerCombatStatePerfectParryRiposte::InitializeState(const FCombatStateInitializeParameter& Parameter)
 {
@@ -27,9 +28,14 @@ EAnimationStateEnum UPlayerCombatStatePerfectParryRiposte::GetAnimationStateEnum
 	return EAnimationStateEnum::Riposte;
 }
 
-bool UPlayerCombatStatePerfectParryRiposte::IsStateExpired()
+TOptional<TScriptInterface<IPlayerCombatState>> UPlayerCombatStatePerfectParryRiposte::GetStateToTransition()
 {
-	return ElapsedTimeFromStateEnter >= 1.0f;
+	if (ElapsedTimeFromStateEnter >= 1.0f)
+	{
+		TScriptInterface<IPlayerCombatState> NextState = NewObject<UPlayerCombatStateIdle>();
+		return NextState;
+	}
+	return {};
 }
 
 void UPlayerCombatStatePerfectParryRiposte::OnStateEnter()
@@ -42,5 +48,9 @@ void UPlayerCombatStatePerfectParryRiposte::OnStateEnter()
 }
 
 void UPlayerCombatStatePerfectParryRiposte::OnStateFinish()
+{
+}
+
+void UPlayerCombatStatePerfectParryRiposte::OnAttackInputPressed()
 {
 }

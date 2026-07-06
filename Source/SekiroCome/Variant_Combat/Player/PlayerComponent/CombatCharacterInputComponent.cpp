@@ -49,7 +49,7 @@ void UCombatCharacterInputComponent::Look(const FInputActionValue& Value)
 void UCombatCharacterInputComponent::ComboAttackPressed()
 {
 	if (!OwnerCharacter) return;
-	OwnerCharacter->DoComboAttackStart();
+	OwnerCharacter->OnAttackInputPressed();
 }
 
 void UCombatCharacterInputComponent::ToggleCamera()

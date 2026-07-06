@@ -31,9 +31,6 @@ ACombatCharacter::ACombatCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// bind the attack montage ended delegate
-	OnAttackMontageEnded.BindUObject(this, &ACombatCharacter::AttackMontageEnded);
-
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(35.0f, 90.0f);
 
@@ -122,26 +119,9 @@ void ACombatCharacter::DoLook(float Yaw, float Pitch)
 	}
 }
 
-void ACombatCharacter::DoComboAttackStart()
+void ACombatCharacter::OnAttackInputPressed()
 {
-	// can't start a new attack while reeling from a hit
-	if (IsBeingHit())
-	{
-		return;
-	}
-
-	// are we already playing an attack animation?
-	if (bIsAttacking)
-	{
-		// cache the input time so we can check it later
-		CachedAttackInputTime = GetWorld()->GetTimeSeconds();
-
-		return;
-	}
-
-	// enter the Attack state and perform a combo attack
-	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Attack);
-	ComboAttack();
+	CombatStateMachineComponent->OnAttackInputPressed();
 }
 
 void ACombatCharacter::DoComboAttackEnd()
@@ -172,13 +152,10 @@ void ACombatCharacter::ResetHP()
 
 void ACombatCharacter::ComboAttack()
 {
-	// raise the attacking flag
-	bIsAttacking = true;
+	// enter (or re-enter) the Attack state, resetting its combo progress
+	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Attack);
 
 	VitalityComponent->OnRegenStopTimerBegin();
-
-	// reset the combo count
-	ComboCount = 0;
 
 	// notify enemies they are about to be attacked
 	NotifyEnemiesOfIncomingAttack();
@@ -204,63 +181,9 @@ void ACombatCharacter::ComboAttack()
 
 }
 
-void ACombatCharacter::ChargedAttack()
-{
-	// raise the attacking flag
-	bIsAttacking = true;
-
-	VitalityComponent->OnRegenStopTimerBegin();
-
-	// reset the charge loop flag
-	bHasLoopedChargedAttack = false;
-
-	// notify enemies they are about to be attacked
-	NotifyEnemiesOfIncomingAttack();
-
-	// play the charged attack montage
-	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-	{
-		const float MontageLength = AnimInstance->Montage_Play(ChargedAttackMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
-
-		// subscribe to montage completed and interrupted events
-		if (MontageLength > 0.0f)
-		{
-			// set the end delegate for the montage
-			AnimInstance->Montage_SetEndDelegate(OnAttackMontageEnded, ChargedAttackMontage);
-		}
-	}
-}
-
-void ACombatCharacter::AttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
-{
-	// reset the attacking flag
-	bIsAttacking = false;
-
-	// check if we have a non-stale cached input
-	if (GetWorld()->GetTimeSeconds() - CachedAttackInputTime <= AttackInputCacheTimeTolerance)
-	{
-		// are we holding the charged attack button?
-		if (bIsChargingAttack)
-		{
-			// do a charged attack
-			ChargedAttack();
-		}
-		else
-		{
-			// do a regular attack
-			ComboAttack();
-		}
-	}
-}
-
 bool ACombatCharacter::CanParryNow() const
 {
 	return CombatStateMachineComponent->CanParryNow();
-}
-
-bool ACombatCharacter::IsBeingHit() const
-{
-	return CombatStateMachineComponent->IsBeingHit();
 }
 
 void ACombatCharacter::ChangeToRiposteState()
@@ -314,44 +237,12 @@ void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection At
 
 void ACombatCharacter::CheckCombo()
 {
-	// are we playing a non-charge attack animation?
-	if (bIsAttacking && !bIsChargingAttack)
-	{
-		// is the last attack input not stale?
-		if (GetWorld()->GetTimeSeconds() - CachedAttackInputTime <= ComboInputCacheTimeTolerance)
-		{
-			// consume the attack input so we don't accidentally trigger it twice
-			CachedAttackInputTime = 0.0f;
-
-			// increase the combo counter
-			++ComboCount;
-
-			// do we still have a combo section to play?
-			if (ComboCount < ComboSectionNames.Num())
-			{
-				// notify enemies they are about to be attacked
-				NotifyEnemiesOfIncomingAttack();
-
-				// jump to the next combo section
-				if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-				{
-					AnimInstance->Montage_JumpToSection(ComboSectionNames[ComboCount], ComboAttackMontage);
-				}
-			}
-		}
-	}
+	//CombatCharacter 에서는 일단 사용 안합니다.
 }
 
 void ACombatCharacter::CheckChargedAttack()
 {
-	// raise the looped charged attack flag
-	bHasLoopedChargedAttack = true;
-
-	// jump to either the loop or the attack section depending on whether we're still holding the charge button
-	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-	{
-		AnimInstance->Montage_JumpToSection(bIsChargingAttack ? ChargeLoopSection : ChargeAttackSection, ChargedAttackMontage);
-	}
+	//CombatCharacter 에서는 일단 사용 안합니다.
 }
 
 FName ACombatCharacter::GetWeaponID() const

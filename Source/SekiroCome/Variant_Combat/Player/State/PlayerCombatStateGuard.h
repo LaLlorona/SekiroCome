@@ -26,7 +26,8 @@ public:
 	virtual float GetElapsedTimeFromStateEnter() override;
 	virtual EAnimationStateEnum GetAnimationStateEnum() override;
 	bool CanParryNow() const;
-	virtual bool IsStateExpired() override;
 	virtual void OnStateEnter() override;
 	virtual void OnStateFinish() override;
+	virtual void OnAttackInputPressed() override;
+	virtual TOptional<TScriptInterface<IPlayerCombatState>> GetStateToTransition() override;
 };

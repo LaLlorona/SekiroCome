@@ -19,12 +19,16 @@ class SEKIROCOME_API UPlayerCombatStateIdle : public UObject, public IPlayerComb
 	UPROPERTY()
 	FCombatStateInitializeParameter InitParam;
 
+	UPROPERTY()
+	TScriptInterface<IPlayerCombatState> PendingNextState;
+
 public:
 	virtual void InitializeState(const FCombatStateInitializeParameter& Parameter) override;
 	virtual void UpdateState(float deltaTime) override;
 	virtual float GetElapsedTimeFromStateEnter() override;
 	virtual EAnimationStateEnum GetAnimationStateEnum() override;
-	virtual bool IsStateExpired() override;
 	virtual void OnStateEnter() override;
 	virtual void OnStateFinish() override;
+	virtual void OnAttackInputPressed() override;
+	virtual TOptional<TScriptInterface<IPlayerCombatState>> GetStateToTransition() override;
 };

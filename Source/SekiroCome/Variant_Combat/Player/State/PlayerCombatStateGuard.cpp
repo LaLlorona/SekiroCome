@@ -33,9 +33,9 @@ bool UPlayerCombatStateGuard::CanParryNow() const
 	return ElapsedTimeFromStateEnter <= CombatDefine::RiposteMinimumTimeWindow;
 }
 
-bool UPlayerCombatStateGuard::IsStateExpired()
+TOptional<TScriptInterface<IPlayerCombatState>> UPlayerCombatStateGuard::GetStateToTransition()
 {
-	return false;
+	return {};
 }
 
 void UPlayerCombatStateGuard::OnStateEnter()
@@ -44,6 +44,10 @@ void UPlayerCombatStateGuard::OnStateEnter()
 }
 
 void UPlayerCombatStateGuard::OnStateFinish()
+{
+}
+
+void UPlayerCombatStateGuard::OnAttackInputPressed()
 {
 }
 

@@ -6,6 +6,7 @@
 #include "CombatCharacter.h"
 #include "CombatTypes.h"
 #include "FCombatStateInitializeParameter.h"
+#include "PlayerCombatStateAttack.h"
 
 void UPlayerCombatStateIdle::InitializeState(const FCombatStateInitializeParameter& Parameter)
 {
@@ -26,9 +27,13 @@ EAnimationStateEnum UPlayerCombatStateIdle::GetAnimationStateEnum()
 	return EAnimationStateEnum::Normal;
 }
 
-bool UPlayerCombatStateIdle::IsStateExpired()
+TOptional<TScriptInterface<IPlayerCombatState>> UPlayerCombatStateIdle::GetStateToTransition()
 {
-	return false;
+	if (PendingNextState.GetObject() != nullptr)
+	{
+		return PendingNextState;
+	}
+	return {};
 }
 
 void UPlayerCombatStateIdle::OnStateEnter()
@@ -37,4 +42,9 @@ void UPlayerCombatStateIdle::OnStateEnter()
 
 void UPlayerCombatStateIdle::OnStateFinish()
 {
+}
+
+void UPlayerCombatStateIdle::OnAttackInputPressed()
+{
+	PendingNextState = NewObject<UPlayerCombatStateAttack>();
 }

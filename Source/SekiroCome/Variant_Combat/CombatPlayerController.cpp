@@ -15,6 +15,8 @@
 #include "Player/State/PlayerCombatStateMachineComponent.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
+
+
 void ACombatPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -75,6 +77,12 @@ void ACombatPlayerController::OnPossess(APawn* InPawn)
 
 	// subscribe to the pawn's OnDestroyed delegate
 	InPawn->OnDestroyed.AddDynamic(this, &ACombatPlayerController::OnPawnDestroyed);
+
+	if (ACombatCharacter* CombatChar = Cast<ACombatCharacter>(InPawn))
+	{
+		CombatChar->GetCombatStateComponent()->OnAttackDirectionChanged
+			.AddUniqueDynamic(this, &ACombatPlayerController::HandleAttackDirectionChanged);
+	}
 }
 
 void ACombatPlayerController::SetRespawnTransform(const FTransform& NewRespawn)
@@ -97,4 +105,9 @@ bool ACombatPlayerController::ShouldUseTouchControls() const
 {
 	// are we on a mobile platform? Should we force touch?
 	return SVirtualJoystick::ShouldDisplayTouchInterface() || bForceTouchControls;
+}
+
+void ACombatPlayerController::HandleAttackDirectionChanged(EAttackDirection AttackDirection)
+{
+	FourDirectionWidget->SetDirectionalUI(AttackDirection);
 }

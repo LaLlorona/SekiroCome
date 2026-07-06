@@ -11,12 +11,16 @@ struct FCombatStateInitializeParameter;
 class IPlayerCombatState;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+
 class SEKIROCOME_API UPlayerCombatStateMachineComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
 	TScriptInterface<IPlayerCombatState> PlayerCombatState;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttackDirectionChanged, EAttackDirection, NewDirection);
+
+
 	
 
 public:
@@ -32,17 +36,22 @@ public:
 	void UpdateCombatState(float deltaTime);
 	void Initialize(const FCombatStateInitializeParameter& Parameter);
 	void TryChangeState(ECombatStateEnum NewState);
-	
+	void TryChangeState(TScriptInterface<IPlayerCombatState> NewState);
+
 
 	bool CanParryNow() const ;
-	bool IsBeingHit() const;
-
+	void OnAttackInputPressed();
+	
 	EAnimationStateEnum GetAnimationStateEnum();
 	EAttackDirection GetPreparedAttackDirection() const;
 	void SetAttackDirection(EAttackDirection NewDirection);
 
+	UPROPERTY(BlueprintAssignable, Category="Combat")
+	FOnAttackDirectionChanged OnAttackDirectionChanged;
+
 private:
 	void ChangeState(ECombatStateEnum NewState);
+	void ChangeState(TScriptInterface<IPlayerCombatState> NewState);
 
 	UPROPERTY()
 	FCombatStateInitializeParameter CombatStateInitializeParameter;

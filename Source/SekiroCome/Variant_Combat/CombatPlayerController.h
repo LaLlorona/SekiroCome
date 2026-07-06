@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "CombatPlayerController.generated.h"
 
+enum class EAttackDirection : uint8;
 class UCombatAttackDirectionUI;
 class UPlayerCombatStateMachineComponent;
 class UInputMappingContext;
@@ -55,6 +56,9 @@ protected:
 
 	/** Transform to respawn the character at. Can be set to create checkpoints */
 	FTransform RespawnTransform;
+
+	UFUNCTION()
+	void HandleAttackDirectionChanged(EAttackDirection AttackDirection);
 
 protected:
 

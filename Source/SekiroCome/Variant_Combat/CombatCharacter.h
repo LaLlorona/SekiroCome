@@ -92,12 +92,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Melee Attack", meta = (ClampMin = 0, ClampMax = 5, Units = "s"))
 	float AttackInputCacheTimeTolerance = 1.0f;
 
-	/** Time at which an attack button was last pressed */
-	float CachedAttackInputTime = 0.0f;
-
-	/** If true, the character is currently playing an attack animation */
-	bool bIsAttacking = false;
-
 	/** Distance ahead of the character that melee attack sphere collision traces will extend */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Trace", meta = (ClampMin = 0, ClampMax = 500, Units="cm"))
 	float MeleeTraceDistance = 75.0f;
@@ -138,9 +132,6 @@ protected:
 	/** Max amount of time that may elapse for a combo attack input to not be considered stale */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Combo", meta = (ClampMin = 0, ClampMax = 5, Units = "s"))
 	float ComboInputCacheTimeTolerance = 0.45f;
-
-	/** Index of the current stage of the melee attack combo */
-	int32 ComboCount = 0;
 
 	/** AnimMontage that will play for charged attacks */
 	UPROPERTY(EditAnywhere, Category="Melee Attack|Charged")
@@ -208,7 +199,7 @@ public:
 
 	/** Handles combo attack pressed from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void DoComboAttackStart();
+	virtual void OnAttackInputPressed();
 
 	/** Handles combo attack released from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
@@ -220,9 +211,6 @@ public:
 	/** The direction the player is currently aiming/attacking in, for the animation blueprint's upper body pose */
 	UFUNCTION(BlueprintPure, Category="Combat")
 	EAttackDirection GetPreparedAttackDirection() const;
-
-	/** True while an attack montage is currently playing */
-	bool IsAttacking() const { return bIsAttacking; }
 
 	/** Row key into UCombatTuningDataTable for this character's tunable values (stamina regen, hit stun, etc.) */
 	FName GetCombatTuningRowName() const { return CombatTuningRowName; }
@@ -241,12 +229,6 @@ protected:
 
 	/** Performs a combo attack */
 	void ComboAttack();
-
-	/** Performs a charged attack */
-	void ChargedAttack();
-
-	/** Called from a delegate when the attack montage ends */
-	void AttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 public:
 	virtual bool CanParryNow() const override ;
@@ -342,4 +324,6 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	FORCEINLINE class UPlayerCombatStateMachineComponent* GetCombatStateComponent() const {return CombatStateMachineComponent;}
 };
