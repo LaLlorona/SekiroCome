@@ -3,6 +3,7 @@
 
 #include "PlayerCombatStateMachineComponent.h"
 
+#include "FCombatStateParameter.h"
 #include "PlayerCombatState.h"
 #include "PlayerCombatStateAttack.h"
 #include "PlayerCombatStateGuard.h"
@@ -42,62 +43,51 @@ void UPlayerCombatStateMachineComponent::UpdateCombatState(float deltaTime)
 	PlayerCombatState->UpdateState(deltaTime);
 }
 
-void UPlayerCombatStateMachineComponent::Initialize(const FCombatStateInitializeParameter& Parameter)
+void UPlayerCombatStateMachineComponent::Initialize(const FCombatStateComponentInitializeParameter& Parameter)
 {
 	CombatStateInitializeParameter = Parameter;
-	ChangeState(ECombatStateEnum::Idle);
+	TryChangeStateByStateEnum(ECombatStateEnum::Idle);
 }
 
-void UPlayerCombatStateMachineComponent::TryChangeState(ECombatStateEnum NewState)
-{
-	//check whether current transition is possible
-	ChangeState(NewState);
-}
-
-void UPlayerCombatStateMachineComponent::TryChangeState(TScriptInterface<IPlayerCombatState> NewState)
-{
-	//check whether current transition is possible
-	ChangeState(NewState);
-}
 
 #pragma warning(push)
 #pragma warning(error: 4062)
-void UPlayerCombatStateMachineComponent::ChangeState(ECombatStateEnum NewState)
+void UPlayerCombatStateMachineComponent::TryChangeStateByStateEnum(ECombatStateEnum NewState)
 {
 	TScriptInterface<IPlayerCombatState> NewStateInstance;
+	auto combatStateParam = FCombatStateParameter(CombatStateInitializeParameter, CurrentAttackDirection);
 	switch (NewState)
 	{
 		case ECombatStateEnum::Idle:
-			NewStateInstance = NewObject<UPlayerCombatStateIdle>();
+			NewStateInstance = CreateCombatState<UPlayerCombatStateIdle>(combatStateParam);
 			break;
 		case ECombatStateEnum::Guard:
-			NewStateInstance = NewObject<UPlayerCombatStateGuard>();
+			NewStateInstance = CreateCombatState<UPlayerCombatStateGuard>(combatStateParam);
 			break;
 		case ECombatStateEnum::PartialParry:
-			NewStateInstance = NewObject<UPlayerCombatStatePartialParry>();
+			NewStateInstance = CreateCombatState<UPlayerCombatStatePartialParry>(combatStateParam);
 			break;
 		case ECombatStateEnum::PerfectParryRiposte:
-			NewStateInstance = NewObject<UPlayerCombatStatePerfectParryRiposte>();
+			NewStateInstance = CreateCombatState<UPlayerCombatStatePerfectParryRiposte>(combatStateParam);
 			break;
 		case ECombatStateEnum::Hit:
-			NewStateInstance = NewObject<UPlayerCombatStateHit>();
+			NewStateInstance = CreateCombatState<UPlayerCombatStateHit>(combatStateParam);
 			break;
 		case ECombatStateEnum::Attack:
-			NewStateInstance = NewObject<UPlayerCombatStateAttack>();
+			NewStateInstance = CreateCombatState<UPlayerCombatStateAttack>(combatStateParam);
 			break;
 	}
-	ChangeState(NewStateInstance);
+	TryChangeState(NewStateInstance);
 }
 #pragma warning(pop)
 
-void UPlayerCombatStateMachineComponent::ChangeState(TScriptInterface<IPlayerCombatState> NewState)
+void UPlayerCombatStateMachineComponent::TryChangeState(TScriptInterface<IPlayerCombatState> NewState)
 {
 	if (PlayerCombatState)
 	{
 		PlayerCombatState->OnStateFinish();
 	}
 	PlayerCombatState = NewState;
-	PlayerCombatState->InitializeState(CombatStateInitializeParameter);
 	PlayerCombatState->OnStateEnter();
 }
 
@@ -134,6 +124,11 @@ void UPlayerCombatStateMachineComponent::SetAttackDirection(EAttackDirection New
 {
 	CurrentAttackDirection = NewDirection;
 	OnAttackDirectionChanged.Broadcast(NewDirection);
+
+	if (auto attackState = Cast<UPlayerCombatStateAttack>(PlayerCombatState.GetInterface()))
+	{
+		attackState->OnAttackDirectionManuallyChanged();
+	}
 }
 
 

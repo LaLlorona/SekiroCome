@@ -76,13 +76,13 @@ void ACombatCharacter::TryLockOnCamera()
 
 void ACombatCharacter::TryGuardStart()
 {
-	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Guard);
+	CombatStateMachineComponent->TryChangeStateByStateEnum(ECombatStateEnum::Guard);
 	VitalityComponent->OnRegenStopTimerBegin();
 }
 
 void ACombatCharacter::TryGuardEnd()
 {
-	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Idle);
+	CombatStateMachineComponent->TryChangeStateByStateEnum(ECombatStateEnum::Idle);
 }
 
 
@@ -153,7 +153,7 @@ void ACombatCharacter::ResetHP()
 void ACombatCharacter::ComboAttack()
 {
 	// enter (or re-enter) the Attack state, resetting its combo progress
-	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Attack);
+	CombatStateMachineComponent->TryChangeStateByStateEnum(ECombatStateEnum::Attack);
 
 	VitalityComponent->OnRegenStopTimerBegin();
 
@@ -178,7 +178,6 @@ void ACombatCharacter::ComboAttack()
 			AnimInstance->Montage_JumpToSection(*SectionName, ComboAttackMontage);
 		}
 	}
-
 }
 
 bool ACombatCharacter::CanParryNow() const
@@ -188,7 +187,7 @@ bool ACombatCharacter::CanParryNow() const
 
 void ACombatCharacter::ChangeToRiposteState()
 {
-	CombatStateMachineComponent->TryChangeState(ECombatStateEnum::PerfectParryRiposte);
+	CombatStateMachineComponent->TryChangeStateByStateEnum(ECombatStateEnum::PerfectParryRiposte);
 }
 
 void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection AttackDirection, EAttackType AttackType)
@@ -358,6 +357,15 @@ void ACombatCharacter::PlayMontage(UAnimMontage* Montage)
 	}
 }
 
+void ACombatCharacter::PlayMontageWithSectionName(UAnimMontage* Montage, const FName& SectionName)
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->Montage_Play(Montage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+		AnimInstance->Montage_JumpToSection(SectionName, Montage);
+	}
+}
+
 EAnimationStateEnum ACombatCharacter::GetCurrentAnimationState()
 {
 	if (CombatStateMachineComponent)
@@ -396,7 +404,7 @@ float ACombatCharacter::ApplyDamageToVitality(const FDamageData& DamageData)
 		GetMesh()->SetBodySimulatePhysics(PelvisBoneName, false);
 
 		// enter the Hit (stagger) state so a new attack can't be started mid-reaction
-		CombatStateMachineComponent->TryChangeState(ECombatStateEnum::Hit);
+		CombatStateMachineComponent->TryChangeStateByStateEnum(ECombatStateEnum::Hit);
 	}
 
 	// return the received damage amount
@@ -435,7 +443,7 @@ void ACombatCharacter::BeginPlay()
 
 	// reset HP to maximum
 	ResetHP();
-	CombatStateMachineComponent->Initialize(FCombatStateInitializeParameter(CombatMontageSet, this));
+	CombatStateMachineComponent->Initialize(FCombatStateComponentInitializeParameter(CombatMontageSet, this));
 	CombatInputComponent->Initialize(this);
 	VitalityComponent->Initialize(CombatTuningRowName);
 }

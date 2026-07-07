@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "FCombatStateInitializeParameter.h"
+#include "FCombatStateParameter.h"
 #include "PlayerCombatState.h"
 
 #include "PlayerCombatStateHit.generated.h"
@@ -19,10 +19,10 @@ class SEKIROCOME_API UPlayerCombatStateHit : public UObject, public IPlayerComba
 	float ElapsedTimeFromStateEnter;
 
 	UPROPERTY()
-	FCombatStateInitializeParameter InitParam;
+	FCombatStateParameter InitParam;
 
 public:
-	virtual void InitializeState(const FCombatStateInitializeParameter& Parameter) override;
+	virtual void InitializeState(const FCombatStateParameter& Parameter) override;
 	virtual void UpdateState(float deltaTime) override;
 	virtual float GetElapsedTimeFromStateEnter() override;
 	virtual EAnimationStateEnum GetAnimationStateEnum() override;

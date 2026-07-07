@@ -6,9 +6,9 @@
 #include "CombatCharacter.h"
 #include "CombatTypes.h"
 #include "CombatLogic/CombatDefine.h"
-#include "FCombatStateInitializeParameter.h"
+#include "FCombatStateParameter.h"
 
-void UPlayerCombatStateGuard::InitializeState(const FCombatStateInitializeParameter& Parameter)
+void UPlayerCombatStateGuard::InitializeState(const FCombatStateParameter& Parameter)
 {
 	InitParam = Parameter;
 }

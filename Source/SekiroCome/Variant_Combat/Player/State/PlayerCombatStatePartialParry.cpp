@@ -4,11 +4,11 @@
 #include "PlayerCombatStatePartialParry.h"
 
 #include "CombatCharacter.h"
-#include "FCombatStateInitializeParameter.h"
+#include "FCombatStateParameter.h"
 #include "Montage/CombatMontageSet.h"
 #include "PlayerCombatStateIdle.h"
 
-void UPlayerCombatStatePartialParry::InitializeState(const FCombatStateInitializeParameter& Parameter)
+void UPlayerCombatStatePartialParry::InitializeState(const FCombatStateParameter& Parameter)
 {
 	InitParam = Parameter;
 }
@@ -32,7 +32,8 @@ TOptional<TScriptInterface<IPlayerCombatState>> UPlayerCombatStatePartialParry::
 {
 	if (ElapsedTimeFromStateEnter >= 1.0f)
 	{
-		TScriptInterface<IPlayerCombatState> NextState = NewObject<UPlayerCombatStateIdle>();
+		auto attackStateParam = FCombatStateParameter::CreateWithPreparedAttackDirection(InitParam.StateComponentInitializeParameter);
+		TScriptInterface<IPlayerCombatState> NextState = CreateCombatState<UPlayerCombatStateIdle>(attackStateParam);
 		return NextState;
 	}
 	return {};
@@ -42,8 +43,8 @@ void UPlayerCombatStatePartialParry::OnStateEnter()
 {
 	ElapsedTimeFromStateEnter = 0.0f;
 	//ToDO: Montage 재생
-	auto stateOwner = InitParam.OwnerCharacter;
-	stateOwner.Get()->PlayMontage(InitParam.CombatMontageSet->GetPartialParryMontage());
+	auto stateOwner = InitParam.StateComponentInitializeParameter.OwnerCharacter;
+	stateOwner.Get()->PlayMontage(InitParam.StateComponentInitializeParameter.CombatMontageSet->GetPartialParryMontage());
 }
 
 void UPlayerCombatStatePartialParry::OnStateFinish()

@@ -18,7 +18,7 @@
 
 namespace CombatLogic
 {
-	FDamageData CalculateFinalDamage(const FCombatDamageMultiplierDataRow& DamageMultiplierData, const FCombatWeaponDamageDataRow& WeaponDamageRowData, const FCombatArmorDataRow& ArmorDataRow)
+	constexpr FDamageData CalculateFinalDamage(const FCombatDamageMultiplierDataRow& DamageMultiplierData, const FCombatWeaponDamageDataRow& WeaponDamageRowData, const FCombatArmorDataRow& ArmorDataRow)
 	{
 		// §1-2-4: 속성별 (무기 데미지 × 공격 종류 배율 - 방어력)에 최소 1 보장(chip damage floor)을 적용한 뒤 합산 (최소 3, 상한 없음)
 		const float ThrustContribution = FMath::Max(1.0f, (WeaponDamageRowData.ThrustDamage * DamageMultiplierData.ThrustMultiplier) - ArmorDataRow.ThrustDefense);
@@ -50,7 +50,7 @@ namespace CombatLogic
 			{
 				if (ICombatDamageable* AttackerDamageable = Cast<ICombatDamageable>(AttackerActor))
 				{
-					//ToDo: Reposte Animation 재생
+					//ToDo: Riposte Animation 재생
 					AttackerDamageable->ApplyDamage(DamageData, AttackerActor, AttackData.DamageLocation, AttackData.DamageImpulse);
 					/*Parryable->*/
 					Parryable->ChangeToRiposteState();
@@ -59,5 +59,52 @@ namespace CombatLogic
 			}
 		}
 		Damageable->ApplyDamage(DamageData, AttackerActor, AttackData.DamageLocation, AttackData.DamageImpulse);
+	}
+	EAttackDirection GetNextAttackDirectionOnAttack(const EAttackDirection CurrentAttackDirection)
+	{
+		switch (CurrentAttackDirection)
+		{
+			case EAttackDirection::Up:
+				return EAttackDirection::Left;
+			case EAttackDirection::Down:
+				return EAttackDirection::Right;
+			case EAttackDirection::Right:
+				return EAttackDirection::Left;
+			case EAttackDirection::Left:
+				return EAttackDirection::Right;
+		}
+		return EAttackDirection::Left;
+	}
+	EAttackDirection GetNextAttackDirectionOnBlock(const EAttackDirection BlockedAttackDirection)
+	{
+		switch (BlockedAttackDirection)
+		{
+		case EAttackDirection::Up:
+			return EAttackDirection::Right;
+		case EAttackDirection::Down:
+			return EAttackDirection::Right;
+		case EAttackDirection::Right:
+			return EAttackDirection::Left;
+		case EAttackDirection::Left:
+			return EAttackDirection::Up;
+		}
+		return EAttackDirection::Left;
+	}
+
+	FName GetAnimationSectionNameByAttackDirection(const EAttackDirection AttackDirection)
+	{
+		switch (AttackDirection)
+		{
+		case EAttackDirection::Up:
+			//ToDO: 지금 AnimMontage 에 UpAttack 이 없어서 일단 Down 으로 설정
+			return FName("Down");
+		case EAttackDirection::Down:
+			return FName("Down");
+		case EAttackDirection::Right:
+			return FName("Right");
+		case EAttackDirection::Left:
+			return FName("Left");
+		}
+		return FName("Down");
 	}
 }

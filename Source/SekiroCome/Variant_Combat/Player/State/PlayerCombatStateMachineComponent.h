@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "CombatTypes.h"
-#include "FCombatStateInitializeParameter.h"
+#include "FCombatStateComponentInitializeParameter.h"
 
 #include "PlayerCombatStateMachineComponent.generated.h"
-struct FCombatStateInitializeParameter;
+struct FCombatStateComponentInitializeParameter;
 class IPlayerCombatState;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -34,8 +34,8 @@ protected:
 public:
 
 	void UpdateCombatState(float deltaTime);
-	void Initialize(const FCombatStateInitializeParameter& Parameter);
-	void TryChangeState(ECombatStateEnum NewState);
+	void Initialize(const FCombatStateComponentInitializeParameter& Parameter);
+	void TryChangeStateByStateEnum(ECombatStateEnum NewState);
 	void TryChangeState(TScriptInterface<IPlayerCombatState> NewState);
 
 
@@ -50,11 +50,9 @@ public:
 	FOnAttackDirectionChanged OnAttackDirectionChanged;
 
 private:
-	void ChangeState(ECombatStateEnum NewState);
-	void ChangeState(TScriptInterface<IPlayerCombatState> NewState);
 
 	UPROPERTY()
-	FCombatStateInitializeParameter CombatStateInitializeParameter;
+	FCombatStateComponentInitializeParameter CombatStateInitializeParameter;
 	
 	EAttackDirection CurrentAttackDirection = EAttackDirection::Down;
 };

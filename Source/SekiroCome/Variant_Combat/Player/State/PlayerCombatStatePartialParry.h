@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 
-#include "FCombatStateInitializeParameter.h"
+#include "FCombatStateParameter.h"
 #include "PlayerCombatState.h"
 
 #include "PlayerCombatStatePartialParry.generated.h"
@@ -17,13 +17,14 @@ UCLASS()
 class SEKIROCOME_API UPlayerCombatStatePartialParry : public UObject, public IPlayerCombatState 
 {
 	GENERATED_BODY()
+	
 	float ElapsedTimeFromStateEnter;
 
 	UPROPERTY()
-	FCombatStateInitializeParameter InitParam;
+	FCombatStateParameter InitParam;
 
 public:
-	virtual void InitializeState(const FCombatStateInitializeParameter& Parameter) override;
+	virtual void InitializeState(const FCombatStateParameter& Parameter) override;
 	virtual void UpdateState(float deltaTime) override;
 	virtual float GetElapsedTimeFromStateEnter() override;
 	virtual EAnimationStateEnum GetAnimationStateEnum() override;

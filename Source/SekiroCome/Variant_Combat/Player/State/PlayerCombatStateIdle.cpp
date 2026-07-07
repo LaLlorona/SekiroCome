@@ -5,10 +5,11 @@
 
 #include "CombatCharacter.h"
 #include "CombatTypes.h"
-#include "FCombatStateInitializeParameter.h"
+#include "FCombatStateParameter.h"
 #include "PlayerCombatStateAttack.h"
+#include "PlayerCombatStateMachineComponent.h"
 
-void UPlayerCombatStateIdle::InitializeState(const FCombatStateInitializeParameter& Parameter)
+void UPlayerCombatStateIdle::InitializeState(const FCombatStateParameter& Parameter)
 {
 	InitParam = Parameter;
 }
@@ -46,5 +47,8 @@ void UPlayerCombatStateIdle::OnStateFinish()
 
 void UPlayerCombatStateIdle::OnAttackInputPressed()
 {
-	PendingNextState = NewObject<UPlayerCombatStateAttack>();
+	auto combatStateMachineComponent = InitParam.StateComponentInitializeParameter.OwnerCharacter->GetCombatStateComponent();
+	auto directionOnAttackInputPressed = combatStateMachineComponent->GetPreparedAttackDirection();
+	auto attackStateParam = FCombatStateParameter(InitParam.StateComponentInitializeParameter, directionOnAttackInputPressed);
+	PendingNextState = CreateCombatState<UPlayerCombatStateAttack>(attackStateParam);
 }

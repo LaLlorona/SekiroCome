@@ -276,6 +276,7 @@ public:
 	void RespawnCharacter();
 
 	void PlayMontage(UAnimMontage* Montage);
+	void PlayMontageWithSectionName(UAnimMontage* Montage, const FName& SectionName);
 
 	UFUNCTION(BlueprintPure, Category="Combat")
 	EAnimationStateEnum GetCurrentAnimationState();

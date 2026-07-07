@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerCombatState.h"
-#include "FCombatStateInitializeParameter.h"
+#include "FCombatStateParameter.h"
 
 #include "PlayerCombatStatePerfectParryRiposte.generated.h"
 
@@ -18,10 +18,10 @@ class SEKIROCOME_API UPlayerCombatStatePerfectParryRiposte : public UObject, pub
 	float ElapsedTimeFromStateEnter;
 
 	UPROPERTY()
-	FCombatStateInitializeParameter InitParam;
+	FCombatStateParameter InitParam;
 
 public:
-	virtual void InitializeState(const FCombatStateInitializeParameter& Parameter) override;
+	virtual void InitializeState(const FCombatStateParameter& Parameter) override;
 	virtual void UpdateState(float deltaTime) override;
 	virtual float GetElapsedTimeFromStateEnter() override;
 	virtual EAnimationStateEnum GetAnimationStateEnum() override;

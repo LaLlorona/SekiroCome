@@ -52,9 +52,9 @@
 
 > **우선 구현 이유**: 콤보 히스토리 버퍼와 MasterStrike 난이도 분기의 전제 조건.
 
-- [ ] 플레이어 "다음 공격 방향" 상태 변수 추가 (`EAttackDirection NextAttackDirection`)
-- [ ] 공격 성공 후 방향 자동 전환 테이블 구현 (§3-1: 우→좌, 좌→우, 아래→우, 위→좌)
-- [ ] 가드 성공(Block) 후 방향 자동 전환 테이블 구현 (§3-2: 우→좌, 좌→위, 아래→우, 위→우)
+- [x] 플레이어 "다음 공격 방향" 상태 변수 추가 (`EAttackDirection NextAttackDirection`)
+- [x] 공격 성공 후 방향 자동 전환 테이블 구현 (§3-1: 우→좌, 좌→우, 아래→우, 위→좌)
+- [x] 가드 성공(Block) 후 방향 자동 전환 테이블 구현 (§3-2: 우→좌, 좌→위, 아래→우, 위→우)
 - [ ] `CombatAttackDirectionUI`에 `NextAttackDirection` 연동 (기존 UI 위젯 활용)
 
 ---

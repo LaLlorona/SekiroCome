@@ -4,13 +4,13 @@
 #include "PlayerCombatStateHit.h"
 
 #include "CombatCharacter.h"
-#include "FCombatStateInitializeParameter.h"
+#include "FCombatStateParameter.h"
 #include "PlayerCombatStateIdle.h"
 #include "Table/CombatDataSubsystem.h"
 #include "Table/CombatDataTableManager.h"
 #include "Table/CombatTuningDataTable.h"
 
-void UPlayerCombatStateHit::InitializeState(const FCombatStateInitializeParameter& Parameter)
+void UPlayerCombatStateHit::InitializeState(const FCombatStateParameter& Parameter)
 {
 	InitParam = Parameter;
 }
@@ -32,12 +32,13 @@ EAnimationStateEnum UPlayerCombatStateHit::GetAnimationStateEnum()
 
 TOptional<TScriptInterface<IPlayerCombatState>> UPlayerCombatStateHit::GetStateToTransition()
 {
-	ACombatCharacter* OwnerCharacter = InitParam.OwnerCharacter.Get();
+	ACombatCharacter* OwnerCharacter = InitParam.StateComponentInitializeParameter.OwnerCharacter.Get();
 	const FCombatTuningRow& Row = UCombatDataSubsystem::GetCombatDataSubsystem(OwnerCharacter)->GetInGameTableManager()->CombatTuningDataTable->FindByRowNameOrThrow(OwnerCharacter->GetCombatTuningRowName());
 
 	if (ElapsedTimeFromStateEnter >= Row.HitStunDurationInSecond)
 	{
-		TScriptInterface<IPlayerCombatState> NextState = NewObject<UPlayerCombatStateIdle>();
+		auto attackStateParam = FCombatStateParameter::CreateWithPreparedAttackDirection(InitParam.StateComponentInitializeParameter);
+		TScriptInterface<IPlayerCombatState> NextState = CreateCombatState<UPlayerCombatStateIdle>(attackStateParam);
 		return NextState;
 	}
 	return {};

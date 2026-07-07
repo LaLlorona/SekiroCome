@@ -7,13 +7,13 @@ class ACombatCharacter;
 class UCombatMontageSet;
 
 
-#include "FCombatStateInitializeParameter.generated.h"
+#include "FCombatStateComponentInitializeParameter.generated.h"
 
 
  
 
 USTRUCT()
-struct FCombatStateInitializeParameter
+struct FCombatStateComponentInitializeParameter
 {
 	GENERATED_BODY()
 
@@ -24,8 +24,10 @@ struct FCombatStateInitializeParameter
 	UPROPERTY()
 	TObjectPtr<ACombatCharacter> OwnerCharacter;
 
-	FCombatStateInitializeParameter() = default;
-	FCombatStateInitializeParameter(UCombatMontageSet* InCombatMontageSet, ACombatCharacter* InCombatCharacter):  CombatMontageSet (InCombatMontageSet), OwnerCharacter(InCombatCharacter)
+	FCombatStateComponentInitializeParameter() = default;
+	FCombatStateComponentInitializeParameter(UCombatMontageSet* InCombatMontageSet, ACombatCharacter* InCombatCharacter):
+	CombatMontageSet (InCombatMontageSet),
+	OwnerCharacter(InCombatCharacter)
 	{
 	}
 	

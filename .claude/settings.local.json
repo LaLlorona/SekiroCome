@@ -23,7 +23,9 @@
       "Bash(ls -d /c/Epic*)",
       "Bash(ls -d /d/Epic*)",
       "Bash(\"/c/Program Files/Epic Games/UE_5.7/Engine/Build/BatchFiles/Build.bat\" SekiroComeEditor Win64 Development -Project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -WaitMutex -FromMsBuild)",
-      "PowerShell(& \"C:\\\\Program Files\\\\Epic Games\\\\UE_5.7\\\\Engine\\\\Build\\\\BatchFiles\\\\Build.bat\" SekiroComeEditor Win64 Development -project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -waitmutex)"
+      "PowerShell(& \"C:\\\\Program Files\\\\Epic Games\\\\UE_5.7\\\\Engine\\\\Build\\\\BatchFiles\\\\Build.bat\" SekiroComeEditor Win64 Development -project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -waitmutex)",
+      "Bash(powershell -NoProfile -Command \"Get-ChildItem -Path 'C:\\\\Program Files\\\\Epic Games' -Recurse -Filter 'AnimNotifies.h' -ErrorAction SilentlyContinue | Select-Object -First 5 FullName\")",
+      "Bash(powershell -NoProfile -Command \"Get-ChildItem -Path 'C:\\\\' -Directory -Filter 'UE_*' -ErrorAction SilentlyContinue\")"
     ]
   }
 }
