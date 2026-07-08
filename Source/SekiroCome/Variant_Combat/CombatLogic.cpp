@@ -6,6 +6,7 @@
 #include "Interfaces/CombatParryable.h"
 #include "GameFramework/Actor.h"
 #include "Engine/GameInstance.h"
+#include "Montage/AttackAnimationSectionInfo.h"
 #include "Table/CombatDataSubsystem.h"
 #include "Table/CombatDataTableManager.h"
 #include "Table/CombatDamageMultiplierTable.h"
@@ -91,20 +92,20 @@ namespace CombatLogic
 		return EAttackDirection::Left;
 	}
 
-	FName GetAnimationSectionNameByAttackDirection(const EAttackDirection AttackDirection)
+	AttackAnimationSectionInfo GetAnimationSectionNameByAttackDirection(const EAttackDirection AttackDirection)
 	{
 		switch (AttackDirection)
 		{
 		case EAttackDirection::Up:
 			//ToDO: 지금 AnimMontage 에 UpAttack 이 없어서 일단 Down 으로 설정
-			return FName("Down");
+			return AttackAnimationSectionInfo(FName("Down"), 0.7f);
 		case EAttackDirection::Down:
-			return FName("Down");
+			return AttackAnimationSectionInfo(FName("Down"), 0.7f);
 		case EAttackDirection::Right:
-			return FName("Right");
+			return AttackAnimationSectionInfo(FName("Right"), 0.7f);
 		case EAttackDirection::Left:
-			return FName("Left");
+			return AttackAnimationSectionInfo(FName("Left"), 0.7f);
 		}
-		return FName("Down");
+		return AttackAnimationSectionInfo(FName("Down"), 0.7f);
 	}
 }

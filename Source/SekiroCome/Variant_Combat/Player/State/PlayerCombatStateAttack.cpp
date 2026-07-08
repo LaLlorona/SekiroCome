@@ -39,7 +39,7 @@ void UPlayerCombatStateAttack::TryConsumeBufferedAttackInput()
 
 void UPlayerCombatStateAttack::TryFallbackToIdleState()
 {
-	if (PendingNextState.GetObject() == nullptr && ElapsedTimeFromStateEnter >= 1.0f)
+	if (PendingNextState.GetObject() == nullptr && ElapsedTimeFromStateEnter >= CachedAttackStateDurationTime)
 	{
 		auto attackStateParam = FCombatStateParameter::CreateWithPreparedAttackDirection(InitParam.StateComponentInitializeParameter);
 		TScriptInterface<IPlayerCombatState> NextState = CreateCombatState<UPlayerCombatStateIdle>(attackStateParam);
@@ -91,10 +91,14 @@ void UPlayerCombatStateAttack::OnStateEnter()
 
 	auto stateOwner = InitParam.StateComponentInitializeParameter.OwnerCharacter;
 	auto attackAnimMontage = InitParam.StateComponentInitializeParameter.CombatMontageSet->GetAttackAnimMontage();
-	auto attackSectionName = CombatLogic::GetAnimationSectionNameByAttackDirection(InitParam.StateEnterAttackDirection);
+	auto attackAnimSectionInfo = CombatLogic::GetAnimationSectionNameByAttackDirection(InitParam.StateEnterAttackDirection);
+	auto animMontagePlaySpeed = attackAnimSectionInfo.AnimSectionPlaySpeed;
+
+	
 
 
-	int32 sectionIndex = attackAnimMontage->GetSectionIndex(attackSectionName);
+	int32 sectionIndex = attackAnimMontage->GetSectionIndex(attackAnimSectionInfo.SectionName);
+	CachedAttackStateDurationTime = attackAnimMontage->GetSectionLength(sectionIndex) / animMontagePlaySpeed;
 	float sectionStartTime, sectionEndTime;
 	attackAnimMontage->GetSectionStartAndEndTime(sectionIndex, sectionStartTime, sectionEndTime);
 	for (auto NotifyEvent: attackAnimMontage->Notifies)
@@ -103,16 +107,16 @@ void UPlayerCombatStateAttack::OnStateEnter()
 		{
 			if (Cast<UAnimNotify_AttackTransitionWindowOpened>(NotifyEvent.Notify))
 			{
-				CachedGetComboTransitionWindowTime = NotifyEvent.GetTriggerTime() - sectionStartTime;
+				CachedGetComboTransitionWindowTime = (NotifyEvent.GetTriggerTime() - sectionStartTime) / animMontagePlaySpeed;
 				UtilityLogic::PrintString(FString::Printf(TEXT("Transition Time을 찾았습니다: %f"), CachedGetComboTransitionWindowTime));
 			}
 			else if (Cast<UAnimNotify_AttackDirectionChange>(NotifyEvent.Notify))
 			{
-				CachedAttackDirectionChangeTime = NotifyEvent.GetTriggerTime() - sectionStartTime;
+				CachedAttackDirectionChangeTime = (NotifyEvent.GetTriggerTime() - sectionStartTime) / animMontagePlaySpeed;
 			}
 		}
 	}
-	stateOwner.Get()->PlayMontageWithSectionName(attackAnimMontage, attackSectionName);
+	stateOwner.Get()->PlayMontageWithSectionName(attackAnimMontage, attackAnimSectionInfo.SectionName, animMontagePlaySpeed);
 	
 }
 

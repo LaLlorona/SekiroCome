@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Montage/AttackAnimationSectionInfo.h"
 
 enum class EAttackDirection : uint8;
 struct FAttackData;
@@ -16,5 +17,5 @@ namespace CombatLogic
 
 	EAttackDirection GetNextAttackDirectionOnBlock(EAttackDirection BlockedAttackDirection);
 
-	FName GetAnimationSectionNameByAttackDirection(EAttackDirection AttackDirection);
+	AttackAnimationSectionInfo GetAnimationSectionNameByAttackDirection(const EAttackDirection AttackDirection);
 }

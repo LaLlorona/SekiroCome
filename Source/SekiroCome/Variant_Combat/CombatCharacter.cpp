@@ -357,11 +357,11 @@ void ACombatCharacter::PlayMontage(UAnimMontage* Montage)
 	}
 }
 
-void ACombatCharacter::PlayMontageWithSectionName(UAnimMontage* Montage, const FName& SectionName)
+void ACombatCharacter::PlayMontageWithSectionName(UAnimMontage* Montage, const FName& SectionName, float MontagePlaySpeed)
 {
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
-		AnimInstance->Montage_Play(Montage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+		AnimInstance->Montage_Play(Montage, MontagePlaySpeed, EMontagePlayReturnType::MontageLength, 0.0f, true);
 		AnimInstance->Montage_JumpToSection(SectionName, Montage);
 	}
 }

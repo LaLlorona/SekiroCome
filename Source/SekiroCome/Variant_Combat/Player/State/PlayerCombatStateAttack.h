@@ -45,6 +45,7 @@ private:
 
 	float CachedGetComboTransitionWindowTime;
 	float CachedAttackDirectionChangeTime;
+	float CachedAttackStateDurationTime;
 
 	// AttackState 진입 이후 SetAttackDirection이 한 번이라도 호출됐는지 여부.
 	// true가 되면 GetNextAttackDirectionOnAttack에 의한 자동 방향 전환을 더 이상 시도하지 않는다.
