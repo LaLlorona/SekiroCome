@@ -19,5 +19,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category="Set Direction UI")
 	void SetDirectionalUI(EAttackDirection DirectionEnum);
 
+	UFUNCTION(BlueprintImplementableEvent, Category="Set Direction UI")
+	void SetActiveStatusDirectionalUI(bool active);
+
+	
+
 	
 };

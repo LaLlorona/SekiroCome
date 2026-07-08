@@ -481,6 +481,7 @@ void ACombatCharacter::NotifyControllerChanged()
 void ACombatCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	LockOnComponent->CustomUpdate();
 	FLockOnResult Result = LockOnComponent->GetLockOnResult();
 
 	if (Result.IsType<FLockOnTargetExist>())
@@ -491,10 +492,14 @@ void ACombatCharacter::Tick(float DeltaTime)
 		FRotator TargetRotation = (UKismetMathLibrary::FindLookAtRotation(CameraPos, TargetPos));
 		GetController()->SetControlRotation(TargetRotation);
 	}
-	EAttackDirection MoveDirection;
-	if (CombatInputComponent->GetMoveAttackDirection(MoveDirection))
+	EAttackDirection AttackDirection;
+	const bool bDirectionDetected = Result.IsType<FLockOnTargetExist>()
+	? CombatInputComponent->GetMouseAttackDirection(DeltaTime, AttackDirection)
+		: false;
+
+	if (bDirectionDetected)
 	{
-		CombatStateMachineComponent->SetAttackDirection(MoveDirection);
+		CombatStateMachineComponent->SetAttackDirection(AttackDirection);
 	}
 	CombatStateMachineComponent->UpdateCombatState(DeltaTime);
 	VitalityComponent->CustomUpdate(DeltaTime);

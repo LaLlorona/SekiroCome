@@ -12,10 +12,14 @@
 #include "Engine/World.h"
 #include "Blueprint/UserWidget.h"
 #include "SekiroCome.h"
+#include "Player/PlayerController/ControllerPresentationComponent.h"
 #include "Player/State/PlayerCombatStateMachineComponent.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
-
+ACombatPlayerController::ACombatPlayerController()
+{
+	ControllerPresentationComponent = CreateDefaultSubobject<UControllerPresentationComponent>("ControllerPresentationComponent");
+}
 
 void ACombatPlayerController::BeginPlay()
 {
@@ -36,12 +40,10 @@ void ACombatPlayerController::BeginPlay()
 		} else {
 
 			UE_LOG(LogSekiroCome, Error, TEXT("Could not spawn mobile controls widget."));
-
 		}
-
 	}
-	FourDirectionWidget = CreateWidget<UCombatAttackDirectionUI>(this, FourDirectionWidgetClass);
-	FourDirectionWidget->AddToPlayerScreen(0);
+	ControllerPresentationComponent->CreateAndShowWidget();
+
 }
 
 void ACombatPlayerController::SetupInputComponent()
@@ -80,8 +82,7 @@ void ACombatPlayerController::OnPossess(APawn* InPawn)
 
 	if (ACombatCharacter* CombatChar = Cast<ACombatCharacter>(InPawn))
 	{
-		CombatChar->GetCombatStateComponent()->OnAttackDirectionChanged
-			.AddUniqueDynamic(this, &ACombatPlayerController::HandleAttackDirectionChanged);
+		ControllerPresentationComponent->BindToCharacter(CombatChar);
 	}
 }
 
@@ -90,6 +91,8 @@ void ACombatPlayerController::SetRespawnTransform(const FTransform& NewRespawn)
 	// save the new respawn transform
 	RespawnTransform = NewRespawn;
 }
+
+
 
 void ACombatPlayerController::OnPawnDestroyed(AActor* DestroyedActor)
 {
@@ -105,9 +108,4 @@ bool ACombatPlayerController::ShouldUseTouchControls() const
 {
 	// are we on a mobile platform? Should we force touch?
 	return SVirtualJoystick::ShouldDisplayTouchInterface() || bForceTouchControls;
-}
-
-void ACombatPlayerController::HandleAttackDirectionChanged(EAttackDirection AttackDirection)
-{
-	FourDirectionWidget->SetDirectionalUI(AttackDirection);
 }

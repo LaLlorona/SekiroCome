@@ -11,6 +11,7 @@
 class UInputAction;
 class UEnhancedInputComponent;
 class ACombatCharacter;
+class UMouseInputThresholdCheckComponent;
 struct FInputActionValue;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -21,6 +22,9 @@ class SEKIROCOME_API UCombatCharacterInputComponent : public UActorComponent
 private:
 	UPROPERTY()
 	TObjectPtr<ACombatCharacter> OwnerCharacter;
+
+	UPROPERTY(VisibleAnywhere, Instanced, Category="Components")
+	TObjectPtr<UMouseInputThresholdCheckComponent> MouseThresholdComponent;
 
 public:
 	// Sets default values for this component's properties
@@ -76,4 +80,5 @@ public:
 
 	void SetupBindings(UEnhancedInputComponent* EnhancedInputComponent);
 	bool GetMoveAttackDirection(EAttackDirection& OutDirection) const;
+	bool GetMouseAttackDirection(float DeltaTime, EAttackDirection& OutDirection) const;
 };

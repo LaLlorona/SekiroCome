@@ -10,6 +10,7 @@
 #include "Engine/LocalPlayer.h"
 #include "EnhancedPlayerInput.h"
 #include "CombatPlayerController.h"
+#include "MouseInputThresholdCheckComponent.h"
 
 
 // Sets default values for this component's properties
@@ -19,7 +20,7 @@ UCombatCharacterInputComponent::UCombatCharacterInputComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	// ...
+	MouseThresholdComponent = CreateDefaultSubobject<UMouseInputThresholdCheckComponent>(TEXT("MouseThresholdComponent"));
 }
 
 
@@ -100,6 +101,21 @@ bool UCombatCharacterInputComponent::GetMoveAttackDirection(EAttackDirection& Ou
 		OutDirection = InputValue.Y > 0 ? EAttackDirection::Up : EAttackDirection::Down;
 	}
 	return true;
+}
+
+bool UCombatCharacterInputComponent::GetMouseAttackDirection(float DeltaTime, EAttackDirection& OutDirection) const
+{
+	if (!OwnerCharacter) return false;
+
+	ACombatPlayerController* PC = Cast<ACombatPlayerController>(OwnerCharacter->GetController());
+	if (!PC) return false;
+
+	const UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+	if (!Subsystem || !Subsystem->GetPlayerInput()) return false;
+
+	const FVector2D MouseDelta = Subsystem->GetPlayerInput()->GetActionValue(MouseLookAction).Get<FVector2D>();
+
+	return MouseThresholdComponent->CustomUpdate(DeltaTime, MouseDelta, OutDirection);
 }
 
 

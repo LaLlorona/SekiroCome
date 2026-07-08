@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "CombatPlayerController.generated.h"
 
+class UControllerPresentationComponent;
 enum class EAttackDirection : uint8;
 class UCombatAttackDirectionUI;
 class UPlayerCombatStateMachineComponent;
@@ -36,15 +37,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input|Touch Controls")
 	TSubclassOf<UUserWidget> MobileControlsWidgetClass;
 
-	UPROPERTY(EditAnywhere, Category="HUD")
-	TSubclassOf<UCombatAttackDirectionUI> FourDirectionWidgetClass;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UControllerPresentationComponent> ControllerPresentationComponent;
+
 
 	/** Pointer to the mobile controls widget */
 	UPROPERTY()
 	TObjectPtr<UUserWidget> MobileControlsWidget;
-
-	UPROPERTY()
-	TObjectPtr<UCombatAttackDirectionUI> FourDirectionWidget;
 
 	/** If true, the player will use UMG touch controls even if not playing on mobile platforms */
 	UPROPERTY(EditAnywhere, Config, Category = "Input|Touch Controls")
@@ -56,9 +55,6 @@ protected:
 
 	/** Transform to respawn the character at. Can be set to create checkpoints */
 	FTransform RespawnTransform;
-
-	UFUNCTION()
-	void HandleAttackDirectionChanged(EAttackDirection AttackDirection);
 
 protected:
 
@@ -73,8 +69,10 @@ protected:
 
 public:
 
+	ACombatPlayerController();
 	/** Updates the character respawn transform */
 	void SetRespawnTransform(const FTransform& NewRespawn);
+
 
 protected:
 

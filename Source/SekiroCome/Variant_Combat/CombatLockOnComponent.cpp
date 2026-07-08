@@ -33,6 +33,17 @@ void UCombatLockOnComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UCombatLockOnComponent::CustomUpdate()
+{
+	const bool bIsTargetExist = LockedOnTarget.IsValid();
+
+	if (bIsTargetExist != bWasTargetExist)
+	{
+		bWasTargetExist = bIsTargetExist;
+		OnLockOnTargetChanged.Broadcast(bIsTargetExist);
+	}
+}
+
 FLockOnResult UCombatLockOnComponent::GetLockOnResult() const
 {
 	if (LockedOnTarget.IsValid())

@@ -53,7 +53,7 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	UCombatLockOnComponent* LockOnComponent;
+	TObjectPtr<UCombatLockOnComponent> LockOnComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCombatVitalityComponent> VitalityComponent;
@@ -327,4 +327,6 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	FORCEINLINE class UPlayerCombatStateMachineComponent* GetCombatStateComponent() const {return CombatStateMachineComponent;}
+
+	FORCEINLINE class UCombatLockOnComponent* GetLockOnComponent() const {return LockOnComponent;}
 };
