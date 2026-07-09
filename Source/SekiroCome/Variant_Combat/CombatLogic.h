@@ -1,13 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Montage/AttackAnimationSectionInfo.h"
+#include "Table/Id/FAttackInfoId.h"
 
 enum class EAttackDirection : uint8;
 struct FAttackData;
 class ICombatAttacker;
 class ICombatDamageable;
-class FName;
 
 namespace CombatLogic
 {
@@ -17,5 +16,6 @@ namespace CombatLogic
 
 	EAttackDirection GetNextAttackDirectionOnBlock(EAttackDirection BlockedAttackDirection);
 
-	AttackAnimationSectionInfo GetAnimationSectionNameByAttackDirection(const EAttackDirection AttackDirection);
+	/** Basic(non-combo) attack이 진입할 때 사용할 CombatAttackInfoTable RowName의 기본값. AttackDirection만으로 RowName이 정해지지 않는 콤보 등의 경우에는 쓰지 않는다. */
+	FAttackInfoId GetAttackInfoRowNameByDirection(const EAttackDirection AttackDirection);
 }

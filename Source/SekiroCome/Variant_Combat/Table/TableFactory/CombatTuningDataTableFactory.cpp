@@ -2,8 +2,8 @@
 
 #if WITH_EDITOR
 
-#include "CombatTuningDataTable.h"
-#include "FCombatTuningRow.h"
+#include "Table/Table/CombatTuningDataTable.h"
+#include "Table/Row/FCombatTuningRow.h"
 
 UCombatTuningDataTableFactory::UCombatTuningDataTableFactory()
 {

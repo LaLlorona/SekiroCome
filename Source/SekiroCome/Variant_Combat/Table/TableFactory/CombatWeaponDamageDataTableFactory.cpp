@@ -2,8 +2,8 @@
 
 #if WITH_EDITOR
 
-#include "CombatWeaponDamageDataTable.h"
-#include "FCombatWeaponDamageDataRow.h"
+#include "Table/Table/CombatWeaponDamageDataTable.h"
+#include "Table/Row/FCombatWeaponDamageDataRow.h"
 
 UCombatWeaponDamageDataTableFactory::UCombatWeaponDamageDataTableFactory()
 {

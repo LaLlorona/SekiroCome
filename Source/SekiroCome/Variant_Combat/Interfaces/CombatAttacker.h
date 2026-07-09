@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CombatTypes.h"
 #include "UObject/Interface.h"
+#include "Table/Id/FWeaponId.h"
 #include "CombatAttacker.generated.h"
 
 /**
@@ -37,5 +38,5 @@ public:
 
 	/** Returns the row key (into UCombatWeaponDamageDataTable) identifying the weapon this attacker is currently using */
 	UFUNCTION(BlueprintCallable, Category="Attacker")
-	virtual FName GetWeaponID() const = 0;
+	virtual FWeaponId GetWeaponID() const = 0;
 };

@@ -16,17 +16,11 @@ USTRUCT()
 struct FCombatStateComponentInitializeParameter
 {
 	GENERATED_BODY()
-
-	UPROPERTY()
-	TObjectPtr<UCombatMontageSet> CombatMontageSet;
-
-
 	UPROPERTY()
 	TObjectPtr<ACombatCharacter> OwnerCharacter;
 
 	FCombatStateComponentInitializeParameter() = default;
 	FCombatStateComponentInitializeParameter(UCombatMontageSet* InCombatMontageSet, ACombatCharacter* InCombatCharacter):
-	CombatMontageSet (InCombatMontageSet),
 	OwnerCharacter(InCombatCharacter)
 	{
 	}

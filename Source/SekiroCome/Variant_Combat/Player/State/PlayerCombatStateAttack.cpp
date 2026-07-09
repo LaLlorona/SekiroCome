@@ -10,7 +10,12 @@
 #include "FCombatStateParameter.h"
 #include "PlayerCombatStateIdle.h"
 #include "PlayerCombatStateMachineComponent.h"
-#include "Montage/CombatMontageSet.h"
+#include "Table/CombatDataSubsystem.h"
+#include "Table/CombatDataTableManager.h"
+#include "Table/Row/FCombatAttackInfoRow.h"
+#include "Table/Row/FCombatMontageRow.h"
+#include "Table/Table/CombatAttackInfoTable.h"
+#include "Table/Table/CombatMontageTable.h"
 #include "Utility/UtilityLogic.h"
 
 void UPlayerCombatStateAttack::InitializeState(const FCombatStateParameter& Parameter)
@@ -32,7 +37,9 @@ void UPlayerCombatStateAttack::TryConsumeBufferedAttackInput()
 {
 	if (bAttackInputPressed && PendingNextState.GetObject() == nullptr && ElapsedTimeFromStateEnter >= CachedGetComboTransitionWindowTime)
 	{
-		auto attackStateParam = FCombatStateParameter::CreateWithPreparedAttackDirection(InitParam.StateComponentInitializeParameter);
+		auto direction = InitParam.StateComponentInitializeParameter.OwnerCharacter->GetCombatStateComponent()->GetPreparedAttackDirection();
+		auto attackAnimRowName = CombatLogic::GetAttackInfoRowNameByDirection(direction);
+		auto attackStateParam = FCombatStateParameter::CreateForAttack(InitParam.StateComponentInitializeParameter, attackAnimRowName);
 		PendingNextState = CreateCombatState<UPlayerCombatStateAttack>(attackStateParam);
 	}
 }
@@ -90,14 +97,16 @@ void UPlayerCombatStateAttack::OnStateEnter()
 	CachedAttackDirectionChangeTime = TNumericLimits<float>::Max();
 
 	auto stateOwner = InitParam.StateComponentInitializeParameter.OwnerCharacter;
-	auto attackAnimMontage = InitParam.StateComponentInitializeParameter.CombatMontageSet->GetAttackAnimMontage();
-	auto attackAnimSectionInfo = CombatLogic::GetAnimationSectionNameByAttackDirection(InitParam.StateEnterAttackDirection);
-	auto animMontagePlaySpeed = attackAnimSectionInfo.AnimSectionPlaySpeed;
+	UCombatDataTableManager* TableManager = UCombatDataSubsystem::GetCombatDataSubsystem(stateOwner)->GetInGameTableManager();
 
-	
+	FAttackInfoId AttackInfoRowName = InitParam.AttackInfoRowName.Get(FAttackInfoId(FName("Down")));
+	const FCombatAttackInfoRow& AttackInfoRow = TableManager->CombatAttackInfoTable->FindByAttackInfoId(AttackInfoRowName);
+	const FCombatMontageRow& MontageRow = TableManager->CombatMontageTable->FindByMontageId(AttackInfoRow.MontageNameKey);
 
+	UAnimMontage* attackAnimMontage = MontageRow.Montage;
+	float animMontagePlaySpeed = AttackInfoRow.MontagePlaySpeed;
 
-	int32 sectionIndex = attackAnimMontage->GetSectionIndex(attackAnimSectionInfo.SectionName);
+	int32 sectionIndex = attackAnimMontage->GetSectionIndex(AttackInfoRow.MontageSectionName);
 	CachedAttackStateDurationTime = attackAnimMontage->GetSectionLength(sectionIndex) / animMontagePlaySpeed;
 	float sectionStartTime, sectionEndTime;
 	attackAnimMontage->GetSectionStartAndEndTime(sectionIndex, sectionStartTime, sectionEndTime);
@@ -116,8 +125,7 @@ void UPlayerCombatStateAttack::OnStateEnter()
 			}
 		}
 	}
-	stateOwner.Get()->PlayMontageWithSectionName(attackAnimMontage, attackAnimSectionInfo.SectionName, animMontagePlaySpeed);
-	
+	stateOwner.Get()->PlayMontageWithSectionName(attackAnimMontage, AttackInfoRow.MontageSectionName, animMontagePlaySpeed);
 }
 
 void UPlayerCombatStateAttack::OnStateFinish()

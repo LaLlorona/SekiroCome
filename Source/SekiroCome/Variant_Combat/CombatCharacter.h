@@ -8,6 +8,9 @@
 #include "CombatDamageable.h"
 #include "CombatParryable.h"
 #include "Animation/AnimInstance.h"
+#include "Table/Id/FWeaponId.h"
+#include "Table/Id/FArmorTypeId.h"
+#include "Table/Id/FCombatTuningId.h"
 #include "CombatCharacter.generated.h"
 
 class UCombatAttackDirectionUI;
@@ -65,15 +68,15 @@ class ACombatCharacter : public ACharacter, public ICombatAttacker, public IComb
 	TObjectPtr<UCombatCharacterInputComponent> CombatInputComponent;
 	
 	UPROPERTY(EditAnywhere, Category="Damage")
-	FName CombatTuningRowName;
+	FCombatTuningId CombatTuningRowName;
 
 	/** Row key into UCombatWeaponDamageDataTable identifying the weapon this character is using. Equipping a weapon actor may replace this later. */
 	UPROPERTY(EditAnywhere, Category="Damage")
-	FName WeaponID;
+	FWeaponId WeaponID;
 
 	/** Row key into UCombatDefenseDataTable identifying this character's armor type */
 	UPROPERTY(EditAnywhere, Category="Damage")
-	FName ArmorTypeID;
+	FArmorTypeId ArmorTypeID;
 
 protected:
 	/** Life bar widget fill color */
@@ -213,7 +216,7 @@ public:
 	EAttackDirection GetPreparedAttackDirection() const;
 
 	/** Row key into UCombatTuningDataTable for this character's tunable values (stamina regen, hit stun, etc.) */
-	FName GetCombatTuningRowName() const { return CombatTuningRowName; }
+	FCombatTuningId GetCombatTuningRowName() const { return CombatTuningRowName; }
 
 	/** True while the character is in the Hit (stagger) state and cannot start a new attack */
 	bool IsBeingHit() const;
@@ -246,7 +249,7 @@ public:
 	virtual void CheckChargedAttack() override;
 
 	/** Returns the row key identifying the weapon this character is using */
-	virtual FName GetWeaponID() const override;
+	virtual FWeaponId GetWeaponID() const override;
 
 	// ~end CombatAttacker interface
 
@@ -268,7 +271,7 @@ public:
 	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource) override;
 
 	/** Returns the row key identifying this character's armor type */
-	virtual FName GetArmorTypeID() const override;
+	virtual FArmorTypeId GetArmorTypeID() const override;
 
 	// ~end CombatDamageable interface
 

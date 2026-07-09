@@ -8,7 +8,7 @@
 #include "PlayerCombatStateIdle.h"
 #include "Table/CombatDataSubsystem.h"
 #include "Table/CombatDataTableManager.h"
-#include "Table/CombatTuningDataTable.h"
+#include "Table/Table/CombatTuningDataTable.h"
 
 void UPlayerCombatStateHit::InitializeState(const FCombatStateParameter& Parameter)
 {
@@ -33,7 +33,7 @@ EAnimationStateEnum UPlayerCombatStateHit::GetAnimationStateEnum()
 TOptional<TScriptInterface<IPlayerCombatState>> UPlayerCombatStateHit::GetStateToTransition()
 {
 	ACombatCharacter* OwnerCharacter = InitParam.StateComponentInitializeParameter.OwnerCharacter.Get();
-	const FCombatTuningRow& Row = UCombatDataSubsystem::GetCombatDataSubsystem(OwnerCharacter)->GetInGameTableManager()->CombatTuningDataTable->FindByRowNameOrThrow(OwnerCharacter->GetCombatTuningRowName());
+	const FCombatTuningRow& Row = UCombatDataSubsystem::GetCombatDataSubsystem(OwnerCharacter)->GetInGameTableManager()->CombatTuningDataTable->FindByCombatTuningId(OwnerCharacter->GetCombatTuningRowName());
 
 	if (ElapsedTimeFromStateEnter >= Row.HitStunDurationInSecond)
 	{

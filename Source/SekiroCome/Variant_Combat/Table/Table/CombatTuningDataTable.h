@@ -2,7 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "FCombatTuningRow.h"
+#include "Table/Row/FCombatTuningRow.h"
+#include "Table/Id/FCombatTuningId.h"
 #include "CombatTuningDataTable.generated.h"
 
 /** DataTable locked to FCombatTuningRow, so any table of this class always uses that row schema */
@@ -14,6 +15,6 @@ class SEKIROCOME_API UCombatTuningDataTable : public UDataTable
 public:
 	UCombatTuningDataTable();
 
-	/** Finds a row by name. Crashes (checkf) if the row does not exist - a missing row is a data-authoring bug, not a normal runtime case */
-	const FCombatTuningRow& FindByRowNameOrThrow(FName RowName) const;
+	/** Finds a row by CombatTuningId. Crashes (checkf) if the row does not exist - a missing row is a data-authoring bug, not a normal runtime case */
+	const FCombatTuningRow& FindByCombatTuningId(FCombatTuningId CombatTuningId) const;
 };

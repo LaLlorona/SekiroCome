@@ -9,6 +9,9 @@
 #include "CombatTypes.h"
 #include "Animation/AnimMontage.h"
 #include "Engine/TimerHandle.h"
+#include "Table/Id/FWeaponId.h"
+#include "Table/Id/FArmorTypeId.h"
+#include "Table/Id/FCombatTuningId.h"
 #include "CombatEnemy.generated.h"
 
 class UWidgetComponent;
@@ -55,15 +58,15 @@ public:
 	UCombatTuningDataTable* CombatTuningDataTable;
 
 	UPROPERTY(EditAnywhere, Category="Damage")
-	FName CombatTuningRowName;
+	FCombatTuningId CombatTuningRowName;
 
 	/** Row key into UCombatWeaponDamageDataTable identifying the weapon this enemy is using. Equipping a weapon actor may replace this later. */
 	UPROPERTY(EditAnywhere, Category="Damage")
-	FName WeaponID;
+	FWeaponId WeaponID;
 
 	/** Row key into UCombatDefenseDataTable identifying this enemy's armor type */
 	UPROPERTY(EditAnywhere, Category="Damage")
-	FName ArmorTypeID;
+	FArmorTypeId ArmorTypeID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AttackState")
 	bool bParryWindowOpen = false;
@@ -200,7 +203,7 @@ public:
 	virtual void CheckChargedAttack() override;
 
 	/** Returns the row key identifying the weapon this enemy is using */
-	virtual FName GetWeaponID() const override;
+	virtual FWeaponId GetWeaponID() const override;
 
 	// ~end ICombatAttacker interface
 
@@ -219,7 +222,7 @@ public:
 	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource) override;
 
 	/** Returns the row key identifying this enemy's armor type */
-	virtual FName GetArmorTypeID() const override;
+	virtual FArmorTypeId GetArmorTypeID() const override;
 
 	// ~end ICombatDamageable interface
 

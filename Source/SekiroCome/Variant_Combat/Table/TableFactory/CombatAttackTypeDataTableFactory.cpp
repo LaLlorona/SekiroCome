@@ -2,8 +2,8 @@
 
 #if WITH_EDITOR
 
-#include "CombatDamageMultiplierTable.h"
-#include "FCombatDamageMultiplierDataRow.h"
+#include "Table/Table/CombatDamageMultiplierTable.h"
+#include "Table/Row/FCombatDamageMultiplierDataRow.h"
 
 UCombatAttackTypeDataTableFactory::UCombatAttackTypeDataTableFactory()
 {

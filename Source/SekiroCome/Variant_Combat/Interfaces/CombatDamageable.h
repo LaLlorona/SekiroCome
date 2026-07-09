@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "CombatLogic/FDamageData.h"
+#include "Table/Id/FArmorTypeId.h"
 #include "CombatDamageable.generated.h"
 
 /**
@@ -42,5 +43,5 @@ public:
 
 	/** Returns the row key (into UCombatDefenseDataTable) identifying this actor's armor type */
 	UFUNCTION(BlueprintCallable, Category="Damageable")
-	virtual FName GetArmorTypeID() const = 0;
+	virtual FArmorTypeId GetArmorTypeID() const = 0;
 };

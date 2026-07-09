@@ -81,7 +81,7 @@ void ACombatDamageableBox::NotifyDanger(const FVector& DangerLocation, AActor* D
 	// stub
 }
 
-FName ACombatDamageableBox::GetArmorTypeID() const
+FArmorTypeId ACombatDamageableBox::GetArmorTypeID() const
 {
 	return ArmorTypeID;
 }

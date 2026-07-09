@@ -7,6 +7,8 @@
 
 #include "CombatDataTableManager.generated.h"
 
+class UCombatAttackInfoTable;
+class UCombatMontageTable;
 class UCombatDefenseDataTable;
 class UCombatDamageMultiplierTable;
 class UCombatWeaponDamageDataTable;
@@ -34,5 +36,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TObjectPtr<UCombatDefenseDataTable> DefenseTable;
+
+	UPROPERTY(EditAnywhere, Category="Combat")
+	TObjectPtr<UCombatMontageTable> CombatMontageTable;
+	
+	UPROPERTY(EditAnywhere, Category="Combat")
+	TObjectPtr<UCombatAttackInfoTable> CombatAttackInfoTable;
+	
 };
 

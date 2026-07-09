@@ -244,7 +244,7 @@ void ACombatCharacter::CheckChargedAttack()
 	//CombatCharacter 에서는 일단 사용 안합니다.
 }
 
-FName ACombatCharacter::GetWeaponID() const
+FWeaponId ACombatCharacter::GetWeaponID() const
 {
 	return WeaponID;
 }
@@ -338,7 +338,7 @@ void ACombatCharacter::NotifyDanger(const FVector& DangerLocation, AActor* Dange
 	// stub
 }
 
-FName ACombatCharacter::GetArmorTypeID() const
+FArmorTypeId ACombatCharacter::GetArmorTypeID() const
 {
 	return ArmorTypeID;
 }

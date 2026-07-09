@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CombatDamageable.h"
+#include "Table/Id/FArmorTypeId.h"
 #include "CombatDamageableBox.generated.h"
 
 /**
@@ -20,7 +21,7 @@ class ACombatDamageableBox : public AActor, public ICombatDamageable
 	UStaticMeshComponent* Mesh;
 	
 	UPROPERTY(EditAnywhere, Category="Damage")
-	FName ArmorTypeID;
+	FArmorTypeId ArmorTypeID;
 
 public:	
 
@@ -71,7 +72,7 @@ public:
 
 	/** Allows reaction to incoming attacks */
 	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource) override;
-	virtual FName GetArmorTypeID() const override;
+	virtual FArmorTypeId GetArmorTypeID() const override;
 
 	// ~End CombatDamageable interface
 };

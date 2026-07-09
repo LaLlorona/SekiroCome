@@ -44,7 +44,7 @@ void UPlayerCombatStatePerfectParryRiposte::OnStateEnter()
 	ElapsedTimeFromStateEnter = 0.0f;
 	//ToDO: Montage 재생
 	auto stateOwner = InitParam.StateComponentInitializeParameter.OwnerCharacter;
-	stateOwner.Get()->PlayMontage(InitParam.StateComponentInitializeParameter.CombatMontageSet->GetRiposteMontage());
+	/*stateOwner.Get()->PlayMontage(InitParam.StateComponentInitializeParameter.CombatMontageSet->GetRiposteMontage());*/
 	
 }
 

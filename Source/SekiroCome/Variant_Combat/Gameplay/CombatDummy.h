@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CombatDamageable.h"
+#include "Table/Id/FArmorTypeId.h"
 #include "CombatDummy.generated.h"
 
 class UStaticMeshComponent;
@@ -53,7 +54,7 @@ public:
 	/** Allows reaction to incoming attacks */
 	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource) override;
 
-	virtual FName GetArmorTypeID() const override;
+	virtual FArmorTypeId GetArmorTypeID() const override;
 	// ~End CombatDamageable interface
 	
 

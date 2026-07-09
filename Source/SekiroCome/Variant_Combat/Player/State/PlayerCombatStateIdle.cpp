@@ -4,6 +4,7 @@
 #include "PlayerCombatStateIdle.h"
 
 #include "CombatCharacter.h"
+#include "CombatLogic.h"
 #include "CombatTypes.h"
 #include "FCombatStateParameter.h"
 #include "PlayerCombatStateAttack.h"
@@ -49,6 +50,8 @@ void UPlayerCombatStateIdle::OnAttackInputPressed()
 {
 	auto combatStateMachineComponent = InitParam.StateComponentInitializeParameter.OwnerCharacter->GetCombatStateComponent();
 	auto directionOnAttackInputPressed = combatStateMachineComponent->GetPreparedAttackDirection();
-	auto attackStateParam = FCombatStateParameter(InitParam.StateComponentInitializeParameter, directionOnAttackInputPressed);
+	auto attackStateParam = FCombatStateParameter::CreateForAttack(
+		InitParam.StateComponentInitializeParameter,
+		CombatLogic::GetAttackInfoRowNameByDirection(directionOnAttackInputPressed));
 	PendingNextState = CreateCombatState<UPlayerCombatStateAttack>(attackStateParam);
 }

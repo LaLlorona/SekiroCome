@@ -6,15 +6,14 @@
 #include "Interfaces/CombatParryable.h"
 #include "GameFramework/Actor.h"
 #include "Engine/GameInstance.h"
-#include "Montage/AttackAnimationSectionInfo.h"
 #include "Table/CombatDataSubsystem.h"
 #include "Table/CombatDataTableManager.h"
-#include "Table/CombatDamageMultiplierTable.h"
-#include "Table/CombatDefenseDataTable.h"
-#include "Table/CombatWeaponDamageDataTable.h"
-#include "Table/FCombatDamageMultiplierDataRow.h"
-#include "Table/FCombatArmorDataRow.h"
-#include "Table/FCombatWeaponDamageDataRow.h"
+#include "Table/Table/CombatDamageMultiplierTable.h"
+#include "Table/Table/CombatDefenseDataTable.h"
+#include "Table/Table/CombatWeaponDamageDataTable.h"
+#include "Table/Row/FCombatDamageMultiplierDataRow.h"
+#include "Table/Row/FCombatArmorDataRow.h"
+#include "Table/Row/FCombatWeaponDamageDataRow.h"
 
 
 namespace CombatLogic
@@ -34,12 +33,12 @@ namespace CombatLogic
 	void ResolveAttack(AActor* AttackerActor, ICombatAttacker* Attacker, AActor* DamagedActor, ICombatDamageable* Damageable, const FAttackData& AttackData)
 	{
 		UCombatDataTableManager* TableManager = UCombatDataSubsystem::GetCombatDataSubsystem(AttackerActor)->GetInGameTableManager();
-		const FName WeaponID = Attacker->GetWeaponID();
-		const FName ArmorTypeID = Damageable->GetArmorTypeID();
+		const FWeaponId WeaponID = Attacker->GetWeaponID();
+		const FArmorTypeId ArmorTypeID = Damageable->GetArmorTypeID();
 
 		const FCombatDamageMultiplierDataRow& DamageMultiplierData = TableManager->AttackTypeTable->FindByAttackTypeOrThrow(AttackData.AttackType);
-		const FCombatWeaponDamageDataRow& WeaponDamageRowData = TableManager->WeaponDamageTable->FindByRowNameOrThrow(WeaponID);
-		const FCombatArmorDataRow& ArmorDataRow = TableManager->DefenseTable->FindByRowNameOrThrow(ArmorTypeID);
+		const FCombatWeaponDamageDataRow& WeaponDamageRowData = TableManager->WeaponDamageTable->FindByWeaponId(WeaponID);
+		const FCombatArmorDataRow& ArmorDataRow = TableManager->DefenseTable->FindByArmorTypeId(ArmorTypeID);
 
 		const FDamageData DamageData = CalculateFinalDamage(DamageMultiplierData, WeaponDamageRowData, ArmorDataRow);
 
@@ -92,20 +91,19 @@ namespace CombatLogic
 		return EAttackDirection::Left;
 	}
 
-	AttackAnimationSectionInfo GetAnimationSectionNameByAttackDirection(const EAttackDirection AttackDirection)
+	FAttackInfoId GetAttackInfoRowNameByDirection(const EAttackDirection AttackDirection)
 	{
 		switch (AttackDirection)
 		{
 		case EAttackDirection::Up:
-			//ToDO: 지금 AnimMontage 에 UpAttack 이 없어서 일단 Down 으로 설정
-			return AttackAnimationSectionInfo(FName("Down"), 0.7f);
+			return FAttackInfoId(FName("Up"));
 		case EAttackDirection::Down:
-			return AttackAnimationSectionInfo(FName("Down"), 0.7f);
+			return FAttackInfoId(FName("Down"));
 		case EAttackDirection::Right:
-			return AttackAnimationSectionInfo(FName("Right"), 0.7f);
+			return FAttackInfoId(FName("Right"));
 		case EAttackDirection::Left:
-			return AttackAnimationSectionInfo(FName("Left"), 0.7f);
+			return FAttackInfoId(FName("Left"));
 		}
-		return AttackAnimationSectionInfo(FName("Down"), 0.7f);
+		return FAttackInfoId(FName("Down"));
 	}
 }

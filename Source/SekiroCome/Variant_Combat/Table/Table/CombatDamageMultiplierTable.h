@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "CombatTypes.h"
-#include "FCombatDamageMultiplierDataRow.h"
+#include "Table/Row/FCombatDamageMultiplierDataRow.h"
 #include "CombatDamageMultiplierTable.generated.h"
 
 /** DataTable locked to FCombatAttackTypeRow, so any table of this class always uses that row schema */

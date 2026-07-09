@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "CombatLogic/FDamageData.h"
+#include "Table/Id/FCombatTuningId.h"
 #include "CombatVitalityComponent.generated.h"
 
 class UCombatTuningDataTable;
@@ -15,7 +16,7 @@ class SEKIROCOME_API UCombatVitalityComponent : public UActorComponent
 	GENERATED_BODY()
 	float HpRegenLeftTime = 0.0f;
 
-	FName CombatTuningRowName;
+	FCombatTuningId CombatTuningRowName;
 
 public:
 	// Sets default values for this component's properties
@@ -66,5 +67,5 @@ public:
 
 	void OnRegenStopTimerBegin();
 
-	void Initialize(FName InTuningRowName);
+	void Initialize(FCombatTuningId InTuningRowName);
 };

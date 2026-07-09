@@ -4,7 +4,7 @@
 #include "CombatVitalityComponent.h"
 #include "Table/CombatDataTableManager.h"
 #include "Table/CombatDataSubsystem.h"
-#include "Table/CombatTuningDataTable.h"
+#include "Table/Table/CombatTuningDataTable.h"
 
 
 // Sets default values for this component's properties
@@ -27,18 +27,18 @@ void UCombatVitalityComponent::CustomUpdate(float DeltaTime)
 		return;
 	}
 
-	const FCombatTuningRow& Row = UCombatDataSubsystem::GetCombatDataSubsystem(this)->GetInGameTableManager()->CombatTuningDataTable->FindByRowNameOrThrow(CombatTuningRowName);
+	const FCombatTuningRow& Row = UCombatDataSubsystem::GetCombatDataSubsystem(this)->GetInGameTableManager()->CombatTuningDataTable->FindByCombatTuningId(CombatTuningRowName);
 	CurrentSP = FMath::Min(CurrentSP + Row.SP_RegenPerSecond * DeltaTime, GetCurrentPossibleMaxSP());
 }
 
 void UCombatVitalityComponent::OnRegenStopTimerBegin()
 {
 	const FCombatTuningRow& Row =
-		UCombatDataSubsystem::GetCombatDataSubsystem(this)->GetInGameTableManager()->CombatTuningDataTable->FindByRowNameOrThrow(CombatTuningRowName);
+		UCombatDataSubsystem::GetCombatDataSubsystem(this)->GetInGameTableManager()->CombatTuningDataTable->FindByCombatTuningId(CombatTuningRowName);
 	HpRegenLeftTime = Row.SP_RegenDelayInSecond;
 }
 
-void UCombatVitalityComponent::Initialize(FName InTuningRowName)
+void UCombatVitalityComponent::Initialize(FCombatTuningId InTuningRowName)
 {
 	CombatTuningRowName = InTuningRowName;
 	OnRegenStopTimerBegin();

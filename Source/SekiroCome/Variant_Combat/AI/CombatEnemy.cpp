@@ -217,7 +217,7 @@ void ACombatEnemy::CheckChargedAttack()
 	}
 }
 
-FName ACombatEnemy::GetWeaponID() const
+FWeaponId ACombatEnemy::GetWeaponID() const
 {
 	return WeaponID;
 }
@@ -288,7 +288,7 @@ void ACombatEnemy::NotifyDanger(const FVector& DangerLocation, AActor* DangerSou
 	}
 }
 
-FName ACombatEnemy::GetArmorTypeID() const
+FArmorTypeId ACombatEnemy::GetArmorTypeID() const
 {
 	return ArmorTypeID;
 }

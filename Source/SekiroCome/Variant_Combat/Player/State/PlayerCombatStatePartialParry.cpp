@@ -44,7 +44,7 @@ void UPlayerCombatStatePartialParry::OnStateEnter()
 	ElapsedTimeFromStateEnter = 0.0f;
 	//ToDO: Montage 재생
 	auto stateOwner = InitParam.StateComponentInitializeParameter.OwnerCharacter;
-	stateOwner.Get()->PlayMontage(InitParam.StateComponentInitializeParameter.CombatMontageSet->GetPartialParryMontage());
+	/*stateOwner.Get()->PlayMontage(InitParam.StateComponentInitializeParameter.CombatMontageSet->GetPartialParryMontage());*/
 }
 
 void UPlayerCombatStatePartialParry::OnStateFinish()

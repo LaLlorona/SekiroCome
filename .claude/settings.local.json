@@ -25,7 +25,11 @@
       "Bash(\"/c/Program Files/Epic Games/UE_5.7/Engine/Build/BatchFiles/Build.bat\" SekiroComeEditor Win64 Development -Project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -WaitMutex -FromMsBuild)",
       "PowerShell(& \"C:\\\\Program Files\\\\Epic Games\\\\UE_5.7\\\\Engine\\\\Build\\\\BatchFiles\\\\Build.bat\" SekiroComeEditor Win64 Development -project=\"D:\\\\myfiles\\\\programming_code\\\\unreal\\\\SekiroCome\\\\SekiroCome.uproject\" -waitmutex)",
       "Bash(powershell -NoProfile -Command \"Get-ChildItem -Path 'C:\\\\Program Files\\\\Epic Games' -Recurse -Filter 'AnimNotifies.h' -ErrorAction SilentlyContinue | Select-Object -First 5 FullName\")",
-      "Bash(powershell -NoProfile -Command \"Get-ChildItem -Path 'C:\\\\' -Directory -Filter 'UE_*' -ErrorAction SilentlyContinue\")"
+      "Bash(powershell -NoProfile -Command \"Get-ChildItem -Path 'C:\\\\' -Directory -Filter 'UE_*' -ErrorAction SilentlyContinue\")",
+      "Bash(mv CombatTuningDataTable.h CombatTuningDataTable.cpp CombatWeaponDamageDataTable.h CombatWeaponDamageDataTable.cpp CombatDefenseDataTable.h CombatDefenseDataTable.cpp CombatDamageMultiplierTable.h CombatDamageMultiplierTable.cpp CombatMontageTable.h CombatMontageTable.cpp CombatAttackInfoTable.h CombatAttackInfoTable.cpp Table/)",
+      "Bash(mv FCombatTuningRow.h FCombatWeaponDamageDataRow.h FCombatArmorDataRow.h FCombatDamageMultiplierDataRow.h FCombatAttackInfoRow.h FCombatMontageRow.h Row/)",
+      "Bash(mv CombatTuningDataTableFactory.h CombatTuningDataTableFactory.cpp CombatWeaponDamageDataTableFactory.h CombatWeaponDamageDataTableFactory.cpp CombatAttackTypeDataTableFactory.h CombatAttackTypeDataTableFactory.cpp CombatDefenseDataTableFactory.h CombatDefenseDataTableFactory.cpp CombatMontageTableFactory.h CombatMontageTableFactory.cpp CombatAttackInfoTableFactory.h CombatAttackInfoTableFactory.cpp TableFactory/)",
+      "Bash(git rm *)"
     ]
   }
 }

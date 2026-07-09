@@ -55,7 +55,7 @@ void ACombatDummy::NotifyDanger(const FVector& DangerLocation, AActor* DangerSou
 	// unused
 }
 
-FName ACombatDummy::GetArmorTypeID() const
+FArmorTypeId ACombatDummy::GetArmorTypeID() const
 {
-	return TEXT("1");
+	return FArmorTypeId(TEXT("1"));
 }
