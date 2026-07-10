@@ -15,6 +15,7 @@ class SEKIROCOME_API UCombatVitalityComponent : public UActorComponent
 {
 	GENERATED_BODY()
 	float HpRegenLeftTime = 0.0f;
+	
 
 	FCombatTuningId CombatTuningRowName;
 
