@@ -59,18 +59,19 @@
 
 ---
 
-## Phase 4 — MasterStrike / PerfectBlock 고도화 (설계 §5)
+## Phase 4 — MasterStrike / PerfectBlock 구현 (설계 §5)
 
-> **우선 구현 이유**: 방향 자동 전환(Phase 3) 완료 후 방향-난이도 분기 구현 가능.
+> **우선 구현 이유**: 적 공격에 대한 판정 구간 시스템으로, 기존 PerfectParry(플레이어 가드 시작 기준 타이밍)와 별개로 적 공격 몽타주 기준 AnimNotify 구간이 필요하다.
 
-- [ ] MasterStrike 판정 창을 InGameTime 기준으로 변경 (Time Dilation 보정)
-- [ ] 무기별 판정 창 DataTable 추가 (`MasterStrike_WindowStart`, `MasterStrike_WindowEnd`, `MasterStrike_ColliderActivation`)
-- [ ] 방향 난이도 분기 구현 (§3-3: Down/Right = 자동흐름으로 MasterStrike 가능 / Up/Left = 수동 재조정 필요)
-- [ ] MasterStrike 데미지: `UCombatAttackTypeDataTable`의 "MasterStrike" 행을 이용한 §1-2 통합 계산식 적용 (§5-4)
-- [ ] 실패 분기 구현: 판정 창 이후 플레이어 공격 시 적 공격 캔슬 (§5-3)
-- [ ] 실패 분기 구현: 일반 Block → 피해 감소, 적 콤보 유지 (§5-3)
-- [ ] PerfectBlock 반격 창 (`PerfectBlock_CounterWindow`) DataTable 추가
-- [ ] `PerfectBlock_GuaranteedHit` bool DataTable 추가
+- [ ] 적 공격 몽타주에 `AnimNotify_StartPerfectBlockWindow` / `AnimNotify_FinishPerfectBlockWindow` 추가 — 판정 구간 시작/끝 정의 (§5-1)
+- [ ] 판정 구간 동안 화면 중앙 방패 아이콘 UI 표시 (구간 시작 시 표시, 종료 시 제거) (§5-1)
+- [ ] 판정 구간 내 플레이어 입력 분기: 가드 입력 시 PerfectBlock 발동 / MasterStrike 가능 방향 공격 입력 시 MasterStrike 발동 (§5-1)
+- [ ] PerfectBlock 발동 시 플레이어 데미지 0 처리 후 종료 (§5-1)
+- [ ] MasterStrike 발동 시 입력 즉시 몽타주 재생하지 않고, 적 공격 몽타주의 `AnimNotify_PlayMasterStrikeMontage` 시점에 플레이어 Riposte 몽타주 + 적 피격 몽타주 동시 재생 (§5-1)
+- [ ] 적 피격 몽타주에 `AnimNotify_OnGetRipostedByMasterStrike` 추가 — 이 시점에 적에게 데미지 적용 (§5-1)
+- [ ] 플레이어 Riposte 몽타주에 `AnimNotify_OnSuccessMasterStrike` 추가 — 이 시점에 플레이어 스태미나 10 회복 (§5-1)
+- [ ] MasterStrike 데미지는 별도 계산식 없이 §1-2-4/1-2-5 통합 데미지 계산식 재사용 — `UCombatAttackTypeDataTable`의 "MasterStrike" 행(Phase 2에서 테이블은 이미 준비됨) 연결만 필요 (§5-2)
+- [ ] 무기별 판정 구간 타이밍 DataTable 상수 추가: `MasterStrike_WindowStart` / `MasterStrike_WindowEnd` / `MasterStrike_ColliderActivation` (InGameTime 기준, Time Dilation 보정) (§5-1, §7)
 
 ---
 

@@ -196,49 +196,31 @@ else:
 
 ---
 
-## 5. MasterStrike / PerfectBlock 판정 타이밍
+## 5. MasterStrike / PerfectBlock
 
 ### 5-1. 판정 구간 (3-3 규칙과 연동)
-- 적 공격 모션 중 특정 지점부터 방어/MasterStrike 입력 가능 구간 시작.
-- **3-3에서 정의한 "쉬운 방향(아래/오른쪽)"과 "어려운 방향(위/왼쪽)"에 따라 판정 조건이 분기**되어야 합니다:
-  - 쉬운 방향: 자동 전환 흐름을 유지한 채 입력 시 MasterStrike 가능
-  - 어려운 방향: 수동으로 방향을 재조정한 상태에서 입력해야 MasterStrike 가능
-
-### 5-2. 실측 데이터 편차의 원인 — 인게임 슬로우모션
-
-**확정**: v1에서 지적했던 C-A(방패 아이콘~피격) 값의 편차(0.75~0.984초)는 **인게임 슬로우 모션 효과 때문**입니다. 실제 판정 구간 길이 자체는 **무기별 고정값**입니다.
-
-- 즉 "InGameTime 기준 판정 구간 길이"는 무기마다 고정 상수(`MasterStrike_WindowDuration_ByWeapon`, DataTable)로 정의하되, **실제 체감/측정되는 시간(WorldTime)은 슬로우모션 배율에 따라 달라질 수 있음**을 감안해서, 타이밍 판정 로직은 **InGameTime(또는 Time Dilation 보정된 시간) 기준**으로 계산해야 합니다.
-
+- 적 공격 모션 중 특정 지점부터 MasterStrike / PerfectBlock 입력 가능 구간 시작과 끝이 존재함. 
+- 이를 AnimNotify_StartPerfectBlockWindow , AnimNotify_FinishPerfectBlockWindow 로 정의함.
+- 이 타이밍에는 화면 중앙에 방패 아이콘이 등장함.
+- 이 사이에 플레이어가 가드를 누르거나, MasterStrike 가 가능한 방향에서 공격을 하면 PerfectBlock 이나 MasterStrike 가 발동함.
+- Perfect Block 이 발동할 경우에는 플레이어가 아무런 데미지를 받지 않는 것으로 종료.
+- Master Strike 가 발동할 경우에는 플레이어의 Master Strike 방향에 따라 플레이어는 Riposte Montage, 적은 Master Strike 에 당하는 Montage 재생.
+- Master Strike 가 발동할 경우 바로 Montage 를 재생하는 것이 아니라 적 공격 모션의 AnimNotify_PlayMasterStrikeMontage 시점에 플레이어와 적이 동시에 Montage 를 재생함.
+- Master Strike 가 발동할 경우, 해당 Montage 에는 AnimNotify_OnGetRipostedByMasterStrike 와 AnimNotify_OnSuccessMasterStrike 가 있어서
+- Master Strike 에 당한 적은 OnGetRespostedByMasterStrike 타이밍에 데미지를 입고, Master Strike 에 성공한 플레이어는 AnimNotify_OnSuccessMasterStrike 에 스태미나를 10 만큼 회복함.
 ```
 타임라인 (예시, InGameTime 기준 — 무기별 상수)
 0.0초   적 공격 시작
 0.1초   방패 아이콘 등장 (판정 구간 시작) — 무기별 상수
 0.5초   판정 구간 종료 — 무기별 상수
 0.6초   MasterStrike 성공 시 몽타주 시작 (입력 시점과 무관)
-0.8초   MasterStrike 실패 시 데미지 콜라이더 활성화 — 무기별 상수
+0.8초   MasterStrike 실패 시 일반적인 적 공격 로직과 동일.
 ```
 
-### 5-3. 실패 시 분기 (확정)
-
-```
-0.5초 이후 ~ 콜라이더 활성화(0.8초) 이전 구간:
-  └─ 플레이어가 공격 적중 시
-        → 적의 공격은 완전히 캔슬됩니다 (클래시 아님, 적 공격 무효화)
-
-0.5초 이후, 플레이어가 (퍼펙트 아닌) 일반 방어 시:
-  └─ 그냥 맞는 것보다 적은 피해, 단 적은 콤보를 계속 이어갈 수 있음
-```
-
-### 5-4. MasterStrike 데미지 (1-2로 통합)
+### 5-2. MasterStrike 데미지 (1-2로 통합)
 
 MasterStrike의 데미지도 1-2-4/1-2-5의 통합 데미지 계산식을 그대로 사용합니다. 공격 종류 배율·체력 우선 비율은 1-2-2 표의 "MasterStrike" 행 값을 사용합니다.
 
-### 5-5. PerfectBlock 이후 반격
-- Perfect Block 성공 시 화면 중앙 아이콘 표시, 해당 방향으로 즉시 공격 가능.
-- **유예시간, 확정 히트 여부 모두 DataTable 상수**로 지정:
-  - `PerfectBlock_CounterWindow` (아이콘 유지/입력 유예 시간)
-  - `PerfectBlock_GuaranteedHit` (bool — 확정 히트 여부. false면 일반 공격처럼 막히거나 회피당할 수 있음)
 
 ---
 
@@ -270,7 +252,6 @@ MasterStrike의 데미지도 1-2-4/1-2-5의 통합 데미지 계산식을 그대
 
 **MasterStrike (무기별 개별 값)**
 - `MasterStrike_WindowStart` / `MasterStrike_WindowEnd`
-- `MasterStrike_ColliderActivation`
 
 **PerfectBlock**
 - `PerfectBlock_CounterWindow`
