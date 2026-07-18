@@ -224,6 +224,12 @@ public:
 	/** Returns the row key identifying this enemy's armor type */
 	virtual FArmorTypeId GetArmorTypeID() const override;
 
+	/** True while this enemy's current attack montage has its PerfectBlock/MasterStrike judgement window open */
+	virtual bool IsParryWindowOpen() const override { return bParryWindowOpen; }
+
+	/** Opens/closes the PerfectBlock/MasterStrike judgement window, set by AnimNotify_StartPerfectBlockWindow / AnimNotify_FinishPerfectBlockWindow */
+	virtual void SetParryWindowOpen(bool bOpen) override { bParryWindowOpen = bOpen; }
+
 	// ~end ICombatDamageable interface
 
 protected:

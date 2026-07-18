@@ -55,6 +55,9 @@ public:
 
 	FLockOnResult GetLockOnResult() const;
 
+	/** True if the locked-on target implements ICombatDamageable and its PerfectBlock/MasterStrike judgement window is currently open (§5-1). False if there is no target or it doesn't implement the interface. */
+	bool IsLockOnTargetParryWindowOpen() const;
+
 	// 소유 Character의 Tick에서 명시적으로 호출. 타겟 존재 여부가 실제로 바뀐 경우에만 OnLockOnTargetChanged를 Broadcast한다.
 	void CustomUpdate();
 

@@ -32,6 +32,8 @@ public:
 	/** Handles death events */
 	UFUNCTION(BlueprintCallable, Category="Damageable")
 	virtual void HandleDeath() = 0;
+	
+	
 
 	/** Handles healing events */
 	UFUNCTION(BlueprintCallable, Category="Damageable")
@@ -44,4 +46,15 @@ public:
 	/** Returns the row key (into UCombatDefenseDataTable) identifying this actor's armor type */
 	UFUNCTION(BlueprintCallable, Category="Damageable")
 	virtual FArmorTypeId GetArmorTypeID() const = 0;
+	
+
+	/**
+	 * True while this actor's current attack montage has its PerfectBlock/MasterStrike judgement window open (§5-1).
+	 * Defaulted to false (not pure) since only attacking characters (e.g. ACombatEnemy) ever open a window;
+	 * non-attacking ICombatDamageable actors (player, dummies, damageable boxes) don't need to override it.
+	 */
+	virtual bool IsParryWindowOpen() const { return false; }
+
+	/** Opens/closes the PerfectBlock/MasterStrike judgement window. Called from AnimNotify_StartPerfectBlockWindow / AnimNotify_FinishPerfectBlockWindow. */
+	virtual void SetParryWindowOpen(bool bOpen) {}
 };

@@ -10,6 +10,7 @@
 enum class EAttackDirection : uint8;
 class ACombatCharacter;
 class UCombatAttackDirectionUI;
+class UCombatLockOnComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SEKIROCOME_API UControllerPresentationComponent : public UActorComponent
@@ -29,6 +30,9 @@ public:
 	TSubclassOf<UCombatAttackDirectionUI> FourDirectionWidgetClass;
 	UPROPERTY()
 	TObjectPtr<UCombatAttackDirectionUI> FourDirectionWidget;
+
+	UPROPERTY()
+	TObjectPtr<UCombatLockOnComponent> BoundLockOnComponent;
 
 
 protected:

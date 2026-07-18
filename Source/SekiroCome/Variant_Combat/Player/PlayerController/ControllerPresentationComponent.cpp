@@ -25,7 +25,7 @@ UControllerPresentationComponent::UControllerPresentationComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
 }
@@ -47,7 +47,11 @@ void UControllerPresentationComponent::TickComponent(float DeltaTime, ELevelTick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (!FourDirectionWidget || !BoundLockOnComponent)
+	{
+		return;
+	}
+	FourDirectionWidget->SetPerfectBlockWindowActive(BoundLockOnComponent->IsLockOnTargetParryWindowOpen());
 }
 
 void UControllerPresentationComponent::CreateAndShowWidget()
@@ -61,5 +65,6 @@ void UControllerPresentationComponent::BindToCharacter(ACombatCharacter* Charact
 {
 	Character->GetCombatStateComponent()->OnAttackDirectionChanged.AddUniqueDynamic(this, &UControllerPresentationComponent::HandleAttackDirectionChanged);
 	Character->GetLockOnComponent()->OnLockOnTargetChanged.AddUniqueDynamic(this, &UControllerPresentationComponent::HandleLockOnTargetChanged);
+	BoundLockOnComponent = Character->GetLockOnComponent();
 }
 

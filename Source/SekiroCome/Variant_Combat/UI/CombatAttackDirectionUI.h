@@ -22,6 +22,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category="Set Direction UI")
 	void SetActiveStatusDirectionalUI(bool active);
 
+	/** Shows/hides the PerfectBlock/MasterStrike shield icon while the locked-on target's judgement window is open (§5-1) */
+	UFUNCTION(BlueprintImplementableEvent, Category="Set Direction UI")
+	void SetPerfectBlockWindowActive(bool bActive);
+
 	
 
 	

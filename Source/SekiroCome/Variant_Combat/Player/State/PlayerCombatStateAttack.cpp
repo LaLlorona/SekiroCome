@@ -4,6 +4,7 @@
 #include "PlayerCombatStateAttack.h"
 
 #include "AnimNotify_AttackDirectionChange.h"
+#include "AnimNotify_AttackInputWindowOpened.h"
 #include "AnimNotify_AttackTransitionWindowOpened.h"
 #include "CombatCharacter.h"
 #include "CombatLogic.h"
@@ -95,6 +96,7 @@ void UPlayerCombatStateAttack::OnStateEnter()
 	ElapsedTimeFromStateEnter = 0.0f;
 	bAttackDirectionManuallyChanged = false;
 	CachedAttackDirectionChangeTime = TNumericLimits<float>::Max();
+	CachedAttackInputWindowOpenTime = 0.0f;
 
 	auto stateOwner = InitParam.StateComponentInitializeParameter.OwnerCharacter;
 	UCombatDataTableManager* TableManager = UCombatDataSubsystem::GetCombatDataSubsystem(stateOwner)->GetInGameTableManager();
@@ -123,6 +125,10 @@ void UPlayerCombatStateAttack::OnStateEnter()
 			{
 				CachedAttackDirectionChangeTime = (NotifyEvent.GetTriggerTime() - sectionStartTime) / animMontagePlaySpeed;
 			}
+			else if (Cast<UAnimNotify_AttackInputWindowOpened>(NotifyEvent.Notify))
+			{
+				CachedAttackInputWindowOpenTime = (NotifyEvent.GetTriggerTime() - sectionStartTime) / animMontagePlaySpeed;
+			}
 		}
 	}
 	stateOwner.Get()->PlayMontageWithSectionName(attackAnimMontage, AttackInfoRow.MontageSectionName, animMontagePlaySpeed);
@@ -134,7 +140,10 @@ void UPlayerCombatStateAttack::OnStateFinish()
 
 void UPlayerCombatStateAttack::OnAttackInputPressed()
 {
-	bAttackInputPressed = true;
+	if (ElapsedTimeFromStateEnter >= CachedAttackInputWindowOpenTime)
+	{
+		bAttackInputPressed = true;
+	}
 }
 
 

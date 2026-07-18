@@ -82,7 +82,7 @@ void ACombatEnemy::DoAIComboAttack()
 	// play the attack montage
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
-		const float MontageLength = AnimInstance->Montage_Play(ComboAttackMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+		const float MontageLength = AnimInstance->Montage_Play(ComboAttackMontage, 0.5f, EMontagePlayReturnType::MontageLength, 0.0f, true);
 
 		// subscribe to montage completed and interrupted events
 		if (MontageLength > 0.0f)
@@ -115,7 +115,7 @@ void ACombatEnemy::DoAIChargedAttack()
 	// play the attack montage
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
-		const float MontageLength = AnimInstance->Montage_Play(ChargedAttackMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+		const float MontageLength = AnimInstance->Montage_Play(ChargedAttackMontage, 0.5f, EMontagePlayReturnType::MontageLength, 0.0f, true);
 
 		// subscribe to montage completed and interrupted events
 		if (MontageLength > 0.0f)

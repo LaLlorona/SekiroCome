@@ -2,6 +2,7 @@
 
 
 #include "CombatLockOnComponent.h"
+#include "CombatDamageable.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -42,6 +43,15 @@ void UCombatLockOnComponent::CustomUpdate()
 		bWasTargetExist = bIsTargetExist;
 		OnLockOnTargetChanged.Broadcast(bIsTargetExist);
 	}
+}
+
+bool UCombatLockOnComponent::IsLockOnTargetParryWindowOpen() const
+{
+	if (const ICombatDamageable* DamageableInterface = Cast<ICombatDamageable>(LockedOnTarget.Get()))
+	{
+		return DamageableInterface->IsParryWindowOpen();
+	}
+	return false;
 }
 
 FLockOnResult UCombatLockOnComponent::GetLockOnResult() const
