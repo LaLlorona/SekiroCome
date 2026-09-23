@@ -1,109 +1,109 @@
-# 구현 체크리스트 (combatsystem_base.md 기준)
+# Implementation Checklist (based on combatsystem_base.md)
 
-> **완료 기준**: 각 항목 완료 후 실제 코드를 확인하여 `[ ]` → `[x]` 로 변경한다.
-> **참고 설계 문서**: `docs/combatsystem_base.md`
-
----
-
-## 현재 구현 완료 상태 (기존 코드 확인 기준)
-
-- [x] HP 기본 구조 (`ACombatCharacter::CurrentHP / MaxHP`)
-- [x] 공격 콤보 / 차지 공격 몽타주 재생
-- [x] 공격 충돌 판정 (`DoAttackTrace` — sphere sweep)
-- [x] 락온 컴포넌트 (`UCombatLockOnComponent`)
-- [x] 가드 / 패링 상태머신 (Idle / Guard / PartialParry / PerfectParryRiposte)
-- [x] PerfectParry 타이밍 창 (Guard 진입 후 `RiposteMinimumTimeWindow` 이내)
-- [x] 리포스트 몽타주 재생 (`UCombatMontageSet`)
-- [x] 공격 방향 열거형 (`EAttackDirection`: Up / Down / Left / Right)
-- [x] 이동 입력 → 방향 변환 (`ECombatInputDirectionEnum`, `GetCombatInputDirection`)
-- [x] 피격 해결 로직 (`CombatLogic::ResolveAttack` — 패링 여부 판별 후 데미지 적용)
-- [x] AnimNotify 연결 (DoAttackTrace / CheckCombo / CheckChargedAttack)
+> **Completion rule**: After finishing each item, verify it in the actual code, then change `[ ]` → `[x]`.
+> **Reference design doc**: `docs/combatsystem_base.md`
 
 ---
 
-## Phase 1 — 스태미나 시스템 (설계 §1)
+## Currently Implemented (verified against existing code)
 
-> **우선 구현 이유**: 데미지 계산, MasterStrike 반격 조건 등 이후 모든 시스템이 스태미나에 의존한다.
-
-- [x] `ACombatCharacter`에 `CurrentSP / MaxSP` 추가 (`MaxSP = 30 + 70 * HP/100`) — `UCombatVitalityComponent`(`CurrentHP/MaxHP/CurrentSP/MaxSP`)를 만들어 `ACombatCharacter`가 소유하는 방식으로 구현 (`VitalityComponent` 필드)
-- [x] `ACombatEnemy`에 동일한 SP 필드 추가 — `VitalityComponent`(`UCombatVitalityComponent`) 소유, `BeginPlay`에서 `Initialize(CombatTuningDataTable, CombatTuningRowName)` 호출, `Tick`에서 `CustomUpdate` 명시 호출, `TakeDamage`도 `VitalityComponent::ApplyDamage` 경유로 전환 완료
-- [x] 데미지 처리: SP > 0 이면 SP 우선 차감, 초과분 즉시 HP 전이 (`UCombatVitalityComponent::ApplyDamage`)
-- [x] 스태미나 회복 틱 구현 (`SP_RegenPerSecond`, `UCombatVitalityComponent::CustomUpdate`에서 매 틱 처리 — 엔진 `TickComponent`가 아니라 `ACombatCharacter::Tick`에서 명시적으로 호출)
-- [~] 회복 정지 조건 — 공격 / 가드 / 회피 / 점프 / 스프린트 시작 시 타이머 리셋 (`SP_RegenDelay`) — 플레이어 쪽 공격(`ComboAttack`/`ChargedAttack`)과 가드(`TryGuardStart`), AI 쪽 공격(`DoAIComboAttack`/`DoAIChargedAttack`) 모두 `VitalityComponent->OnRegenStopTimerBegin()` 연결 완료. 회피/점프/스프린트는 `ACombatCharacter`/`ACombatEnemy`에 해당 액션 자체가 아직 없어서 미적용 (해당 시스템 구현 시 같이 연결 필요)
-- [x] 이동(걷기)은 회복 정지 조건에서 제외 (현재 `DoMove`는 스태미나 영향 없음 — 유지)
-- [x] HP 변경 시 SP 최댓값 즉시 클램프 (`UCombatVitalityComponent::RecomputeMaxSP`, `ApplyDamage`/`ResetVitality`/`CustomUpdate`에서 호출)
-- [x] DataTable 생성: `UCombatTuningDataTable`(`FCombatTuningRow`: `SP_RegenPerSecond`, `SP_RegenDelayInSecond`) + 전용 `UFactory`
-
----
-
-## Phase 2 — 무기 데미지 타입 / 계산식 (설계 §1-2, 3-테이블 방식)
-
-> **우선 구현 이유**: Phase 1 스태미나 시스템과 함께 데미지 파이프라인 완성.
-
-- [x] 무기 데미지 테이블 (`FCombatWeaponDamageRow`: ThrustDamage/SlashDamage/BluntDamage) + `UCombatWeaponDamageDataTable` + 전용 `UFactory` (§1-2-1)
-- [x] 공격 종류 배율 테이블 (`FCombatAttackTypeRow`: ThrustMultiplier/SlashMultiplier/BluntMultiplier/PriorityHealthDamageRatio) + `UCombatAttackTypeDataTable` + 전용 `UFactory` (§1-2-2, 좌/우/상/하 공격·Riposte·콤보피니셔·MasterStrike 10행 예정)
-- [x] 방어구 방어력 테이블 (`FCombatDefenseRow`: ThrustDefense/SlashDefense/BluntDefense, RowName = 방어구 타입 ID) + `UCombatDefenseDataTable` + 전용 `UFactory` (§1-2-3) — 플레이어/적 공용으로 사용하도록 `FCombatEnemyDefenseRow`/`UCombatEnemyDefenseDataTable`에서 이름 변경 (기존 `DT_EnemyDefenseData.uasset` 호환을 위해 `DefaultEngine.ini`에 `CoreRedirects` 추가)
-- [x] `FAttackData`에 공격 종류 RowName(`AttackTypeRowName`) 필드 추가 (무기 ID는 `ACombatCharacter`/`ACombatEnemy`가, 방어구 타입 ID는 `ACombatCharacter`/`ACombatEnemy`가 각각 직접 보유 — 장착 시스템은 추후 구현). `ICombatAttacker::GetWeaponID()` / `ICombatDamageable::GetArmorTypeID()` 인터페이스 게터 추가, `CombatLogic::ResolveAttack`에서 호출하여 값 확보 (실제 데미지 계산식에는 아직 미사용)
-- [x] `CombatLogic::ResolveAttack`에 최종 데미지 계산식(§1-2-4) + 체력 우선 데미지 분리 적용(§1-2-5) 구현 — `CombatLogic::CalculateFinalDamage`가 `FDamageData(PriorityHealthDamage, RemainingDamage)`를 반환하도록 구현, `ICombatDamageable::ApplyDamage`/`UCombatVitalityComponent::ApplyDamage` 모두 `FDamageData`를 받도록 변경. `ACombatCharacter`/`ACombatEnemy`는 실제 반영 로직을 `ApplyDamageToVitality(const FDamageData&)` private 헬퍼로 분리하고, 엔진 표준 `TakeDamage(float,...)` 오버라이드는 이 프로젝트에서 아무도 호출하지 않아 완전히 제거함
+- [x] HP basic structure (`ACombatCharacter::CurrentHP / MaxHP`)
+- [x] Attack combo / charged attack montage playback
+- [x] Attack collision detection (`DoAttackTrace` — sphere sweep)
+- [x] Lock-on component (`UCombatLockOnComponent`)
+- [x] Guard / parry state machine (Idle / Guard / PartialParry / PerfectParryRiposte)
+- [x] PerfectParry timing window (within `RiposteMinimumTimeWindow` after entering Guard)
+- [x] Riposte montage playback (`UCombatMontageSet`)
+- [x] Attack direction enum (`EAttackDirection`: Up / Down / Left / Right)
+- [x] Movement input → direction conversion (`ECombatInputDirectionEnum`, `GetCombatInputDirection`)
+- [x] Hit resolution logic (`CombatLogic::ResolveAttack` — checks for parry, then applies damage)
+- [x] AnimNotify hookup (DoAttackTrace / CheckCombo / CheckChargedAttack)
 
 ---
 
-## Phase 3 — 공격 방향 자동 전환 (설계 §3-1, §3-2)
+## Phase 1 — Stamina System (Design §1)
 
-> **우선 구현 이유**: 콤보 히스토리 버퍼와 MasterStrike 난이도 분기의 전제 조건.
+> **Why first**: All later systems, such as damage calculation and MasterStrike counter conditions, depend on stamina.
 
-- [x] 플레이어 "다음 공격 방향" 상태 변수 추가 (`EAttackDirection NextAttackDirection`)
-- [x] 공격 성공 후 방향 자동 전환 테이블 구현 (§3-1: 우→좌, 좌→우, 아래→우, 위→좌)
-- [x] 가드 성공(Block) 후 방향 자동 전환 테이블 구현 (§3-2: 우→좌, 좌→위, 아래→우, 위→우)
-- [x] `CombatAttackDirectionUI`에 `NextAttackDirection` 연동 (기존 UI 위젯 활용)
-
----
-
-## Phase 4 — MasterStrike / PerfectBlock 구현 (설계 §5)
-
-> **우선 구현 이유**: 적 공격에 대한 판정 구간 시스템으로, 기존 PerfectParry(플레이어 가드 시작 기준 타이밍)와 별개로 적 공격 몽타주 기준 AnimNotify 구간이 필요하다.
-
-- [ ] 적 공격 몽타주에 `AnimNotify_StartPerfectBlockWindow` / `AnimNotify_FinishPerfectBlockWindow` 추가 — 판정 구간 시작/끝 정의 (§5-1)
-- [ ] 판정 구간 동안 화면 중앙 방패 아이콘 UI 표시 (구간 시작 시 표시, 종료 시 제거) (§5-1)
-- [ ] 판정 구간 내 플레이어 입력 분기: 가드 입력 시 PerfectBlock 발동 / MasterStrike 가능 방향 공격 입력 시 MasterStrike 발동 (§5-1)
-- [ ] PerfectBlock 발동 시 플레이어 데미지 0 처리 후 종료 (§5-1)
-- [ ] MasterStrike 발동 시 입력 즉시 몽타주 재생하지 않고, 적 공격 몽타주의 `AnimNotify_PlayMasterStrikeMontage` 시점에 플레이어 Riposte 몽타주 + 적 피격 몽타주 동시 재생 (§5-1)
-- [ ] 적 피격 몽타주에 `AnimNotify_OnGetRipostedByMasterStrike` 추가 — 이 시점에 적에게 데미지 적용 (§5-1)
-- [ ] 플레이어 Riposte 몽타주에 `AnimNotify_OnSuccessMasterStrike` 추가 — 이 시점에 플레이어 스태미나 10 회복 (§5-1)
-- [ ] MasterStrike 데미지는 별도 계산식 없이 §1-2-4/1-2-5 통합 데미지 계산식 재사용 — `UCombatAttackTypeDataTable`의 "MasterStrike" 행(Phase 2에서 테이블은 이미 준비됨) 연결만 필요 (§5-2)
-- [ ] 무기별 판정 구간 타이밍 DataTable 상수 추가: `MasterStrike_WindowStart` / `MasterStrike_WindowEnd` / `MasterStrike_ColliderActivation` (InGameTime 기준, Time Dilation 보정) (§5-1, §7)
+- [x] Add `CurrentSP / MaxSP` to `ACombatCharacter` (`MaxSP = 30 + 70 * HP/100`) — implemented by creating `UCombatVitalityComponent` (`CurrentHP/MaxHP/CurrentSP/MaxSP`) owned by `ACombatCharacter` (`VitalityComponent` field)
+- [x] Add the same SP fields to `ACombatEnemy` — owns `VitalityComponent` (`UCombatVitalityComponent`), calls `Initialize(CombatTuningDataTable, CombatTuningRowName)` in `BeginPlay`, explicitly calls `CustomUpdate` in `Tick`, and `TakeDamage` now routes through `VitalityComponent::ApplyDamage`
+- [x] Damage handling: if SP > 0, deduct from SP first; excess carries over to HP immediately (`UCombatVitalityComponent::ApplyDamage`)
+- [x] Stamina regen tick (`SP_RegenPerSecond`, handled every tick in `UCombatVitalityComponent::CustomUpdate` — called explicitly from `ACombatCharacter::Tick`, not the engine's `TickComponent`)
+- [~] Regen stop conditions — reset timer (`SP_RegenDelay`) when Attack / Guard / Dodge / Jump / Sprint starts — `VitalityComponent->OnRegenStopTimerBegin()` is hooked up for player attacks (`ComboAttack`/`ChargedAttack`), guard (`TryGuardStart`), and AI attacks (`DoAIComboAttack`/`DoAIChargedAttack`). Dodge/Jump/Sprint are not applied yet because those actions don't exist in `ACombatCharacter`/`ACombatEnemy` (hook them up when those systems are implemented)
+- [x] Movement (walking) excluded from regen stop conditions (`DoMove` currently has no stamina effect — keep as-is)
+- [x] Immediately clamp SP max when HP changes (`UCombatVitalityComponent::RecomputeMaxSP`, called from `ApplyDamage`/`ResetVitality`/`CustomUpdate`)
+- [x] Create DataTable: `UCombatTuningDataTable` (`FCombatTuningRow`: `SP_RegenPerSecond`, `SP_RegenDelayInSecond`) + dedicated `UFactory`
 
 ---
 
-## Phase 5 — 콤보 커맨드 매칭 시스템 (설계 §4)
+## Phase 2 — Weapon Damage Types / Formula (Design §1-2, 3-table approach)
 
-> **우선 구현 이유**: 방향 자동 전환(Phase 3) 완료 후 히스토리 버퍼 의미 있음.
+> **Why first**: Completes the damage pipeline together with the Phase 1 stamina system.
 
-- [ ] 공격 히스토리 버퍼 구조 추가 (`TArray<EAttackDirection> AttackHistoryBuffer`, 최대 길이 3)
-- [ ] 공격 성공 시 버퍼에 방향 추가 + 패턴 매칭 검사
-- [ ] 버퍼 초기화 조건 구현 (PerfectBlock 당함 / `Combo_BufferTimeout` 초과)
-- [ ] DataTable 기반 콤보 패턴 정의 (`FCombatComboRow`: 패턴 배열 + 피니셔 몽타주 + 데미지값)
-- [ ] 기본 패턴 3종 등록 (좌→우→좌 / 우→좌→우 / 아래→아래→우)
-- [ ] 패턴 매칭 성공 시 피니셔 몽타주 재생
-- [ ] 콤보 피니셔 데미지: `UCombatAttackTypeDataTable`의 "ComboFinisher" 행을 이용한 §1-2 통합 계산식 적용 — §4-5
-- [ ] PerfectBlock 당하면 콤보 버퍼 초기화 (§3-5 확정 사항)
-- [ ] 적 PerfectBlock 성공 시 반격 조건 (`Enemy_CounterStaminaThreshold` DataTable 상수)
+- [x] Weapon damage table (`FCombatWeaponDamageRow`: ThrustDamage/SlashDamage/BluntDamage) + `UCombatWeaponDamageDataTable` + dedicated `UFactory` (§1-2-1)
+- [x] Attack type multiplier table (`FCombatAttackTypeRow`: ThrustMultiplier/SlashMultiplier/BluntMultiplier/PriorityHealthDamageRatio) + `UCombatAttackTypeDataTable` + dedicated `UFactory` (§1-2-2, 10 rows planned: Left/Right/Up/Down attack, Riposte, combo finisher, MasterStrike)
+- [x] Armor defense table (`FCombatDefenseRow`: ThrustDefense/SlashDefense/BluntDefense, RowName = armor type ID) + `UCombatDefenseDataTable` + dedicated `UFactory` (§1-2-3) — renamed from `FCombatEnemyDefenseRow`/`UCombatEnemyDefenseDataTable` so it can be shared by player and enemies (added `CoreRedirects` to `DefaultEngine.ini` for compatibility with the existing `DT_EnemyDefenseData.uasset`)
+- [x] Add attack type RowName (`AttackTypeRowName`) field to `FAttackData` (weapon ID and armor type ID are each held directly by `ACombatCharacter`/`ACombatEnemy` — equipment system to be implemented later). Added interface getters `ICombatAttacker::GetWeaponID()` / `ICombatDamageable::GetArmorTypeID()`, called from `CombatLogic::ResolveAttack` to obtain the values (not yet used in the actual damage formula)
+- [x] Implement the final damage formula (§1-2-4) + separate Priority HP damage application (§1-2-5) in `CombatLogic::ResolveAttack` — `CombatLogic::CalculateFinalDamage` returns `FDamageData(PriorityHealthDamage, RemainingDamage)`, and both `ICombatDamageable::ApplyDamage`/`UCombatVitalityComponent::ApplyDamage` now take `FDamageData`. `ACombatCharacter`/`ACombatEnemy` moved the actual application logic into a private helper `ApplyDamageToVitality(const FDamageData&)`, and the engine-standard `TakeDamage(float,...)` override was removed entirely since nothing in this project calls it
 
 ---
 
-## Phase 6 — 이동 시스템 (설계 §2)
+## Phase 3 — Automatic Attack Direction Switching (Design §3-1, §3-2)
 
-> **우선 구현 이유**: 전투 느낌 완성을 위한 락온 연동 이동.
+> **Why first**: Prerequisite for the combo history buffer and MasterStrike difficulty branching.
 
-- [ ] 락온 시 좌우 입력 → 원형 스트레이프 이동 구현 (`LockOn_StrafeRadius`, `LockOn_AngularSpeed`)
-- [ ] 스트레이프 반경 / 각속도 DataTable 추가
-- [ ] AI 다수 포위 슬롯 시스템 (`Surround_MaxCloseSlots`, `Surround_CloseSlotRadius`, `Surround_SideAngle`)
+- [x] Add player "next attack direction" state variable (`EAttackDirection NextAttackDirection`)
+- [x] Implement automatic direction switch table after a successful attack (§3-1: Right→Left, Left→Right, Down→Right, Up→Left)
+- [x] Implement automatic direction switch table after a successful guard (Block) (§3-2: Right→Left, Left→Up, Down→Right, Up→Right)
+- [x] Hook up `NextAttackDirection` to `CombatAttackDirectionUI` (using the existing UI widget)
 
 ---
 
-## DataTable 전체 상수 목록 (설계 §7)
+## Phase 4 — MasterStrike / PerfectBlock (Design §5)
 
-> 위 Phase 구현 완료 여부와 별개로, 하드코딩된 수치가 있으면 DataTable로 이동한다.
+> **Why first**: A judgement window system for enemy attacks; separate from the existing PerfectParry (timing based on when the player starts guarding), it needs an AnimNotify window based on the enemy attack montage.
+
+- [ ] Add `AnimNotify_StartPerfectBlockWindow` / `AnimNotify_FinishPerfectBlockWindow` to enemy attack montages — defines the judgement window start/end (§5-1)
+- [ ] Show a shield icon UI at the center of the screen during the judgement window (show when the window starts, remove when it ends) (§5-1)
+- [ ] Branch player input within the judgement window: guard input triggers PerfectBlock / attack input in a MasterStrike-capable direction triggers MasterStrike (§5-1)
+- [ ] On PerfectBlock, set player damage to 0 and end (§5-1)
+- [ ] On MasterStrike, don't play the montage immediately on input; at the `AnimNotify_PlayMasterStrikeMontage` point in the enemy attack montage, play the player Riposte montage and enemy hit montage simultaneously (§5-1)
+- [ ] Add `AnimNotify_OnGetRipostedByMasterStrike` to the enemy hit montage — apply damage to the enemy at this point (§5-1)
+- [ ] Add `AnimNotify_OnSuccessMasterStrike` to the player Riposte montage — recover 10 player stamina at this point (§5-1)
+- [ ] MasterStrike damage reuses the unified §1-2-4/1-2-5 damage formula without a separate formula — only needs hooking up to the "MasterStrike" row of `UCombatAttackTypeDataTable` (table already prepared in Phase 2) (§5-2)
+- [ ] Add per-weapon judgement window timing DataTable constants: `MasterStrike_WindowStart` / `MasterStrike_WindowEnd` / `MasterStrike_ColliderActivation` (InGameTime-based, Time Dilation corrected) (§5-1, §7)
+
+---
+
+## Phase 5 — Combo Command Matching System (Design §4)
+
+> **Why first**: The history buffer is only meaningful after automatic direction switching (Phase 3) is done.
+
+- [ ] Add attack history buffer structure (`TArray<EAttackDirection> AttackHistoryBuffer`, max length 3)
+- [ ] On successful attack, append the direction to the buffer + check for pattern matches
+- [ ] Implement buffer reset conditions (getting PerfectBlocked / exceeding `Combo_BufferTimeout`)
+- [ ] DataTable-based combo pattern definitions (`FCombatComboRow`: pattern array + finisher montage + damage value)
+- [ ] Register the 3 basic patterns (Left→Right→Left / Right→Left→Right / Down→Down→Right)
+- [ ] Play finisher montage on successful pattern match
+- [ ] Combo finisher damage: apply the §1-2 unified formula using the "ComboFinisher" row of `UCombatAttackTypeDataTable` — §4-5
+- [ ] Reset combo buffer when PerfectBlocked (finalized rule §3-5)
+- [ ] Enemy counterattack condition on successful enemy PerfectBlock (`Enemy_CounterStaminaThreshold` DataTable constant)
+
+---
+
+## Phase 6 — Movement System (Design §2)
+
+> **Why first**: Lock-on-linked movement to complete the combat feel.
+
+- [ ] Implement Left/Right input → circular strafe movement while locked on (`LockOn_StrafeRadius`, `LockOn_AngularSpeed`)
+- [ ] Add strafe radius / angular speed DataTable
+- [ ] AI multi-enemy surround slot system (`Surround_MaxCloseSlots`, `Surround_CloseSlotRadius`, `Surround_SideAngle`)
+
+---
+
+## Full DataTable Constant List (Design §7)
+
+> Independent of whether the Phases above are complete, move any hardcoded values into a DataTable.
 
 - [ ] `SP_RegenPerSecond`
 - [ ] `SP_RegenDelay`
@@ -115,9 +115,9 @@
 - [ ] `Enemy_CounterStaminaThreshold`
 - [ ] `Combo_BufferTimeout`
 - [ ] `Combo_InputWindow`
-- [ ] `MasterStrike_WindowStart` / `MasterStrike_WindowEnd` / `MasterStrike_ColliderActivation` (무기별)
+- [ ] `MasterStrike_WindowStart` / `MasterStrike_WindowEnd` / `MasterStrike_ColliderActivation` (per weapon)
 - [ ] `PerfectBlock_CounterWindow`
 - [ ] `PerfectBlock_GuaranteedHit`
-- [x] 무기별 찌르기/베기/둔기 데미지 (`UCombatWeaponDamageDataTable`, §1-2-1)
-- [x] 공격 종류별(좌/우/상/하 공격·Riposte·콤보피니셔·MasterStrike) 찌르기/베기/둔기 배율 + 체력 우선 비율 (`UCombatAttackTypeDataTable`, §1-2-2)
-- [x] 방어구 타입별 찌르기/베기/둔기 방어력 (`UCombatDefenseDataTable`, §1-2-3, 플레이어/적 공용)
+- [x] Per-weapon Thrust/Slash/Blunt damage (`UCombatWeaponDamageDataTable`, §1-2-1)
+- [x] Per-attack-type (Left/Right/Up/Down attack, Riposte, combo finisher, MasterStrike) Thrust/Slash/Blunt multipliers + Priority HP Ratio (`UCombatAttackTypeDataTable`, §1-2-2)
+- [x] Per-armor-type Thrust/Slash/Blunt defense (`UCombatDefenseDataTable`, §1-2-3, shared by player and enemies)

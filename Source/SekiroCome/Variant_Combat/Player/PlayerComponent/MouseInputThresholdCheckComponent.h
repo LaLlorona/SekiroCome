@@ -7,8 +7,8 @@
 
 #include "MouseInputThresholdCheckComponent.generated.h"
 
-// 마우스의 프레임별 이동량을 누적하고 시간에 따라 감쇠(leaky accumulator)시켜,
-// 클릭-드래그 없이 상시 추적만으로 상/하/좌/우 "플릭"을 감지하는 컴포넌트.
+// Component that accumulates per-frame mouse movement and decays it over time (leaky accumulator),
+// detecting up/down/left/right "flicks" through continuous tracking alone, without click-and-drag.
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SEKIROCOME_API UMouseInputThresholdCheckComponent : public UActorComponent
 {
@@ -17,16 +17,16 @@ class SEKIROCOME_API UMouseInputThresholdCheckComponent : public UActorComponent
 public:
 	UMouseInputThresholdCheckComponent();
 
-	// 매 프레임 호출. 이번 프레임의 MouseDelta를 누적/감쇠시키고,
-	// TriggerThreshold를 넘으면 누적값을 리셋한 뒤 true와 함께 OutDirection을 채운다.
+	// Called every frame. Accumulates/decays this frame's MouseDelta, and when it exceeds
+	// TriggerThreshold, resets the accumulated value, fills OutDirection, and returns true.
 	bool CustomUpdate(float DeltaTime, const FVector2D& MouseDelta, EAttackDirection& OutDirection);
 
 protected:
-	// 누적값이 시간에 따라 줄어드는 속도. 클수록 마우스를 멈췄을 때 더 빨리 리셋된다.
+	// Rate at which the accumulated value decays over time. Higher values reset faster once the mouse stops.
 	UPROPERTY(EditAnywhere, Category="MouseThreshold")
 	float DecayRate = 8.0f;
 
-	// 누적된 이동량이 이 값을 넘으면 플릭으로 판정한다.
+	// A flick is registered when the accumulated movement exceeds this value.
 	UPROPERTY(EditAnywhere, Category="MouseThreshold")
 	float TriggerThreshold = 40.0f;
 

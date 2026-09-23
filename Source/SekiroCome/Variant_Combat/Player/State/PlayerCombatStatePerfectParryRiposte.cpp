@@ -42,7 +42,7 @@ TOptional<TScriptInterface<IPlayerCombatState>> UPlayerCombatStatePerfectParryRi
 void UPlayerCombatStatePerfectParryRiposte::OnStateEnter()
 {
 	ElapsedTimeFromStateEnter = 0.0f;
-	//ToDO: Montage 재생
+	//ToDO: Play Montage
 	auto stateOwner = InitParam.StateComponentInitializeParameter.OwnerCharacter;
 	/*stateOwner.Get()->PlayMontage(InitParam.StateComponentInitializeParameter.CombatMontageSet->GetRiposteMontage());*/
 	

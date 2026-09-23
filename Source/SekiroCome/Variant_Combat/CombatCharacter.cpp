@@ -236,12 +236,12 @@ void ACombatCharacter::DoAttackTrace(FName DamageSourceBone, EAttackDirection At
 
 void ACombatCharacter::CheckCombo()
 {
-	//CombatCharacter 에서는 일단 사용 안합니다.
+	//Not used in CombatCharacter for now.
 }
 
 void ACombatCharacter::CheckChargedAttack()
 {
-	//CombatCharacter 에서는 일단 사용 안합니다.
+	//Not used in CombatCharacter for now.
 }
 
 FWeaponId ACombatCharacter::GetWeaponID() const

@@ -16,6 +16,6 @@ namespace CombatLogic
 
 	EAttackDirection GetNextAttackDirectionOnBlock(EAttackDirection BlockedAttackDirection);
 
-	/** Basic(non-combo) attack이 진입할 때 사용할 CombatAttackInfoTable RowName의 기본값. AttackDirection만으로 RowName이 정해지지 않는 콤보 등의 경우에는 쓰지 않는다. */
+	/** Default CombatAttackInfoTable RowName used when entering a basic (non-combo) attack. Not used for cases such as combos, where the RowName can't be determined from AttackDirection alone. */
 	FAttackInfoId GetAttackInfoRowNameByDirection(const EAttackDirection AttackDirection);
 }

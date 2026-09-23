@@ -16,7 +16,7 @@ struct FCombatStateParameter
 
 	EAttackDirection StateEnterAttackDirection;
 
-	// Attack 상태로 진입할 때만 채워지는 CombatAttackInfoTable 조회 키. Attack 이외의 State로 전환할 때는 비어있다(TOptional).
+	// CombatAttackInfoTable lookup key, filled only when entering an Attack state. Empty (TOptional) when transitioning to any non-Attack State.
 	TOptional<FAttackInfoId> AttackInfoRowName;
 
 	static FCombatStateParameter CreateWithPreparedAttackDirection(

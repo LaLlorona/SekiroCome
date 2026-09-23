@@ -119,7 +119,7 @@ void UPlayerCombatStateAttack::OnStateEnter()
 			if (Cast<UAnimNotify_AttackTransitionWindowOpened>(NotifyEvent.Notify))
 			{
 				CachedGetComboTransitionWindowTime = (NotifyEvent.GetTriggerTime() - sectionStartTime) / animMontagePlaySpeed;
-				UtilityLogic::PrintString(FString::Printf(TEXT("Transition Time을 찾았습니다: %f"), CachedGetComboTransitionWindowTime));
+				UtilityLogic::PrintString(FString::Printf(TEXT("Found Transition Time: %f"), CachedGetComboTransitionWindowTime));
 			}
 			else if (Cast<UAnimNotify_AttackDirectionChange>(NotifyEvent.Notify))
 			{

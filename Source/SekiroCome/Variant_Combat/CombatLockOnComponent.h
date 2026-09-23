@@ -40,7 +40,7 @@ protected:
 	
 	TWeakObjectPtr<AActor> LockedOnTarget;
 
-	// 직전 CustomUpdate 시점의 타겟 존재 여부. 값이 바뀐 프레임에만 OnLockOnTargetChanged를 Broadcast하기 위한 비교용.
+	// Whether a target existed at the previous CustomUpdate. Used for comparison so OnLockOnTargetChanged is broadcast only on frames where the value changed.
 	bool bWasTargetExist = false;
 
 
@@ -58,7 +58,7 @@ public:
 	/** True if the locked-on target implements ICombatDamageable and its PerfectBlock/MasterStrike judgement window is currently open (§5-1). False if there is no target or it doesn't implement the interface. */
 	bool IsLockOnTargetParryWindowOpen() const;
 
-	// 소유 Character의 Tick에서 명시적으로 호출. 타겟 존재 여부가 실제로 바뀐 경우에만 OnLockOnTargetChanged를 Broadcast한다.
+	// Called explicitly from the owning Character's Tick. Broadcasts OnLockOnTargetChanged only when target existence actually changed.
 	void CustomUpdate();
 
 	UPROPERTY(BlueprintAssignable, Category="Combat")

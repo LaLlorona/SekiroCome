@@ -21,7 +21,7 @@ class SEKIROCOME_API UPlayerCombatStateAttack : public UObject, public IPlayerCo
 	UPROPERTY()
 	FCombatStateParameter InitParam;
 
-	// AttackInput이 눌렸을 때 예약해두는 다음 Attack 상태. 아직 전환 가능 시점이 아니면 GetStateToTransition()에서 대기시킨다.
+	// Next Attack state reserved when AttackInput is pressed. If a transition isn't allowed yet, GetStateToTransition() holds it until it is.
 	UPROPERTY()
 	TScriptInterface<IPlayerCombatState> PendingNextState;
 
@@ -47,14 +47,14 @@ private:
 	float CachedAttackDirectionChangeTime;
 	float CachedAttackStateDurationTime;
 
-	// 이 시점 이후에 눌린 입력만 bAttackInputPressed = true로 반영된다. Notify가 없으면 0.0f로 남아 항상 즉시 허용된다.
+	// Only inputs pressed after this time are reflected as bAttackInputPressed = true. If there is no Notify, it stays 0.0f and input is always accepted immediately.
 	float CachedAttackInputWindowOpenTime;
 
-	// AttackState 진입 이후 SetAttackDirection이 한 번이라도 호출됐는지 여부.
-	// true가 되면 GetNextAttackDirectionOnAttack에 의한 자동 방향 전환을 더 이상 시도하지 않는다.
+	// Whether SetAttackDirection has been called at least once since entering AttackState.
+	// Once true, automatic direction change via GetNextAttackDirectionOnAttack is no longer attempted.
 	bool bAttackDirectionManuallyChanged = false;
 
-	// AttackInput이 눌렸다는 사실만 기억해두는 플래그. 실제 PendingNextState 생성은
-	// CachedGetComboTransitionWindowTime이 지난 시점에 UpdateState에서 수행한다.
+	// Flag that only remembers that AttackInput was pressed. The actual PendingNextState is created
+	// in UpdateState once CachedGetComboTransitionWindowTime has passed.
 	bool bAttackInputPressed = false;
 };

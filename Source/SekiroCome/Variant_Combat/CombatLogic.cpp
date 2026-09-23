@@ -20,7 +20,7 @@ namespace CombatLogic
 {
 	constexpr FDamageData CalculateFinalDamage(const FCombatDamageMultiplierDataRow& DamageMultiplierData, const FCombatWeaponDamageDataRow& WeaponDamageRowData, const FCombatArmorDataRow& ArmorDataRow)
 	{
-		// §1-2-4: 속성별 (무기 데미지 × 공격 종류 배율 - 방어력)에 최소 1 보장(chip damage floor)을 적용한 뒤 합산 (최소 3, 상한 없음)
+		// §1-2-4: For each damage type, apply a minimum of 1 (chip damage floor) to (weapon damage × attack type multiplier - defense), then sum them (minimum 3, no upper limit)
 		const float ThrustContribution = FMath::Max(1.0f, (WeaponDamageRowData.ThrustDamage * DamageMultiplierData.ThrustMultiplier) - ArmorDataRow.ThrustDefense);
 		const float SlashContribution = FMath::Max(1.0f, (WeaponDamageRowData.SlashDamage * DamageMultiplierData.SlashMultiplier) - ArmorDataRow.SlashDefense);
 		const float BluntContribution = FMath::Max(1.0f, (WeaponDamageRowData.BluntDamage * DamageMultiplierData.BluntMultiplier) - ArmorDataRow.BluntDefense);
@@ -50,7 +50,7 @@ namespace CombatLogic
 			{
 				if (ICombatDamageable* AttackerDamageable = Cast<ICombatDamageable>(AttackerActor))
 				{
-					//ToDo: Riposte Animation 재생
+					//ToDo: Play Riposte Animation
 					AttackerDamageable->ApplyDamage(DamageData, AttackerActor, AttackData.DamageLocation, AttackData.DamageImpulse);
 					/*Parryable->*/
 					Parryable->ChangeToRiposteState();

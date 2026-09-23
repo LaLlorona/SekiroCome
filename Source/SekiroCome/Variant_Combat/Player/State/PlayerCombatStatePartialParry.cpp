@@ -42,7 +42,7 @@ TOptional<TScriptInterface<IPlayerCombatState>> UPlayerCombatStatePartialParry::
 void UPlayerCombatStatePartialParry::OnStateEnter()
 {
 	ElapsedTimeFromStateEnter = 0.0f;
-	//ToDO: Montage 재생
+	//ToDO: Play Montage
 	auto stateOwner = InitParam.StateComponentInitializeParameter.OwnerCharacter;
 	/*stateOwner.Get()->PlayMontage(InitParam.StateComponentInitializeParameter.CombatMontageSet->GetPartialParryMontage());*/
 }

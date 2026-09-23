@@ -33,7 +33,7 @@ public:
 	virtual void OnStateEnter() = 0;
 	virtual void OnStateFinish() = 0;
 
-	//AttackInput 버퍼링을 할 수도 있으니, AttackInput 이 눌렸을 때 어떤 행동을 할지 결정합니다.
+	//Decides what to do when AttackInput is pressed, since the state may buffer AttackInput.
 	virtual void OnAttackInputPressed() = 0;
 	virtual TOptional<TScriptInterface<IPlayerCombatState>> GetStateToTransition() = 0;
 };
