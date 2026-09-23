@@ -13,7 +13,7 @@
 - [x] Lock-on component (`UCombatLockOnComponent`)
 - [x] Guard / parry state machine (Idle / Guard / PartialParry / PerfectParryRiposte)
 - [x] PerfectParry timing window (within `RiposteMinimumTimeWindow` after entering Guard)
-- [x] Riposte montage playback (`UCombatMontageSet`)
+- [ ] Riposte montage playback (`UCombatMontageSet`)
 - [x] Attack direction enum (`EAttackDirection`: Up / Down / Left / Right)
 - [x] Movement input → direction conversion (`ECombatInputDirectionEnum`, `GetCombatInputDirection`)
 - [x] Hit resolution logic (`CombatLogic::ResolveAttack` — checks for parry, then applies damage)

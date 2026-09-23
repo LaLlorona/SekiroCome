@@ -14,17 +14,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f51be337-ac21-4bda-b480-9d84c8311602" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/CombatCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/CombatCharacter.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/CombatLockOnComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/CombatLockOnComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/CombatLogic.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/CombatLogic.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/CombatLogic.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/CombatLogic.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/PlayerComponent/MouseInputThresholdCheckComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/PlayerComponent/MouseInputThresholdCheckComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/FCombatStateParameter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/FCombatStateParameter.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatState.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatState.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatStateAttack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatStateAttack.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatStateAttack.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatStateAttack.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatStatePartialParry.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatStatePartialParry.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatStatePerfectParryRiposte.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/SekiroCome/Variant_Combat/Player/State/PlayerCombatStatePerfectParryRiposte.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +28,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://2" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://3" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/SekiroCome/SekiroComeCharacter.cpp" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
@@ -170,7 +160,7 @@
       <workItem from="1783692764838" duration="1062000" />
       <workItem from="1790179493007" duration="28000" />
       <workItem from="1790179554828" duration="29000" />
-      <workItem from="1790179601066" duration="1515000" />
+      <workItem from="1790179601066" duration="2039000" />
     </task>
     <servers />
   </component>
