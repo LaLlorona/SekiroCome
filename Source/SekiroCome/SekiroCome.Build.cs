@@ -30,19 +30,12 @@ public class SekiroCome : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] {
 			"SekiroCome",
-			"SekiroCome/Variant_Platforming",
-			"SekiroCome/Variant_Platforming/Animation",
 			"SekiroCome/Variant_Combat",
 			"SekiroCome/Variant_Combat/AI",
 			"SekiroCome/Variant_Combat/Animation",
 			"SekiroCome/Variant_Combat/Gameplay",
 			"SekiroCome/Variant_Combat/Interfaces",
 			"SekiroCome/Variant_Combat/UI",
-			"SekiroCome/Variant_SideScrolling",
-			"SekiroCome/Variant_SideScrolling/AI",
-			"SekiroCome/Variant_SideScrolling/Gameplay",
-			"SekiroCome/Variant_SideScrolling/Interfaces",
-			"SekiroCome/Variant_SideScrolling/UI"
 		});
 
 		// Uncomment if you are using Slate UI
